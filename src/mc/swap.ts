@@ -1,13 +1,14 @@
+import { MultipleChoice } from './mc'
+
 /**
  *
- * @param original The original mc wanna to be computed the swapped versions
- * @param lockedSelectors A set of selectors that should not be swapped
- * @returns A set of mc where choices are significant swapped, while keeping the choices of locked selectors unchanged
+ * @param originalMc The original mc wanna to be computed the swapped versions
+ * @param lockedChoices A set of indices of choices that are locked and should not be swapped
+ * @returns A set of mc where choices are significant swapped, while keeping those in lockedChoices unchanged
  */
-
-export function getSignificantSwappedMc<T extends SelectorIdType>(
-  original: MultipleChoice<T>,
-  lockedSelectors?: Set<T>,
-): Set<MultipleChoice<T>> {
+export function getSignificantSwappedMc(
+  originalMc: MultipleChoice,
+  lockedChoices?: Set<number>,
+): Set<MultipleChoice> {
   return new Set()
 }

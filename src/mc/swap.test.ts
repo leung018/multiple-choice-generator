@@ -1,32 +1,11 @@
 import { getSignificantSwappedMc } from './swap'
+import { MultipleChoice } from './mc'
 
 describe('getSignificantSwappedMc', () => {
   it('compute swaps for two choices', () => {
-    const mc: MultipleChoice<'a' | 'b'> = {
-      choices: {
-        a: {
-          description: 'Apple',
-        },
-        b: {
-          description: 'Banana',
-        },
-      },
-      answer: 'a',
-    }
+    const mc = new MultipleChoice(['a', 'b'], 0)
     expect(getSignificantSwappedMc(mc)).toEqual(
-      new Set([
-        {
-          choices: {
-            a: {
-              description: 'Banana',
-            },
-            b: {
-              description: 'Apple',
-            },
-          },
-          answer: 'b',
-        },
-      ]),
+      new Set([new MultipleChoice(['b', 'a'], 1)]),
     )
   })
 })

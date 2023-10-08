@@ -1,15 +1,6 @@
-interface MultipleChoiceQuestion<T extends SelectorIdType> {
+import { MultipleChoice } from './mc'
+
+interface MultipleChoiceQuestion {
   title: string
-  mc: MultipleChoice<T>
-}
-
-interface MultipleChoice<T extends SelectorIdType> {
-  choices: Record<T, Choice>
-  answer: T
-}
-
-type SelectorIdType = string | number
-
-interface Choice {
-  description: string
+  mc: MultipleChoice
 }
