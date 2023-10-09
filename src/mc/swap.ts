@@ -26,7 +26,7 @@ class MultipleChoiceSwapper {
 
   constructor(originalMc: MultipleChoice, lockedChoices?: Set<number>) {
     this.originalChoices = originalMc.choices
-    this.correctChoice = originalMc.choices[originalMc.correctIndex]
+    this.correctChoice = originalMc.choices[originalMc.correctChoiceIndex]
   }
 
   getSignificantSwappedMc(): Set<MultipleChoice> {
