@@ -1,3 +1,4 @@
+import { getPermutations } from '../utils/permutation'
 import { MultipleChoice } from './mc'
 
 /**
@@ -13,10 +14,42 @@ export function getSignificantSwappedMc(
   originalMc: MultipleChoice,
   lockedChoices?: Set<number>,
 ): Set<MultipleChoice> {
-  return new Set([
-    new MultipleChoice(
-      [...originalMc.choices].reverse(),
-      originalMc.correctIndex ? 0 : 1,
-    ),
-  ])
+  return new MultipleChoiceSwapper(
+    originalMc,
+    lockedChoices,
+  ).getSignificantSwappedMc()
+}
+
+class MultipleChoiceSwapper {
+  private readonly originalChoices: ReadonlyArray<string>
+  private readonly correctChoice: string
+
+  constructor(originalMc: MultipleChoice, lockedChoices?: Set<number>) {
+    this.originalChoices = originalMc.choices
+    this.correctChoice = originalMc.choices[originalMc.correctIndex]
+  }
+
+  getSignificantSwappedMc(): Set<MultipleChoice> {
+    const allPossibleChoices = getPermutations(this.originalChoices)
+    const significantSwappedChoices = Array.from(allPossibleChoices).filter(
+      this.areSignificantlySwapped,
+    )
+    return new Set(significantSwappedChoices.map(this.mapToMc))
+  }
+
+  private areSignificantlySwapped = (
+    choices: ReadonlyArray<string>,
+  ): boolean => {
+    for (let i = 0; i < choices.length; i++) {
+      if (choices[i] === this.originalChoices[i]) return false
+    }
+    return true
+  }
+
+  private mapToMc = (choices: ReadonlyArray<string>): MultipleChoice => {
+    const correctChoiceIndex = choices.findIndex(
+      (c) => c === this.correctChoice,
+    )
+    return new MultipleChoice(choices, correctChoiceIndex)
+  }
 }
