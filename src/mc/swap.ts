@@ -1,26 +1,26 @@
 import { getPermutations } from '../utils/permutation'
 import { MultipleChoice } from './mc'
 
-/**
- * Computes a set of MultipleChoice objects where the choices are significantly swapped.
- * Significantly swapped means that each choice is in a different position from the original MultipleChoice object,
- * except for those choices that are locked and should not be swapped.
- *
- * @param originalMc The original MultipleChoice object to be used as the basis for the swaps.
- * @param lockedChoices A set of indices of choices that are locked and should not be swapped.
- * @returns A set of MultipleChoice objects where the choices are significantly swapped.
- */
-export function getSignificantSwappedMc(
-  originalMc: MultipleChoice,
-  lockedChoices?: Set<number>,
-): Set<MultipleChoice> {
-  return new MultipleChoiceSwapper(
-    originalMc,
-    lockedChoices,
-  ).getSignificantSwappedMc()
-}
+export class MultipleChoiceSwapper {
+  /**
+   * Computes a set of MultipleChoice objects where the choices are significantly swapped.
+   * Significantly swapped means that each choice is in a different position from the original MultipleChoice object,
+   * except for those choices that are locked and should not be swapped.
+   *
+   * @param originalMc The original MultipleChoice object to be used as the basis for the swaps.
+   * @param lockedChoices A set of indices of choices that are locked and should not be swapped.
+   * @returns A set of MultipleChoice objects where the choices are significantly swapped.
+   */
+  static getSignificantlySwapped(
+    originalMc: MultipleChoice,
+    lockedChoices?: Set<number>,
+  ): Set<MultipleChoice> {
+    return new MultipleChoiceSwapper(
+      originalMc,
+      lockedChoices,
+    ).getSignificantlySwapped()
+  }
 
-class MultipleChoiceSwapper {
   private readonly originalChoices: ReadonlyArray<string>
   private readonly correctChoice: string
 
@@ -29,7 +29,7 @@ class MultipleChoiceSwapper {
     this.correctChoice = originalMc.choices[originalMc.correctChoiceIndex]
   }
 
-  getSignificantSwappedMc(): Set<MultipleChoice> {
+  private getSignificantlySwapped(): Set<MultipleChoice> {
     const allPossibleChoices = getPermutations(this.originalChoices)
     const significantSwappedChoices = Array.from(allPossibleChoices).filter(
       this.areSignificantlySwapped,
