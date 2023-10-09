@@ -36,4 +36,28 @@ describe('MultipleChoiceSwapper.getSignificantlySwapped', () => {
       ]),
     )
   })
+
+  it('should ignore lockedChoiceIndices when they are out of range', () => {
+    const mc = new MultipleChoice(['a', 'b'], 1)
+    const lockedChoiceIndices = new Set([2])
+    expect(
+      MultipleChoiceSwapper.getSignificantlySwapped(mc, lockedChoiceIndices),
+    ).toEqual(new Set([new MultipleChoice(['b', 'a'], 0)]))
+  })
+
+  it('should return same set when lockedChoiceIndices contain all choices', () => {
+    const mc = new MultipleChoice(['a', 'b', 'c'], 2)
+    const lockedChoiceIndices = new Set([0, 1, 2])
+    expect(
+      MultipleChoiceSwapper.getSignificantlySwapped(mc, lockedChoiceIndices),
+    ).toEqual(new Set([mc]))
+  })
+
+  it('should return empty set when lockedChoiceIndices contain all choices except one', () => {
+    const mc = new MultipleChoice(['a', 'b', 'c'], 0)
+    const lockedChoiceIndices = new Set([0, 1])
+    expect(
+      MultipleChoiceSwapper.getSignificantlySwapped(mc, lockedChoiceIndices),
+    ).toEqual(new Set())
+  })
 })
