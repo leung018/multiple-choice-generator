@@ -1,7 +1,6 @@
-name: CI
 on: [push]
 jobs:
-  setup:
+  checks:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -10,21 +9,9 @@ jobs:
         with:
           node-version: '18.x'
       - run: yarn install --immutable --immutable-cache # If accept PR from third party in future, please also add --check-cache
-
-  lint:
-    needs: setup
-    runs-on: ubuntu-latest
-    steps:
-      - run: yarn lint
-
-  format-check:
-    needs: setup
-    runs-on: ubuntu-latest
-    steps:
-      - run: yarn format:check
-
-  tests:
-    needs: setup
-    runs-on: ubuntu-latest
-    steps:
-      - run: yarn test
+      - name: Linting
+        run: yarn lint
+      - name: Check formatting
+        run: yarn format:check
+      - name: Run tests
+        run: yarn test
