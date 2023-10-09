@@ -1,21 +1,19 @@
 export function getPermutations<E>(
   input: ReadonlyArray<E>,
 ): Set<ReadonlyArray<E>> {
-  // TODO: Don't hardcode
+  if (input.length === 0) return new Set()
+  if (input.length === 1) return new Set([input])
 
-  if (input.length === 2)
-    return new Set([
-      [input[1], input[0]],
-      [input[0], input[1]],
-    ])
-  else if (input.length === 3)
-    return new Set([
-      [input[0], input[1], input[2]],
-      [input[0], input[2], input[1]],
-      [input[1], input[2], input[0]],
-      [input[1], input[0], input[2]],
-      [input[2], input[0], input[1]],
-      [input[2], input[1], input[0]],
-    ])
-  else throw new Error('Not implemented')
+  const resultSet = new Set<ReadonlyArray<E>>()
+
+  for (let i = 0; i < input.length; i++) {
+    const element = input[i]
+    const rest = input.slice(0, i).concat(input.slice(i + 1))
+    const permutationsOfRest = getPermutations(rest)
+    permutationsOfRest.forEach((permutation) => {
+      resultSet.add([element].concat(permutation))
+    })
+  }
+
+  return resultSet
 }
