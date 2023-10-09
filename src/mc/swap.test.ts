@@ -18,4 +18,22 @@ describe('MultipleChoiceSwapper.getSignificantlySwapped', () => {
       ]),
     )
   })
+
+  it('should further limit output when lockedChoiceIndices have one element', () => {
+    const mc = new MultipleChoice(
+      ['Apple only', 'Banana only', 'None of the above'],
+      1,
+    )
+    const lockedChoiceIndices = new Set([2])
+    expect(
+      MultipleChoiceSwapper.getSignificantlySwapped(mc, lockedChoiceIndices),
+    ).toEqual(
+      new Set([
+        new MultipleChoice(
+          ['Banana only', 'Apple only', 'None of the above'],
+          0,
+        ),
+      ]),
+    )
+  })
 })

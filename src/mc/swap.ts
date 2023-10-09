@@ -8,25 +8,44 @@ export class MultipleChoiceSwapper {
    * except for those choices that are locked and should not be swapped.
    *
    * @param originalMc The original MultipleChoice object to be used as the basis for the swaps.
-   * @param lockedChoices A set of indices of choices that are locked and should not be swapped.
+   * @param lockedChoiceIndices A set of indices of choices that are locked and should not be swapped.
    * @returns A set of MultipleChoice objects where the choices are significantly swapped.
    */
   static getSignificantlySwapped(
     originalMc: MultipleChoice,
-    lockedChoices?: Set<number>,
+    lockedChoiceIndices: ReadonlySet<number> = new Set(),
   ): Set<MultipleChoice> {
     return new MultipleChoiceSwapper(
       originalMc,
-      lockedChoices,
+      lockedChoiceIndices,
     ).getSignificantlySwapped()
   }
 
   private readonly originalChoices: ReadonlyArray<string>
+  private readonly lockedChoiceToOriginalIndexMap: ReadonlyMap<string, number>
   private readonly correctChoice: string
 
-  constructor(originalMc: MultipleChoice, lockedChoices?: Set<number>) {
+  constructor(
+    originalMc: MultipleChoice,
+    lockedChoiceIndices: ReadonlySet<number>,
+  ) {
     this.originalChoices = originalMc.choices
     this.correctChoice = originalMc.choices[originalMc.correctChoiceIndex]
+    this.lockedChoiceToOriginalIndexMap = this.chosenChoicesToIndexMap(
+      lockedChoiceIndices,
+      this.originalChoices,
+    )
+  }
+
+  private chosenChoicesToIndexMap(
+    chosenIndices: ReadonlySet<number>,
+    choices: ReadonlyArray<string>,
+  ): ReadonlyMap<string, number> {
+    const map = new Map<string, number>()
+    chosenIndices.forEach((index) => {
+      map.set(choices[index], index)
+    })
+    return map
   }
 
   private getSignificantlySwapped(): Set<MultipleChoice> {
@@ -41,6 +60,14 @@ export class MultipleChoiceSwapper {
     choices: ReadonlyArray<string>,
   ): boolean => {
     for (let i = 0; i < choices.length; i++) {
+      const choice = choices[i]
+      if (this.lockedChoiceToOriginalIndexMap.has(choice)) {
+        if (this.lockedChoiceToOriginalIndexMap.get(choice) != i) {
+          return false
+        } else {
+          continue
+        }
+      }
       if (choices[i] === this.originalChoices[i]) return false
     }
     return true
