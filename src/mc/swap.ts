@@ -10,5 +10,10 @@ export function getSignificantSwappedMc(
   originalMc: MultipleChoice,
   lockedChoices?: Set<number>,
 ): Set<MultipleChoice> {
-  return new Set()
+  return new Set([
+    new MultipleChoice(
+      [...originalMc.choices].reverse(),
+      originalMc.correctIndex ? 0 : 1,
+    ),
+  ])
 }
