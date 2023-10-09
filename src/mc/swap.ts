@@ -25,7 +25,7 @@ export class MultipleChoiceSwapper {
   private readonly lockedChoiceToOriginalIndexMap: ReadonlyMap<string, number>
   private readonly correctChoice: string
 
-  constructor(
+  private constructor(
     originalMc: MultipleChoice,
     lockedChoiceIndices: ReadonlySet<number>,
   ) {
