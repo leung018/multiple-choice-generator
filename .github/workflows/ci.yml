@@ -8,6 +8,7 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: '18.x'
+          cache: 'yarn'
       - run: yarn install --immutable --immutable-cache # If accept PR from third party in future, please also add --check-cache
       - name: Linting
         run: yarn lint
