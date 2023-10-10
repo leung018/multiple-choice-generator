@@ -25,7 +25,9 @@ const toThrowCustomError: MatcherFunction<
     return {
       pass: false,
       message: () =>
-        `Expected constructor: ${expectedConstructor}\n\nReceived function did not throw`,
+        `Expected constructor: ${this.utils.printExpected(
+          expectedConstructor,
+        )}\nReceived function did not throw`,
     }
   }
   if (!(error instanceof expectedErrorType)) {
@@ -34,7 +36,11 @@ const toThrowCustomError: MatcherFunction<
       message: () => {
         const receivedConstructor = error?.constructor.name
 
-        return `Expected constructor: ${expectedConstructor}\n\nReceived constructor: ${receivedConstructor}`
+        return `Expected constructor: ${this.utils.printExpected(
+          expectedConstructor,
+        )}\nReceived constructor: ${this.utils.printReceived(
+          receivedConstructor,
+        )}`
       },
     }
   }
@@ -47,7 +53,11 @@ const toThrowCustomError: MatcherFunction<
       message: () => {
         const receivedErrorCode = (error as CustomBaseError).cause.code
 
-        return `Expected error code: "${expectedErrorCode}"\n\nReceived error code: "${receivedErrorCode}"`
+        return `Expected error code: "${this.utils.printExpected(
+          expectedErrorCode,
+        )}"\nReceived error code: "${this.utils.printReceived(
+          receivedErrorCode,
+        )}"`
       },
     }
   }
