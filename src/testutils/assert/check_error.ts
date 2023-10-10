@@ -5,8 +5,8 @@ import { CustomBaseError } from '../../utils/err'
 type Newable<T> = { new (...args: any[]): T }
 
 const toThrowCustomError: MatcherFunction<
-  [expectedErrorType: Newable<CustomBaseError>, expectedCode?: string]
-> = function (received, expectedErrorType, expectedCode) {
+  [expectedErrorType: Newable<CustomBaseError>, expectedErrorCode?: string]
+> = function (received, expectedErrorType, expectedErrorCode) {
   if (typeof received !== 'function') {
     throw new Error('This should be type function!')
   }
@@ -39,13 +39,16 @@ const toThrowCustomError: MatcherFunction<
       },
     }
   }
-  if (expectedCode !== undefined && error.cause.code !== expectedCode) {
+  if (
+    expectedErrorCode !== undefined &&
+    error.cause.code !== expectedErrorCode
+  ) {
     return {
       pass: false,
       message: () => {
         const receivedErrorCode = (error as CustomBaseError).cause.code
 
-        return `Expected error code: "${expectedCode}"\n\nReceived error code: "${receivedErrorCode}"`
+        return `Expected error code: "${expectedErrorCode}"\n\nReceived error code: "${receivedErrorCode}"`
       },
     }
   }
