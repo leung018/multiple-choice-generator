@@ -57,18 +57,18 @@ export class MultipleChoiceSwapper {
   }
 
   private areSignificantlySwapped = (
-    choices: ReadonlyArray<string>,
+    newChoices: ReadonlyArray<string>,
   ): boolean => {
-    for (let i = 0; i < choices.length; i++) {
-      const choice = choices[i]
-      if (this.lockedChoiceToOriginalIndexMap.has(choice)) {
-        if (this.lockedChoiceToOriginalIndexMap.get(choice) != i) {
+    for (let i = 0; i < newChoices.length; i++) {
+      const newChoice = newChoices[i]
+      if (this.lockedChoiceToOriginalIndexMap.has(newChoice)) {
+        if (this.lockedChoiceToOriginalIndexMap.get(newChoice) != i) {
           return false
         } else {
           continue
         }
       }
-      if (choices[i] === this.originalChoices[i]) return false
+      if (newChoice === this.originalChoices[i]) return false
     }
     return true
   }
