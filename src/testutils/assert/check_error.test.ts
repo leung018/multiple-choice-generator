@@ -26,7 +26,7 @@ describe('toThrowCustomError', () => {
   it('should pass if it throws the target exception', () => {
     expect(() => {
       expect(() => {
-        throw new TestError('TEST_ERROR')
+        throw new TestError('DUMMY_CODE')
       }).toThrowCustomError(TestError)
     }).not.toThrowError()
   })
