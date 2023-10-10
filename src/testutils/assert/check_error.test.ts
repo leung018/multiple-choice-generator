@@ -13,7 +13,7 @@ describe('toThrowCustomError', () => {
     )
   })
 
-  it('should fails if it is not target exception', () => {
+  it('should fail if it is not target exception', () => {
     expect(() => {
       expect(() => {
         throw new Error('Not a TestError')
