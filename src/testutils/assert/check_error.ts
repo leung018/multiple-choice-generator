@@ -26,7 +26,7 @@ const toThrowCustomError: MatcherFunction<
     return {
       pass: false,
       message: () =>
-        `Expected constructor: ${expectedConstructor}\nReceived function did not throw`,
+        `Expected constructor: ${expectedConstructor}\n\nReceived function did not throw`,
     }
   }
   if (!(error instanceof expectedErrorType)) {
@@ -35,7 +35,7 @@ const toThrowCustomError: MatcherFunction<
       message: () => {
         const receivedConstructor = error?.constructor.name
 
-        return `Expected constructor: ${expectedConstructor}\nReceived constructor: ${receivedConstructor}`
+        return `Expected constructor: ${expectedConstructor}\n\nReceived constructor: ${receivedConstructor}`
       },
     }
   }

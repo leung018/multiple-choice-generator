@@ -9,7 +9,7 @@ describe('toThrowCustomError', () => {
     expect(() => {
       expect(() => {}).toThrowCustomError(TestError)
     }).toThrowError(
-      'Expected constructor: TestError\nReceived function did not throw',
+      'Expected constructor: TestError\n\nReceived function did not throw',
     )
   })
 
@@ -19,7 +19,7 @@ describe('toThrowCustomError', () => {
         throw new Error('Not a TestError')
       }).toThrowCustomError(TestError)
     }).toThrowError(
-      'Expected constructor: TestError\nReceived constructor: Error',
+      'Expected constructor: TestError\n\nReceived constructor: Error',
     )
   })
 
