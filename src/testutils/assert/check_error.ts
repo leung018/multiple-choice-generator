@@ -64,7 +64,7 @@ const toThrowCustomError: MatcherFunction<
 
   return {
     pass: true,
-    message: () => 'Expected not to throw {}',
+    message: () => 'Expected thrown error',
   }
 }
 
