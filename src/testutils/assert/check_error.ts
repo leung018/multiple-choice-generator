@@ -39,8 +39,16 @@ const toThrowCustomError: MatcherFunction<
       },
     }
   }
+  if (expectedCode !== undefined && error.cause.code !== expectedCode) {
+    return {
+      pass: false,
+      message: () => {
+        const receivedErrorCode = (error as CustomBaseError).cause.code
 
-  // TODO: check error code
+        return `Expected error code: "${expectedCode}"\n\nReceived error code: "${receivedErrorCode}"`
+      },
+    }
+  }
 
   return {
     pass: true,

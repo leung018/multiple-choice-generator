@@ -30,4 +30,22 @@ describe('toThrowCustomError', () => {
       }).toThrowCustomError(TestError)
     }).not.toThrowError()
   })
+
+  it('should pass if it throws the target exception with expected code', () => {
+    expect(() => {
+      expect(() => {
+        throw new TestError('TEST_CODE')
+      }).toThrowCustomError(TestError, 'TEST_CODE')
+    }).not.toThrowError()
+  })
+
+  it('should fail if it throws the target exception with unexpected code', () => {
+    expect(() => {
+      expect(() => {
+        throw new TestError('UNEXPECTED_CODE')
+      }).toThrowCustomError(TestError, 'EXPECTED_CODE')
+    }).toThrowError(
+      'Expected error code: "EXPECTED_CODE"\n\nReceived error code: "UNEXPECTED_CODE"',
+    )
+  })
 })
