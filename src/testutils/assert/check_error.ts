@@ -1,8 +1,7 @@
 import { expect } from '@jest/globals'
 import type { MatcherFunction } from 'expect'
 import { CustomBaseError } from '../../utils/err'
-
-type Newable<T> = { new (...args: any[]): T }
+import { Newable } from '@/utils/newable'
 
 const toThrowCustomError: MatcherFunction<
   [expectedErrorType: Newable<CustomBaseError>, expectedErrorCode?: string]
