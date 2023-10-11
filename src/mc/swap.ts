@@ -77,6 +77,6 @@ export class MultipleChoiceSwapper {
     const correctChoiceIndex = choices.findIndex(
       (c) => c === this.correctChoice,
     )
-    return new MultipleChoice(choices, correctChoiceIndex)
+    return new MultipleChoice({ choices, correctChoiceIndex })
   }
 }
