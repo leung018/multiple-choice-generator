@@ -12,10 +12,24 @@ export class MultipleChoice {
   }
 
   constructor(choices: ReadonlyArray<string>, correctIndex: number) {
-    this.validateChoices(choices)
+    this.validateInput(choices, correctIndex)
 
     this.choices = choices
     this.correctChoiceIndex = correctIndex
+  }
+
+  private validateInput(
+    choices: ReadonlyArray<string>,
+    correctChoiceIndex: number,
+  ) {
+    this.validateChoices(choices)
+
+    if (correctChoiceIndex < 0 || correctChoiceIndex >= choices.length) {
+      throw new MultipleChoiceError(
+        'INVALID_INDEX',
+        'MultipleChoice correctChoiceIndex must be within range of choices',
+      )
+    }
   }
 
   private validateChoices(choices: ReadonlyArray<string>): void {
@@ -28,7 +42,7 @@ export class MultipleChoice {
   }
 }
 
-type MultipleChoiceErrorCode = 'DUPLICATE_CHOICES'
+type MultipleChoiceErrorCode = 'DUPLICATE_CHOICES' | 'INVALID_INDEX'
 
 export class MultipleChoiceError extends CustomBaseError {
   constructor(code: MultipleChoiceErrorCode, message?: string) {

@@ -10,4 +10,22 @@ describe('MultipleChoice', () => {
       })
     }).toThrowCustomError(MultipleChoiceError, 'DUPLICATE_CHOICES')
   })
+
+  it('should reject invalid correctChoiceIndex', () => {
+    expect(() => {
+      new MultipleChoice(['a', 'b'], 3)
+    }).toThrowCustomError(MultipleChoiceError, 'INVALID_INDEX')
+    expect(() => {
+      new MultipleChoice(['a', 'b'], -1)
+    }).toThrowCustomError(MultipleChoiceError, 'INVALID_INDEX')
+  })
+
+  it('should accept valid correctChoiceIndex', () => {
+    expect(() => {
+      new MultipleChoice(['a', 'b'], 0)
+    }).not.toThrow()
+    expect(() => {
+      new MultipleChoice(['a', 'b'], 1)
+    }).not.toThrow()
+  })
 })
