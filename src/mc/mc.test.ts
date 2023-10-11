@@ -13,19 +13,19 @@ describe('MultipleChoice', () => {
 
   it('should reject invalid correctChoiceIndex', () => {
     expect(() => {
-      new MultipleChoice(['a', 'b'], 3)
+      new MultipleChoice({ choices: ['a', 'b'], correctChoiceIndex: 3 })
     }).toThrowCustomError(MultipleChoiceError, 'INVALID_INDEX')
     expect(() => {
-      new MultipleChoice(['a', 'b'], -1)
+      new MultipleChoice({ choices: ['a', 'b'], correctChoiceIndex: -1 })
     }).toThrowCustomError(MultipleChoiceError, 'INVALID_INDEX')
   })
 
   it('should accept valid correctChoiceIndex', () => {
     expect(() => {
-      new MultipleChoice(['a', 'b'], 0)
+      new MultipleChoice({ choices: ['a', 'b'], correctChoiceIndex: 0 })
     }).not.toThrow()
     expect(() => {
-      new MultipleChoice(['a', 'b'], 1)
+      new MultipleChoice({ choices: ['a', 'b'], correctChoiceIndex: 1 })
     }).not.toThrow()
   })
 })

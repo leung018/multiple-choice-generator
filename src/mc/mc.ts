@@ -1,5 +1,10 @@
 import { CustomBaseError } from '../utils/err'
 
+interface MultipleChoiceInput {
+  choices: ReadonlyArray<string>
+  correctChoiceIndex: number
+}
+
 export class MultipleChoice {
   readonly choices: ReadonlyArray<string>
   readonly correctChoiceIndex: number
@@ -8,23 +13,23 @@ export class MultipleChoice {
     choices = ['a', 'b'],
     correctChoiceIndex = 0,
   } = {}): MultipleChoice {
-    return new MultipleChoice(choices, correctChoiceIndex)
+    return new MultipleChoice({ choices, correctChoiceIndex })
   }
 
-  constructor(choices: ReadonlyArray<string>, correctIndex: number) {
-    this.validateInput(choices, correctIndex)
+  constructor(input: MultipleChoiceInput) {
+    this.validateInput(input)
 
-    this.choices = choices
-    this.correctChoiceIndex = correctIndex
+    this.choices = input.choices
+    this.correctChoiceIndex = input.correctChoiceIndex
   }
 
-  private validateInput(
-    choices: ReadonlyArray<string>,
-    correctChoiceIndex: number,
-  ) {
-    this.validateChoices(choices)
+  private validateInput(input: MultipleChoiceInput) {
+    this.validateChoices(input.choices)
 
-    if (correctChoiceIndex < 0 || correctChoiceIndex >= choices.length) {
+    if (
+      input.correctChoiceIndex < 0 ||
+      input.correctChoiceIndex >= input.choices.length
+    ) {
       throw new MultipleChoiceError(
         'INVALID_INDEX',
         'MultipleChoice correctChoiceIndex must be within range of choices',
