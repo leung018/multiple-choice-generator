@@ -12,6 +12,8 @@ jobs:
       - run: yarn install --immutable --immutable-cache # If accept PR from third party in future, please also add --check-cache
       - name: Linting
         run: yarn lint
+      - name: Type checking
+        run: yarn ts:check
       - name: Check formatting
         run: yarn format:check
       - name: Run tests
