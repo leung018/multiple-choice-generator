@@ -1,15 +1,11 @@
 import { MultipleChoice, MultipleChoiceError } from './mc'
+import { expect } from '@jest/globals'
+import '../testutils/assert/check_error'
 
 describe('MultipleChoice', () => {
   it('should reject duplicate choices', () => {
-    try {
+    expect(() => {
       new MultipleChoice(['a', 'a'], 0)
-    } catch (err) {
-      if (err instanceof MultipleChoiceError) {
-        expect(err.cause.code).toBe('DUPLICATE_CHOICES')
-      } else {
-        throw new Error('Expected MultipleChoiceError')
-      }
-    }
+    }).toThrowCustomError(MultipleChoiceError, 'DUPLICATE_CHOICES')
   })
 })
