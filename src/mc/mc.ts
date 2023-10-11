@@ -4,6 +4,13 @@ export class MultipleChoice {
   readonly choices: ReadonlyArray<string>
   readonly correctChoiceIndex: number
 
+  static createTestInstance({
+    choices = ['a', 'b'],
+    correctChoiceIndex = 0,
+  } = {}): MultipleChoice {
+    return new MultipleChoice(choices, correctChoiceIndex)
+  }
+
   constructor(choices: ReadonlyArray<string>, correctIndex: number) {
     this.validateChoices(choices)
 

@@ -46,7 +46,9 @@ describe('MultipleChoiceSwapper.getSignificantlySwapped', () => {
   })
 
   it('should return same set when lockedChoiceIndices contain all choices', () => {
-    const mc = new MultipleChoice(['a', 'b', 'c'], 2)
+    const mc = MultipleChoice.createTestInstance({
+      choices: ['a', 'b', 'c'],
+    })
     const lockedChoiceIndices = new Set([0, 1, 2])
     expect(
       MultipleChoiceSwapper.getSignificantlySwapped(mc, lockedChoiceIndices),
@@ -54,7 +56,9 @@ describe('MultipleChoiceSwapper.getSignificantlySwapped', () => {
   })
 
   it('should return empty set when lockedChoiceIndices contain all choices except one', () => {
-    const mc = new MultipleChoice(['a', 'b', 'c'], 0)
+    const mc = MultipleChoice.createTestInstance({
+      choices: ['a', 'b', 'c'],
+    })
     const lockedChoiceIndices = new Set([0, 1])
     expect(
       MultipleChoiceSwapper.getSignificantlySwapped(mc, lockedChoiceIndices),
