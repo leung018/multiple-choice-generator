@@ -28,4 +28,13 @@ describe('MultipleChoice', () => {
       new MultipleChoice({ choices: ['a', 'b'], correctChoiceIndex: 1 })
     }).not.toThrow()
   })
+
+  it('should set choices and correctChoiceIndex', () => {
+    const mc = new MultipleChoice({
+      choices: ['a', 'b'],
+      correctChoiceIndex: 1,
+    })
+    expect(mc.choices).toEqual(['a', 'b'])
+    expect(mc.correctChoiceIndex).toBe(1)
+  })
 })
