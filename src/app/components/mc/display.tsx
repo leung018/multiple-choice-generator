@@ -11,7 +11,7 @@ export default function MultipleChoicePage({
     <div className="p-4">
       {questions.map((question, index) => (
         <div key={index} className="mb-4">
-          <p className="font-bold">{question.title}</p>
+          <p className="font-bold whitespace-pre-line">{question.title}</p>
           <div className="ml-4">
             {question.mc.choices.map((choice, index) => (
               <label key={index} className="flex items-center mb-2">
