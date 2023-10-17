@@ -1,6 +1,6 @@
 import { MultipleChoice } from './mc'
 
-interface MultipleChoiceQuestion {
+export interface MultipleChoiceQuestion {
   title: string
   mc: MultipleChoice
 }
