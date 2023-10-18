@@ -55,7 +55,6 @@ describe('MultipleChoicePage', () => {
     const choice1 = getByLabelText('Choice 1')
     const choice2 = getByLabelText('Choice 2')
 
-    expect(choice1).not.toBeChecked()
     choice1.click()
     expect(choice1).toBeChecked()
 
@@ -90,5 +89,24 @@ describe('MultipleChoicePage', () => {
 
     expect(question1ChoiceA).toBeChecked()
     expect(question2ChoiceB).toBeChecked()
+  })
+
+  it('should are choices unchecked at the beginning', () => {
+    const { getByLabelText } = render(
+      <MultipleChoicePage
+        questions={[
+          MultipleChoiceQuestionFactory.createTestInstance({
+            mc: MultipleChoice.createTestInstance({
+              choices: ['Choice 1', 'Choice 2'],
+            }),
+          }),
+        ]}
+      />,
+    )
+    const choice1 = getByLabelText('Choice 1')
+    const choice2 = getByLabelText('Choice 2')
+
+    expect(choice1).not.toBeChecked()
+    expect(choice2).not.toBeChecked()
   })
 })
