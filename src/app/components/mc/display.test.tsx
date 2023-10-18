@@ -8,7 +8,7 @@ import '@testing-library/jest-dom'
 import MultipleChoicePage from './display'
 
 describe('MultipleChoicePage', () => {
-  it("should render MultipleChoiceQuestion's title and choices", () => {
+  it('should render title and choices of a question', () => {
     const question: MultipleChoiceQuestion = {
       title: 'Sample Question?',
       mc: MultipleChoice.createTestInstance({
