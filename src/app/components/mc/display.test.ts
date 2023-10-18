@@ -19,4 +19,23 @@ describe('MultipleChoicePage', () => {
     expect(getByLabelText('Answer 1')).toBeInTheDocument()
     expect(getByLabelText('Answer 2')).toBeInTheDocument()
   })
+
+  it('should render multiple questions', () => {
+    const { getByText } = render(
+      MultipleChoicePage({
+        questions: [
+          {
+            title: 'Question 1',
+            mc: MultipleChoice.createTestInstance(),
+          },
+          {
+            title: 'Question 2',
+            mc: MultipleChoice.createTestInstance(),
+          },
+        ],
+      }),
+    )
+    expect(getByText('Question 1')).toBeInTheDocument()
+    expect(getByText('Question 2')).toBeInTheDocument()
+  })
 })
