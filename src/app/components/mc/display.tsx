@@ -4,6 +4,7 @@ interface MultipleChoicePageProps {
   questions: MultipleChoiceQuestion[]
 }
 
+// TODO: Noted that won't test the rendering of mc selector and submit button by now. Test that part later in the feature of submitting the answer is more meaningful.
 export default function MultipleChoicePage({
   questions,
 }: MultipleChoicePageProps) {
