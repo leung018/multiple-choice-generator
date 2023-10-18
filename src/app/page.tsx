@@ -22,7 +22,12 @@ export default function Home() {
       title:
         'Which of the below is a programming language?\n I. Java\n II. Python\n III. JavaScript',
       mc: new MultipleChoice({
-        choices: ['I Only', 'II Only', 'III Only', 'All of the above'],
+        choices: [
+          'I Only',
+          'I and II Only',
+          'II and III Only',
+          'All of the above',
+        ],
         correctChoiceIndex: 3,
       }),
     },
