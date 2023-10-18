@@ -1,5 +1,8 @@
 import { MultipleChoice } from '../../../mc/mc'
-import { MultipleChoiceQuestion } from '../../../mc/question'
+import {
+  MultipleChoiceQuestion,
+  MultipleChoiceQuestionFactory,
+} from '../../../mc/question'
 import { render } from '@testing-library/react'
 import '@testing-library/jest-dom'
 import MultipleChoicePage from './display'
@@ -24,14 +27,12 @@ describe('MultipleChoicePage', () => {
     const { getByText } = render(
       MultipleChoicePage({
         questions: [
-          {
+          MultipleChoiceQuestionFactory.createTestInstance({
             title: 'Question 1',
-            mc: MultipleChoice.createTestInstance(),
-          },
-          {
+          }),
+          MultipleChoiceQuestionFactory.createTestInstance({
             title: 'Question 2',
-            mc: MultipleChoice.createTestInstance(),
-          },
+          }),
         ],
       }),
     )
