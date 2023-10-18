@@ -16,7 +16,7 @@ describe('MultipleChoicePage', () => {
       }),
     }
     const { getByText, getByLabelText } = render(
-      MultipleChoicePage({ questions: [question] }),
+      <MultipleChoicePage questions={[question]} />,
     )
     expect(getByText('Sample Question?')).toBeInTheDocument()
     expect(getByLabelText('Answer 1')).toBeInTheDocument()
@@ -25,16 +25,16 @@ describe('MultipleChoicePage', () => {
 
   it('should render multiple questions', () => {
     const { getByText } = render(
-      MultipleChoicePage({
-        questions: [
+      <MultipleChoicePage
+        questions={[
           MultipleChoiceQuestionFactory.createTestInstance({
             title: 'Question 1',
           }),
           MultipleChoiceQuestionFactory.createTestInstance({
             title: 'Question 2',
           }),
-        ],
-      }),
+        ]}
+      />,
     )
     expect(getByText('Question 1')).toBeInTheDocument()
     expect(getByText('Question 2')).toBeInTheDocument()

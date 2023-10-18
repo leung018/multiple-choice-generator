@@ -27,5 +27,5 @@ export default function Home() {
       }),
     },
   ]
-  return MultipleChoicePage({ questions })
+  return <MultipleChoicePage questions={questions} />
 }
