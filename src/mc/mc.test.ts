@@ -37,4 +37,10 @@ describe('MultipleChoice', () => {
     expect(mc.choices).toEqual(['a', 'b'])
     expect(mc.correctChoiceIndex).toBe(1)
   })
+
+  it('should reject number of choices less than 2', () => {
+    expect(() => {
+      MultipleChoice.createTestInstance({ choices: ['a'] })
+    }).toThrowCustomError(MultipleChoiceError, 'INVALID_NUMBER_OF_CHOICES')
+  })
 })
