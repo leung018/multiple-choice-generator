@@ -38,6 +38,12 @@ export class MultipleChoice {
   }
 
   private validateChoices(choices: ReadonlyArray<string>): void {
+    if (choices.length < 2) {
+      throw new MultipleChoiceError(
+        'INVALID_NUMBER_OF_CHOICES',
+        'MultipleChoice must have at least 2 choices',
+      )
+    }
     if (new Set(choices).size !== choices.length) {
       throw new MultipleChoiceError(
         'DUPLICATE_CHOICES',
@@ -47,7 +53,10 @@ export class MultipleChoice {
   }
 }
 
-type MultipleChoiceErrorCode = 'DUPLICATE_CHOICES' | 'INVALID_INDEX'
+type MultipleChoiceErrorCode =
+  | 'DUPLICATE_CHOICES'
+  | 'INVALID_INDEX'
+  | 'INVALID_NUMBER_OF_CHOICES'
 
 export class MultipleChoiceError extends CustomBaseError {
   constructor(code: MultipleChoiceErrorCode, message?: string) {
