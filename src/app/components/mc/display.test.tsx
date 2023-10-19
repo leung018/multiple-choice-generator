@@ -3,7 +3,7 @@ import {
   MultipleChoiceQuestion,
   MultipleChoiceQuestionFactory,
 } from '../../../mc/question'
-import { render } from '@testing-library/react'
+import { render, fireEvent } from '@testing-library/react'
 import '@testing-library/jest-dom'
 import MultipleChoicePage from './display'
 
@@ -52,10 +52,10 @@ describe('MultipleChoicePage', () => {
     const choice1 = getByLabelText('Choice 1')
     const choice2 = getByLabelText('Choice 2')
 
-    choice1.click()
+    fireEvent.click(choice1)
     expect(choice1).toBeChecked()
 
-    choice2.click()
+    fireEvent.click(choice2)
     expect(choice1).not.toBeChecked()
     expect(choice2).toBeChecked()
   })
@@ -79,8 +79,8 @@ describe('MultipleChoicePage', () => {
     const question1ChoiceA = getByLabelText('Question 1 Choice A')
     const question2ChoiceB = getByLabelText('Question 2 Choice B')
 
-    question1ChoiceA.click()
-    question2ChoiceB.click()
+    fireEvent.click(question1ChoiceA)
+    fireEvent.click(question2ChoiceB)
 
     expect(question1ChoiceA).toBeChecked()
     expect(question2ChoiceB).toBeChecked()
