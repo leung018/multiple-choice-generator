@@ -39,7 +39,7 @@ describe('MultipleChoicePage', () => {
     expect(getByText('Question 2')).toBeInTheDocument()
   })
 
-  it('should select one choice in a question will uncheck other selected', () => {
+  it('should select one choice in a question will check it and uncheck other previously selected', () => {
     const { getByLabelText } = renderMultipleChoicePage({
       questions: [
         MultipleChoiceQuestionFactory.createTestInstance({
@@ -51,6 +51,9 @@ describe('MultipleChoicePage', () => {
     })
     const choice1 = getByLabelText('Choice 1')
     const choice2 = getByLabelText('Choice 2')
+
+    expect(choice1).not.toBeChecked()
+    expect(choice2).not.toBeChecked()
 
     fireEvent.click(choice1)
     expect(choice1).toBeChecked()
@@ -84,23 +87,6 @@ describe('MultipleChoicePage', () => {
 
     expect(question1ChoiceA).toBeChecked()
     expect(question2ChoiceB).toBeChecked()
-  })
-
-  it('should are choices unchecked at the beginning', () => {
-    const { getByLabelText } = renderMultipleChoicePage({
-      questions: [
-        MultipleChoiceQuestionFactory.createTestInstance({
-          mc: MultipleChoice.createTestInstance({
-            choices: ['Choice 1', 'Choice 2'],
-          }),
-        }),
-      ],
-    })
-    const choice1 = getByLabelText('Choice 1')
-    const choice2 = getByLabelText('Choice 2')
-
-    expect(choice1).not.toBeChecked()
-    expect(choice2).not.toBeChecked()
   })
 })
 
