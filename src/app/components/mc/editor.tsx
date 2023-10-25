@@ -42,14 +42,13 @@ function QuestionSetEditor() {
       </div>
 
       <div className="mb-8">
-        <h2 className="text-lg font-bold mb-2">Question 1</h2>
-        <div className="form-group">
-          <label>Question:</label>
+        <label>
+          <h2 className="text-lg font-bold mb-2">Question 1:</h2>
           <input
             type="text"
             className="border border-gray-300 px-2 py-1 w-full"
           />
-        </div>
+        </label>
         <div className="form-group">
           <div className="grid grid-cols-5 gap-4">
             <div className="col-span-3"></div>
@@ -57,31 +56,51 @@ function QuestionSetEditor() {
             <div className="col-span-1 text-center">Fixed Position</div>
 
             <div className="col-span-3">
-              <label>Choice 1:</label>
+              <label>
+                Choice 1:
+                <input
+                  type="text"
+                  className="border border-gray-300 px-2 py-1 ml-2"
+                />
+              </label>
+            </div>
+            <div className="col-span-1 flex items-center justify-center">
               <input
-                type="text"
-                className="border border-gray-300 px-2 py-1 ml-2"
+                type="checkbox"
+                className="mr-1"
+                aria-label="Choice 1 is correct answer"
               />
             </div>
             <div className="col-span-1 flex items-center justify-center">
-              <input type="checkbox" className="mr-1" />
-            </div>
-            <div className="col-span-1 flex items-center justify-center">
-              <input type="checkbox" className="mr-1" />
+              <input
+                type="checkbox"
+                className="mr-1"
+                aria-label="Choice 1 is fixed position"
+              />
             </div>
 
             <div className="col-span-3">
-              <label>Choice 2:</label>
+              <label>
+                Choice 2:
+                <input
+                  type="text"
+                  className="border border-gray-300 px-2 py-1 ml-2"
+                />
+              </label>
+            </div>
+            <div className="col-span-1 flex items-center justify-center">
               <input
-                type="text"
-                className="border border-gray-300 px-2 py-1 ml-2"
+                type="checkbox"
+                className="mr-1"
+                aria-label="Choice 2 is correct answer"
               />
             </div>
             <div className="col-span-1 flex items-center justify-center">
-              <input type="checkbox" className="mr-1" />
-            </div>
-            <div className="col-span-1 flex items-center justify-center">
-              <input type="checkbox" className="mr-1" />
+              <input
+                type="checkbox"
+                className="mr-1"
+                aria-label="Choice 2 is fixed position"
+              />
             </div>
 
             <div className="col-span-1">
