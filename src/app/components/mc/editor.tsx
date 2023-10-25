@@ -78,7 +78,7 @@ function QuestionSetEditor() {
                 aria-label="Choice 1 is fixed position"
               />
             </div>
-
+            {/* TODO: Refactor the below duplication */}
             <div className="col-span-3">
               <label>
                 Choice 2:
