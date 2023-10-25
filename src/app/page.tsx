@@ -1,6 +1,6 @@
 import MultipleChoiceQuiz from './components/mc/quiz'
-import { MultipleChoiceQuestion } from '../mc/question'
-import { MultipleChoice } from '../mc/mc'
+import { MultipleChoiceQuestion } from '../model/question'
+import { MultipleChoice } from '../model/mc'
 
 export default function Home() {
   const questions: MultipleChoiceQuestion[] = [

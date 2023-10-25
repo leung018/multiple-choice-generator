@@ -1,5 +1,5 @@
-import QuestionSetEditor from '../../components/mc/editor'
+import { QuestionSetEditorUIService } from '../../components/mc/editor'
 
 export default function QuestionSetEditorPage() {
-  return <QuestionSetEditor />
+  return QuestionSetEditorUIService.create().getElement()
 }

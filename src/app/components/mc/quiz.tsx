@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { MultipleChoiceQuestion } from '../../../mc/question'
+import { MultipleChoiceQuestion } from '../../../model/question'
 
 interface MultipleChoicePageProps {
   questions: MultipleChoiceQuestion[]

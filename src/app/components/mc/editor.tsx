@@ -1,4 +1,33 @@
-export default function QuestionSetEditor() {
+import {
+  QuestionSetRepo,
+  QuestionSetRepoFactory,
+} from '../../../repo/question_set'
+
+export class QuestionSetEditorUIService {
+  static create() {
+    return new QuestionSetEditorUIService({
+      editorRepo: QuestionSetRepoFactory.createTestInstance(), // TODO: replace with real repo
+    })
+  }
+
+  static createTestInstance({
+    editorRepo = QuestionSetRepoFactory.createTestInstance(),
+  }) {
+    return new QuestionSetEditorUIService({ editorRepo })
+  }
+
+  private editorRepo: QuestionSetRepo
+
+  private constructor({ editorRepo }: { editorRepo: QuestionSetRepo }) {
+    this.editorRepo = editorRepo
+  }
+
+  getElement() {
+    return <QuestionSetEditor />
+  }
+}
+
+function QuestionSetEditor() {
   return (
     <div className="container mx-auto p-4">
       <div className="form-group">

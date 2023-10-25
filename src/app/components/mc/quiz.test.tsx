@@ -1,8 +1,8 @@
-import { MultipleChoice } from '../../../mc/mc'
+import { MultipleChoice } from '../../../model/mc'
 import {
   MultipleChoiceQuestion,
   MultipleChoiceQuestionFactory,
-} from '../../../mc/question'
+} from '../../../model/question'
 import { render, fireEvent } from '@testing-library/react'
 import '@testing-library/jest-dom'
 import MultipleChoiceQuiz from './quiz'
