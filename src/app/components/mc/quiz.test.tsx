@@ -5,9 +5,9 @@ import {
 } from '../../../mc/question'
 import { render, fireEvent } from '@testing-library/react'
 import '@testing-library/jest-dom'
-import MultipleChoicePage from './display'
+import MultipleChoiceQuiz from './quiz'
 
-describe('MultipleChoicePage', () => {
+describe('MultipleChoiceQuiz', () => {
   it('should render title and choices of a question', () => {
     const { getByText, getByLabelText } = renderMultipleChoicePage({
       questions: [
@@ -98,5 +98,5 @@ function renderMultipleChoicePage({
 }: {
   questions: MultipleChoiceQuestion[]
 }) {
-  return render(<MultipleChoicePage questions={questions} />)
+  return render(<MultipleChoiceQuiz questions={questions} />)
 }

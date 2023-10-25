@@ -1,4 +1,4 @@
-import MultipleChoicePage from './components/mc/display'
+import MultipleChoiceQuiz from './components/mc/quiz'
 import { MultipleChoiceQuestion } from '../mc/question'
 import { MultipleChoice } from '../mc/mc'
 
@@ -32,5 +32,5 @@ export default function Home() {
       }),
     },
   ]
-  return <MultipleChoicePage questions={questions} />
+  return <MultipleChoiceQuiz questions={questions} />
 }

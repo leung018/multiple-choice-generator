@@ -8,7 +8,7 @@ interface MultipleChoicePageProps {
 }
 
 // TODO: Noted that won't test the rendering of submit button by now. Test that part later in the feature of submitting the answer is more meaningful.
-export default function MultipleChoicePage({
+export default function MultipleChoiceQuiz({
   questions,
 }: MultipleChoicePageProps) {
   const [questionToCheckedChoiceMap, setCheckedChoice] = useState<
