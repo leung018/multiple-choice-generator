@@ -16,20 +16,11 @@ export class MultipleChoiceSwapper {
   }
 
   private readonly originalChoices: ReadonlyArray<Choice>
-  private readonly lockedChoiceToOriginalIndexMap: ReadonlyMap<Choice, number>
   private readonly correctChoice: Choice
 
   private constructor(originalMc: NewVersionMultipleChoice) {
     this.originalChoices = originalMc.choices
     this.correctChoice = originalMc.choices[originalMc.correctChoiceIndex]
-
-    const lockedChoiceToOriginalIndexMap = new Map<Choice, number>()
-    originalMc.choices.forEach((c, i) => {
-      if (c.isFixedPosition) {
-        lockedChoiceToOriginalIndexMap.set(c, i)
-      }
-    })
-    this.lockedChoiceToOriginalIndexMap = lockedChoiceToOriginalIndexMap
   }
 
   private getSignificantlySwapped(): Set<NewVersionMultipleChoice> {
@@ -45,16 +36,22 @@ export class MultipleChoiceSwapper {
   ): boolean => {
     for (let i = 0; i < newChoices.length; i++) {
       const newChoice = newChoices[i]
-      if (this.lockedChoiceToOriginalIndexMap.has(newChoice)) {
-        if (this.lockedChoiceToOriginalIndexMap.get(newChoice) != i) {
-          return false
-        } else {
-          continue
-        }
+      if (newChoice.isFixedPosition && this.isChoiceMoved(newChoice, i)) {
+        return false
       }
-      if (newChoice === this.originalChoices[i]) return false
+      if (!newChoice.isFixedPosition && this.isChoiceStayed(newChoice, i)) {
+        return false
+      }
     }
     return true
+  }
+
+  private isChoiceMoved = (newChoice: Choice, newIndex: number): boolean => {
+    return newChoice !== this.originalChoices[newIndex]
+  }
+
+  private isChoiceStayed = (newChoice: Choice, newIndex: number): boolean => {
+    return newChoice === this.originalChoices[newIndex]
   }
 
   private mapToMc = (
