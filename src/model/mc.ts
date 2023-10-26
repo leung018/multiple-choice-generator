@@ -63,3 +63,27 @@ export class MultipleChoiceError extends CustomBaseError {
     super(code, message)
   }
 }
+
+// TODO: Migrate MultipleChoice to NewVersionMultipleChoice
+export class NewVersionMultipleChoice {
+  choices: ReadonlyArray<{
+    description: string
+    isFixedPosition: boolean
+  }>
+
+  correctChoiceIndex: number
+
+  constructor({
+    choices,
+    correctChoiceIndex,
+  }: {
+    choices: ReadonlyArray<{
+      description: string
+      isFixedPosition: boolean
+    }>
+    correctChoiceIndex: number
+  }) {
+    this.choices = choices
+    this.correctChoiceIndex = correctChoiceIndex
+  }
+}

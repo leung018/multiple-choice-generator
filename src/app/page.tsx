@@ -1,6 +1,6 @@
-import MultipleChoicePage from './components/mc/display'
-import { MultipleChoiceQuestion } from '../mc/question'
-import { MultipleChoice } from '../mc/mc'
+import MultipleChoiceQuiz from './components/mc/quiz'
+import { MultipleChoiceQuestion } from '../model/question'
+import { MultipleChoice } from '../model/mc'
 
 export default function Home() {
   const questions: MultipleChoiceQuestion[] = [
@@ -32,5 +32,5 @@ export default function Home() {
       }),
     },
   ]
-  return <MultipleChoicePage questions={questions} />
+  return <MultipleChoiceQuiz questions={questions} />
 }
