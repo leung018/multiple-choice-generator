@@ -1,5 +1,5 @@
 import { MultipleChoiceSwapper } from './swap'
-import { MultipleChoice, NewVersionMultipleChoice } from './mc'
+import { NewVersionMultipleChoice } from './mc'
 
 describe('MultipleChoiceSwapper.getSignificantlySwapped', () => {
   it('should compute swaps for two choices', () => {
