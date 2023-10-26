@@ -8,6 +8,7 @@ export class MultipleChoiceSwapper {
    * except for those choices that are fixed position and should not be swapped.
    *
    * @returns A set of MultipleChoice objects where the choices are significantly swapped.
+   * This set must not be empty and will contain the original MultipleChoice object if no swaps are possible due to fixed positions.
    */
   static getSignificantlySwapped(
     originalMc: NewVersionMultipleChoice,
@@ -25,10 +26,21 @@ export class MultipleChoiceSwapper {
 
   private getSignificantlySwapped(): Set<NewVersionMultipleChoice> {
     const allPossibleChoices = getPermutations(this.originalChoices)
-    const significantSwappedChoices = Array.from(allPossibleChoices).filter(
+    return new Set(
+      this.listOfSignificantlySwapped(allPossibleChoices).map(this.mapToMc),
+    )
+  }
+
+  private listOfSignificantlySwapped = (
+    allPossibleChoices: Set<ReadonlyArray<Choice>>,
+  ): ReadonlyArray<Choice>[] => {
+    const swappedChoices = Array.from(allPossibleChoices).filter(
       this.areSignificantlySwapped,
     )
-    return new Set(significantSwappedChoices.map(this.mapToMc))
+    if (swappedChoices.length === 0) {
+      swappedChoices.push(this.originalChoices)
+    }
+    return swappedChoices
   }
 
   private areSignificantlySwapped = (
