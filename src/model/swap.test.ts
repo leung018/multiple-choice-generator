@@ -59,7 +59,7 @@ describe('MultipleChoiceSwapper.getSignificantlySwapped', () => {
     )
   })
 
-  it('should return same set when lockedChoiceIndices contain all choices', () => {
+  it('should return same set when all choices are fixed', () => {
     const mc = NewVersionMultipleChoice.createTestInstance({
       choices: [
         { answer: 'a', isFixedPosition: true },
@@ -72,7 +72,7 @@ describe('MultipleChoiceSwapper.getSignificantlySwapped', () => {
     )
   })
 
-  it('should return same set when lockedChoiceIndices contain all choices except one', () => {
+  it('should return same set when all choices are fixed except one', () => {
     const mc = NewVersionMultipleChoice.createTestInstance({
       choices: [
         { answer: 'a', isFixedPosition: true },
