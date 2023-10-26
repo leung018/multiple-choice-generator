@@ -1,54 +1,38 @@
 import { getPermutations } from '../utils/permutation'
-import { MultipleChoice } from './mc'
+import { NewVersionMultipleChoice, Choice } from './mc'
 
 export class MultipleChoiceSwapper {
   /**
    * Computes a set of MultipleChoice objects where the choices are significantly swapped.
    * Significantly swapped means that each choice is in a different position from the original MultipleChoice object,
-   * except for those choices that are locked and should not be swapped.
+   * except for those choices that are fixed position and should not be swapped.
    *
-   * @param originalMc The original MultipleChoice object to be used as the basis for the swaps.
-   * @param lockedChoiceIndices A set of indices of choices that are locked and should not be swapped.
    * @returns A set of MultipleChoice objects where the choices are significantly swapped.
    */
   static getSignificantlySwapped(
-    originalMc: MultipleChoice,
-    lockedChoiceIndices: ReadonlySet<number> = new Set(),
-  ): Set<MultipleChoice> {
-    return new MultipleChoiceSwapper(
-      originalMc,
-      lockedChoiceIndices,
-    ).getSignificantlySwapped()
+    originalMc: NewVersionMultipleChoice,
+  ): Set<NewVersionMultipleChoice> {
+    return new MultipleChoiceSwapper(originalMc).getSignificantlySwapped()
   }
 
-  private readonly originalChoices: ReadonlyArray<string>
-  private readonly lockedChoiceToOriginalIndexMap: ReadonlyMap<string, number>
-  private readonly correctChoice: string
+  private readonly originalChoices: ReadonlyArray<Choice>
+  private readonly lockedChoiceToOriginalIndexMap: ReadonlyMap<Choice, number>
+  private readonly correctChoice: Choice
 
-  private constructor(
-    originalMc: MultipleChoice,
-    lockedChoiceIndices: ReadonlySet<number>,
-  ) {
+  private constructor(originalMc: NewVersionMultipleChoice) {
     this.originalChoices = originalMc.choices
     this.correctChoice = originalMc.choices[originalMc.correctChoiceIndex]
-    this.lockedChoiceToOriginalIndexMap = this.chosenChoicesToIndexMap(
-      lockedChoiceIndices,
-      this.originalChoices,
-    )
-  }
 
-  private chosenChoicesToIndexMap(
-    chosenIndices: ReadonlySet<number>,
-    choices: ReadonlyArray<string>,
-  ): ReadonlyMap<string, number> {
-    const map = new Map<string, number>()
-    chosenIndices.forEach((index) => {
-      map.set(choices[index], index)
+    const lockedChoiceToOriginalIndexMap = new Map<Choice, number>()
+    originalMc.choices.forEach((c, i) => {
+      if (c.isFixedPosition) {
+        lockedChoiceToOriginalIndexMap.set(c, i)
+      }
     })
-    return map
+    this.lockedChoiceToOriginalIndexMap = lockedChoiceToOriginalIndexMap
   }
 
-  private getSignificantlySwapped(): Set<MultipleChoice> {
+  private getSignificantlySwapped(): Set<NewVersionMultipleChoice> {
     const allPossibleChoices = getPermutations(this.originalChoices)
     const significantSwappedChoices = Array.from(allPossibleChoices).filter(
       this.areSignificantlySwapped,
@@ -57,7 +41,7 @@ export class MultipleChoiceSwapper {
   }
 
   private areSignificantlySwapped = (
-    newChoices: ReadonlyArray<string>,
+    newChoices: ReadonlyArray<Choice>,
   ): boolean => {
     for (let i = 0; i < newChoices.length; i++) {
       const newChoice = newChoices[i]
@@ -73,10 +57,12 @@ export class MultipleChoiceSwapper {
     return true
   }
 
-  private mapToMc = (choices: ReadonlyArray<string>): MultipleChoice => {
+  private mapToMc = (
+    choices: ReadonlyArray<Choice>,
+  ): NewVersionMultipleChoice => {
     const correctChoiceIndex = choices.findIndex(
       (c) => c === this.correctChoice,
     )
-    return new MultipleChoice({ choices, correctChoiceIndex })
+    return new NewVersionMultipleChoice({ choices, correctChoiceIndex })
   }
 }

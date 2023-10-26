@@ -64,23 +64,45 @@ export class MultipleChoiceError extends CustomBaseError {
   }
 }
 
+export interface Choice {
+  answer: string
+  isFixedPosition: boolean
+}
+
 // TODO: Migrate MultipleChoice to NewVersionMultipleChoice
 export class NewVersionMultipleChoice {
-  choices: ReadonlyArray<{
-    description: string
-    isFixedPosition: boolean
-  }>
+  choices: ReadonlyArray<Choice>
 
   correctChoiceIndex: number
+
+  static createWithNoFixedChoices({
+    answers = ['a', 'b'],
+    correctAnswerIndex = 0,
+  } = {}): NewVersionMultipleChoice {
+    return new NewVersionMultipleChoice({
+      choices: answers.map((answer) => ({
+        answer,
+        isFixedPosition: false,
+      })),
+      correctChoiceIndex: correctAnswerIndex,
+    })
+  }
+
+  static createTestInstance({
+    choices = [
+      { answer: 'a', isFixedPosition: false },
+      { answer: 'b', isFixedPosition: false },
+    ],
+    correctChoiceIndex = 0,
+  }): NewVersionMultipleChoice {
+    return new NewVersionMultipleChoice({ choices, correctChoiceIndex })
+  }
 
   constructor({
     choices,
     correctChoiceIndex,
   }: {
-    choices: ReadonlyArray<{
-      description: string
-      isFixedPosition: boolean
-    }>
+    choices: ReadonlyArray<Choice>
     correctChoiceIndex: number
   }) {
     this.choices = choices
