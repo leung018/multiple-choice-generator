@@ -1,23 +1,25 @@
-import { MultipleChoice } from '../../../model/mc'
-import {
-  MultipleChoiceQuestion,
-  MultipleChoiceQuestionFactory,
-} from '../../../model/question'
+import { MultipleChoiceBuilder } from '../../../model/mc'
 import { render, fireEvent } from '@testing-library/react'
 import '@testing-library/jest-dom'
 import MultipleChoiceQuiz from './quiz'
+import {
+  QuestionSet,
+  QuestionSetTestBuilder,
+} from '../../../model/question_set'
 
 describe('MultipleChoiceQuiz', () => {
   it('should render title and choices of a question', () => {
     const { getByText, getByLabelText } = renderMultipleChoicePage({
-      questions: [
-        {
+      questionSet: new QuestionSetTestBuilder()
+        .appendQuestion({
           title: 'Sample Question?',
-          mc: MultipleChoice.createTestInstance({
-            choices: ['Answer 1', 'Answer 2'],
-          }),
-        },
-      ],
+          mc: new MultipleChoiceBuilder()
+            .setCorrectChoiceIndex(0)
+            .addNonFixedChoice('Answer 1')
+            .addNonFixedChoice('Answer 2')
+            .build(),
+        })
+        .buildTestInstance(),
     })
     expect(getByText('Sample Question?')).toBeInTheDocument()
     expect(getByLabelText('Answer 1')).toBeInTheDocument()
@@ -26,14 +28,14 @@ describe('MultipleChoiceQuiz', () => {
 
   it('should render multiple questions', () => {
     const { getByText } = renderMultipleChoicePage({
-      questions: [
-        MultipleChoiceQuestionFactory.createTestInstance({
+      questionSet: new QuestionSetTestBuilder()
+        .appendQuestion({
           title: 'Question 1',
-        }),
-        MultipleChoiceQuestionFactory.createTestInstance({
+        })
+        .appendQuestion({
           title: 'Question 2',
-        }),
-      ],
+        })
+        .buildTestInstance(),
     })
     expect(getByText('Question 1')).toBeInTheDocument()
     expect(getByText('Question 2')).toBeInTheDocument()
@@ -41,13 +43,15 @@ describe('MultipleChoiceQuiz', () => {
 
   it('should select one choice in a question will check it and uncheck other previously selected', () => {
     const { getByLabelText } = renderMultipleChoicePage({
-      questions: [
-        MultipleChoiceQuestionFactory.createTestInstance({
-          mc: MultipleChoice.createTestInstance({
-            choices: ['Choice 1', 'Choice 2'],
-          }),
-        }),
-      ],
+      questionSet: new QuestionSetTestBuilder()
+        .appendQuestion({
+          mc: new MultipleChoiceBuilder()
+            .setCorrectChoiceIndex(0)
+            .addNonFixedChoice('Choice 1')
+            .addNonFixedChoice('Choice 2')
+            .build(),
+        })
+        .buildTestInstance(),
     })
     const choice1 = getByLabelText('Choice 1')
     const choice2 = getByLabelText('Choice 2')
@@ -64,19 +68,25 @@ describe('MultipleChoiceQuiz', () => {
   })
 
   it("should select one choice in a question won't affect other questions", () => {
+    const presetIndexMcBuilder =
+      new MultipleChoiceBuilder().setCorrectChoiceIndex(0)
     const { getByLabelText } = renderMultipleChoicePage({
-      questions: [
-        MultipleChoiceQuestionFactory.createTestInstance({
-          mc: MultipleChoice.createTestInstance({
-            choices: ['Question 1 Choice A', 'Question 1 Choice B'],
-          }),
-        }),
-        MultipleChoiceQuestionFactory.createTestInstance({
-          mc: MultipleChoice.createTestInstance({
-            choices: ['Question 2 Choice A', 'Question 2 Choice B'],
-          }),
-        }),
-      ],
+      questionSet: new QuestionSetTestBuilder()
+        .appendQuestion({
+          mc: new MultipleChoiceBuilder()
+            .setCorrectChoiceIndex(0)
+            .addNonFixedChoice('Question 1 Choice A')
+            .addNonFixedChoice('Question 1 Choice B')
+            .build(),
+        })
+        .appendQuestion({
+          mc: new MultipleChoiceBuilder()
+            .setCorrectChoiceIndex(0)
+            .addNonFixedChoice('Question 2 Choice A')
+            .addNonFixedChoice('Question 2 Choice B')
+            .build(),
+        })
+        .buildTestInstance(),
     })
 
     const question1ChoiceA = getByLabelText('Question 1 Choice A')
@@ -94,9 +104,19 @@ describe('MultipleChoiceQuiz', () => {
  * So, with this wrapper function, it will be easier to change in the future.
  */
 function renderMultipleChoicePage({
-  questions,
+  questionSet,
 }: {
-  questions: MultipleChoiceQuestion[]
+  questionSet: QuestionSet
 }) {
+  // TODO: move this mapping to MultipleChoiceQuizUIService
+  const questions = questionSet.questions.map((question) => {
+    return {
+      title: question.title,
+      mc: {
+        choices: question.mc.choices.map((choice) => choice.answer),
+        correctChoiceIndex: question.mc.correctChoiceIndex,
+      },
+    }
+  })
   return render(<MultipleChoiceQuiz questions={questions} />)
 }
