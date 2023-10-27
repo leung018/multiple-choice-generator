@@ -75,29 +75,6 @@ export class NewVersionMultipleChoice {
 
   correctChoiceIndex: number
 
-  static createWithNoFixedChoices({
-    answers = ['a', 'b'],
-    correctAnswerIndex = 0,
-  } = {}): NewVersionMultipleChoice {
-    return new NewVersionMultipleChoice({
-      choices: answers.map((answer) => ({
-        answer,
-        isFixedPosition: false,
-      })),
-      correctChoiceIndex: correctAnswerIndex,
-    })
-  }
-
-  static createTestInstance({
-    choices = [
-      { answer: 'a', isFixedPosition: false },
-      { answer: 'b', isFixedPosition: false },
-    ],
-    correctChoiceIndex = 0,
-  }): NewVersionMultipleChoice {
-    return new NewVersionMultipleChoice({ choices, correctChoiceIndex })
-  }
-
   constructor({
     choices,
     correctChoiceIndex,
@@ -107,5 +84,36 @@ export class NewVersionMultipleChoice {
   }) {
     this.choices = choices
     this.correctChoiceIndex = correctChoiceIndex
+  }
+}
+
+export class MultipleChoiceBuilder {
+  private choices: Choice[] = []
+
+  private correctChoiceIndex: number = -1
+
+  addFixedChoice(answer: string): MultipleChoiceBuilder {
+    return this.addChoice({ answer, isFixedPosition: true })
+  }
+
+  addNonFixedChoice(answer: string): MultipleChoiceBuilder {
+    return this.addChoice({ answer, isFixedPosition: false })
+  }
+
+  addChoice(choice: Choice): MultipleChoiceBuilder {
+    this.choices.push(choice)
+    return this
+  }
+
+  setCorrectChoiceIndex(index: number): MultipleChoiceBuilder {
+    this.correctChoiceIndex = index
+    return this
+  }
+
+  build(): NewVersionMultipleChoice {
+    return new NewVersionMultipleChoice({
+      choices: this.choices,
+      correctChoiceIndex: this.correctChoiceIndex,
+    })
   }
 }

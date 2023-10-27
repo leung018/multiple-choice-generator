@@ -1,36 +1,60 @@
 import { MultipleChoiceSwapper } from './swap'
-import { NewVersionMultipleChoice } from './mc'
+import { NewVersionMultipleChoice, MultipleChoiceBuilder } from './mc'
 
 describe('MultipleChoiceSwapper.getSignificantlySwapped', () => {
+  let presetIndexBuilder: MultipleChoiceBuilder
+
+  beforeEach(() => {
+    presetIndexBuilder = new MultipleChoiceBuilder().setCorrectChoiceIndex(0)
+  })
+
   it('should compute swaps for two choices', () => {
-    const mc = NewVersionMultipleChoice.createWithNoFixedChoices({
-      answers: ['a', 'b'],
-      correctAnswerIndex: 0,
+    const mc = new NewVersionMultipleChoice({
+      choices: [
+        { answer: 'a', isFixedPosition: false },
+        { answer: 'b', isFixedPosition: false },
+      ],
+      correctChoiceIndex: 0,
     })
     expect(MultipleChoiceSwapper.getSignificantlySwapped(mc)).toEqual(
       new Set([
-        NewVersionMultipleChoice.createWithNoFixedChoices({
-          answers: ['b', 'a'],
-          correctAnswerIndex: 1,
+        new NewVersionMultipleChoice({
+          choices: [
+            { answer: 'b', isFixedPosition: false },
+            { answer: 'a', isFixedPosition: false },
+          ],
+          correctChoiceIndex: 1,
         }),
       ]),
     )
   })
 
   it('should compute swaps for three choices', () => {
-    const mc = NewVersionMultipleChoice.createWithNoFixedChoices({
-      answers: ['a', 'b', 'c'],
-      correctAnswerIndex: 1,
+    const mc = new NewVersionMultipleChoice({
+      choices: [
+        { answer: 'a', isFixedPosition: false },
+        { answer: 'b', isFixedPosition: false },
+        { answer: 'c', isFixedPosition: false },
+      ],
+      correctChoiceIndex: 1,
     })
     expect(MultipleChoiceSwapper.getSignificantlySwapped(mc)).toEqual(
       new Set([
-        NewVersionMultipleChoice.createWithNoFixedChoices({
-          answers: ['b', 'c', 'a'],
-          correctAnswerIndex: 0,
+        new NewVersionMultipleChoice({
+          choices: [
+            { answer: 'b', isFixedPosition: false },
+            { answer: 'c', isFixedPosition: false },
+            { answer: 'a', isFixedPosition: false },
+          ],
+          correctChoiceIndex: 0,
         }),
-        NewVersionMultipleChoice.createWithNoFixedChoices({
-          answers: ['c', 'a', 'b'],
-          correctAnswerIndex: 2,
+        new NewVersionMultipleChoice({
+          choices: [
+            { answer: 'c', isFixedPosition: false },
+            { answer: 'a', isFixedPosition: false },
+            { answer: 'b', isFixedPosition: false },
+          ],
+          correctChoiceIndex: 2,
         }),
       ]),
     )
@@ -60,26 +84,22 @@ describe('MultipleChoiceSwapper.getSignificantlySwapped', () => {
   })
 
   it('should return same set when all choices are fixed', () => {
-    const mc = NewVersionMultipleChoice.createTestInstance({
-      choices: [
-        { answer: 'a', isFixedPosition: true },
-        { answer: 'b', isFixedPosition: true },
-        { answer: 'c', isFixedPosition: true },
-      ],
-    })
+    const mc = presetIndexBuilder
+      .addFixedChoice('a')
+      .addFixedChoice('b')
+      .addFixedChoice('c')
+      .build()
     expect(MultipleChoiceSwapper.getSignificantlySwapped(mc)).toEqual(
       new Set([mc]),
     )
   })
 
   it('should return same set when all choices are fixed except one', () => {
-    const mc = NewVersionMultipleChoice.createTestInstance({
-      choices: [
-        { answer: 'a', isFixedPosition: true },
-        { answer: 'b', isFixedPosition: true },
-        { answer: 'c', isFixedPosition: false },
-      ],
-    })
+    const mc = presetIndexBuilder
+      .addFixedChoice('a')
+      .addFixedChoice('b')
+      .addNonFixedChoice('c')
+      .build()
     expect(MultipleChoiceSwapper.getSignificantlySwapped(mc)).toEqual(
       new Set([mc]),
     )
