@@ -33,16 +33,16 @@ describe('MultipleChoice', () => {
 
     // expect builder can do the same thing
     const builder = new MultipleChoiceBuilder()
-      .addNonFixedChoice('a')
-      .addNonFixedChoice('b')
-      .addFixedChoice('All of the above')
-      .addChoice({ answer: 'None of the above', isFixedPosition: true })
+      .appendNonFixedChoice('a')
+      .appendNonFixedChoice('b')
+      .appendFixedChoice('All of the above')
+      .appendChoice({ answer: 'None of the above', isFixedPosition: true })
       .setCorrectChoiceIndex(1)
     expect(builder.build()).toEqual(mc)
   })
 
   it('should reject invalid correctChoiceIndex', () => {
-    presetIndexBuilder.addFixedChoice('a').addFixedChoice('b')
+    presetIndexBuilder.appendFixedChoice('a').appendFixedChoice('b')
     expect(() => {
       presetIndexBuilder.setCorrectChoiceIndex(3).build()
     }).toThrowCustomError(MultipleChoiceError, 'INVALID_INDEX')
@@ -53,22 +53,25 @@ describe('MultipleChoice', () => {
     // using builder without setting correctChoiceIndex should throw
     expect(() => {
       new MultipleChoiceBuilder()
-        .addFixedChoice('a')
-        .addFixedChoice('b')
+        .appendFixedChoice('a')
+        .appendFixedChoice('b')
         .build()
     }).toThrowCustomError(MultipleChoiceError, 'INVALID_INDEX')
   })
 
   it('should reject duplicate answers', () => {
     expect(() => {
-      presetIndexBuilder.addFixedChoice('a').addNonFixedChoice('a').build()
+      presetIndexBuilder
+        .appendFixedChoice('a')
+        .appendNonFixedChoice('a')
+        .build()
     }).toThrowCustomError(MultipleChoiceError, 'DUPLICATE_CHOICES')
   })
 
   it('should accept valid correctChoiceIndex', () => {
     const builder = new MultipleChoiceBuilder()
-      .addFixedChoice('a')
-      .addFixedChoice('b')
+      .appendFixedChoice('a')
+      .appendFixedChoice('b')
     expect(() => {
       builder.setCorrectChoiceIndex(0).build()
     }).not.toThrow()
@@ -79,7 +82,7 @@ describe('MultipleChoice', () => {
 
   it('should reject number of choices less than 2', () => {
     expect(() => {
-      presetIndexBuilder.addFixedChoice('a').build()
+      presetIndexBuilder.appendFixedChoice('a').build()
     }).toThrowCustomError(MultipleChoiceError, 'INVALID_NUMBER_OF_CHOICES')
   })
 })

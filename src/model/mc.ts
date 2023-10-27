@@ -67,15 +67,15 @@ export class MultipleChoiceBuilder {
 
   private correctChoiceIndex: number = -1
 
-  addFixedChoice(answer: string): MultipleChoiceBuilder {
-    return this.addChoice({ answer, isFixedPosition: true })
+  appendFixedChoice(answer: string): MultipleChoiceBuilder {
+    return this.appendChoice({ answer, isFixedPosition: true })
   }
 
-  addNonFixedChoice(answer: string): MultipleChoiceBuilder {
-    return this.addChoice({ answer, isFixedPosition: false })
+  appendNonFixedChoice(answer: string): MultipleChoiceBuilder {
+    return this.appendChoice({ answer, isFixedPosition: false })
   }
 
-  addChoice(choice: Choice): MultipleChoiceBuilder {
+  appendChoice(choice: Choice): MultipleChoiceBuilder {
     this.choices.push(choice)
     return this
   }

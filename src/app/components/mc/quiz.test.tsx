@@ -15,8 +15,8 @@ describe('MultipleChoiceQuiz', () => {
           title: 'Sample Question?',
           mc: new MultipleChoiceBuilder()
             .setCorrectChoiceIndex(0)
-            .addNonFixedChoice('Answer 1')
-            .addNonFixedChoice('Answer 2')
+            .appendNonFixedChoice('Answer 1')
+            .appendNonFixedChoice('Answer 2')
             .build(),
         })
         .build(),
@@ -47,8 +47,8 @@ describe('MultipleChoiceQuiz', () => {
         .appendQuestion({
           mc: new MultipleChoiceBuilder()
             .setCorrectChoiceIndex(0)
-            .addNonFixedChoice('Choice 1')
-            .addNonFixedChoice('Choice 2')
+            .appendNonFixedChoice('Choice 1')
+            .appendNonFixedChoice('Choice 2')
             .build(),
         })
         .build(),
@@ -75,15 +75,15 @@ describe('MultipleChoiceQuiz', () => {
         .appendQuestion({
           mc: new MultipleChoiceBuilder()
             .setCorrectChoiceIndex(0)
-            .addNonFixedChoice('Question 1 Choice A')
-            .addNonFixedChoice('Question 1 Choice B')
+            .appendNonFixedChoice('Question 1 Choice A')
+            .appendNonFixedChoice('Question 1 Choice B')
             .build(),
         })
         .appendQuestion({
           mc: new MultipleChoiceBuilder()
             .setCorrectChoiceIndex(0)
-            .addNonFixedChoice('Question 2 Choice A')
-            .addNonFixedChoice('Question 2 Choice B')
+            .appendNonFixedChoice('Question 2 Choice A')
+            .appendNonFixedChoice('Question 2 Choice B')
             .build(),
         })
         .build(),

@@ -85,9 +85,9 @@ describe('MultipleChoiceSwapper.getSignificantlySwapped', () => {
 
   it('should return same set when all choices are fixed', () => {
     const mc = presetIndexBuilder
-      .addFixedChoice('a')
-      .addFixedChoice('b')
-      .addFixedChoice('c')
+      .appendFixedChoice('a')
+      .appendFixedChoice('b')
+      .appendFixedChoice('c')
       .build()
     expect(MultipleChoiceSwapper.getSignificantlySwapped(mc)).toEqual(
       new Set([mc]),
@@ -96,9 +96,9 @@ describe('MultipleChoiceSwapper.getSignificantlySwapped', () => {
 
   it('should return same set when all choices are fixed except one', () => {
     const mc = presetIndexBuilder
-      .addFixedChoice('a')
-      .addFixedChoice('b')
-      .addNonFixedChoice('c')
+      .appendFixedChoice('a')
+      .appendFixedChoice('b')
+      .appendNonFixedChoice('c')
       .build()
     expect(MultipleChoiceSwapper.getSignificantlySwapped(mc)).toEqual(
       new Set([mc]),

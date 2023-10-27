@@ -19,8 +19,8 @@ export class QuestionSetBuilderForTest {
     title = 'dummy title',
     mc = new MultipleChoiceBuilder()
       .setCorrectChoiceIndex(0)
-      .addNonFixedChoice('dummy choice 1')
-      .addNonFixedChoice('dummy choice 2')
+      .appendNonFixedChoice('dummy choice 1')
+      .appendNonFixedChoice('dummy choice 2')
       .build(),
   } = {}): QuestionSetBuilderForTest {
     this.questions.push({
