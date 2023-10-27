@@ -8,7 +8,7 @@ export interface QuestionSet {
   }>
 }
 
-export class QuestionSetTestBuilder {
+export class QuestionSetBuilderForTest {
   private name: string = 'Dummy question set'
   private questions: {
     title: string
@@ -22,7 +22,7 @@ export class QuestionSetTestBuilder {
       .addNonFixedChoice('dummy choice 1')
       .addNonFixedChoice('dummy choice 2')
       .build(),
-  } = {}): QuestionSetTestBuilder {
+  } = {}): QuestionSetBuilderForTest {
     this.questions.push({
       title: title,
       mc: mc,
@@ -30,7 +30,7 @@ export class QuestionSetTestBuilder {
     return this
   }
 
-  buildTestInstance(): QuestionSet {
+  build(): QuestionSet {
     return {
       name: this.name,
       questions: this.questions,

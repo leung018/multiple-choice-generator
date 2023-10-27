@@ -4,13 +4,13 @@ import '@testing-library/jest-dom'
 import MultipleChoiceQuiz from './quiz'
 import {
   QuestionSet,
-  QuestionSetTestBuilder,
+  QuestionSetBuilderForTest,
 } from '../../../model/question_set'
 
 describe('MultipleChoiceQuiz', () => {
   it('should render title and choices of a question', () => {
     const { getByText, getByLabelText } = renderMultipleChoicePage({
-      questionSet: new QuestionSetTestBuilder()
+      questionSet: new QuestionSetBuilderForTest()
         .appendQuestion({
           title: 'Sample Question?',
           mc: new MultipleChoiceBuilder()
@@ -19,7 +19,7 @@ describe('MultipleChoiceQuiz', () => {
             .addNonFixedChoice('Answer 2')
             .build(),
         })
-        .buildTestInstance(),
+        .build(),
     })
     expect(getByText('Sample Question?')).toBeInTheDocument()
     expect(getByLabelText('Answer 1')).toBeInTheDocument()
@@ -28,14 +28,14 @@ describe('MultipleChoiceQuiz', () => {
 
   it('should render multiple questions', () => {
     const { getByText } = renderMultipleChoicePage({
-      questionSet: new QuestionSetTestBuilder()
+      questionSet: new QuestionSetBuilderForTest()
         .appendQuestion({
           title: 'Question 1',
         })
         .appendQuestion({
           title: 'Question 2',
         })
-        .buildTestInstance(),
+        .build(),
     })
     expect(getByText('Question 1')).toBeInTheDocument()
     expect(getByText('Question 2')).toBeInTheDocument()
@@ -43,7 +43,7 @@ describe('MultipleChoiceQuiz', () => {
 
   it('should select one choice in a question will check it and uncheck other previously selected', () => {
     const { getByLabelText } = renderMultipleChoicePage({
-      questionSet: new QuestionSetTestBuilder()
+      questionSet: new QuestionSetBuilderForTest()
         .appendQuestion({
           mc: new MultipleChoiceBuilder()
             .setCorrectChoiceIndex(0)
@@ -51,7 +51,7 @@ describe('MultipleChoiceQuiz', () => {
             .addNonFixedChoice('Choice 2')
             .build(),
         })
-        .buildTestInstance(),
+        .build(),
     })
     const choice1 = getByLabelText('Choice 1')
     const choice2 = getByLabelText('Choice 2')
@@ -71,7 +71,7 @@ describe('MultipleChoiceQuiz', () => {
     const presetIndexMcBuilder =
       new MultipleChoiceBuilder().setCorrectChoiceIndex(0)
     const { getByLabelText } = renderMultipleChoicePage({
-      questionSet: new QuestionSetTestBuilder()
+      questionSet: new QuestionSetBuilderForTest()
         .appendQuestion({
           mc: new MultipleChoiceBuilder()
             .setCorrectChoiceIndex(0)
@@ -86,7 +86,7 @@ describe('MultipleChoiceQuiz', () => {
             .addNonFixedChoice('Question 2 Choice B')
             .build(),
         })
-        .buildTestInstance(),
+        .build(),
     })
 
     const question1ChoiceA = getByLabelText('Question 1 Choice A')
