@@ -1,6 +1,5 @@
 import {
   MultipleChoiceError,
-  MultipleChoice,
   MultipleChoiceBuilder,
   NewVersionMultipleChoice,
 } from './mc'
@@ -12,34 +11,6 @@ describe('MultipleChoice', () => {
 
   beforeEach(() => {
     presetIndexBuilder = new MultipleChoiceBuilder().setCorrectChoiceIndex(0)
-  })
-
-  it('should reject duplicate answers', () => {
-    expect(() => {
-      presetIndexBuilder.addFixedChoice('a').addNonFixedChoice('a').build()
-    }).toThrowCustomError(MultipleChoiceError, 'DUPLICATE_CHOICES')
-  })
-
-  it('should reject invalid correctChoiceIndex', () => {
-    presetIndexBuilder.addFixedChoice('a').addFixedChoice('b')
-    expect(() => {
-      presetIndexBuilder.setCorrectChoiceIndex(3).build()
-    }).toThrowCustomError(MultipleChoiceError, 'INVALID_INDEX')
-    expect(() => {
-      presetIndexBuilder.setCorrectChoiceIndex(-1).build()
-    }).toThrowCustomError(MultipleChoiceError, 'INVALID_INDEX')
-  })
-
-  it('should accept valid correctChoiceIndex', () => {
-    const builder = new MultipleChoiceBuilder()
-      .addFixedChoice('a')
-      .addFixedChoice('b')
-    expect(() => {
-      builder.setCorrectChoiceIndex(0).build()
-    }).not.toThrow()
-    expect(() => {
-      builder.setCorrectChoiceIndex(1).build()
-    }).not.toThrow()
   })
 
   it('should set choices and correctChoiceIndex', () => {
@@ -68,6 +39,34 @@ describe('MultipleChoice', () => {
       .addChoice({ answer: 'None of the above', isFixedPosition: true })
       .setCorrectChoiceIndex(1)
     expect(builder.build()).toEqual(mc)
+  })
+
+  it('should reject invalid correctChoiceIndex', () => {
+    presetIndexBuilder.addFixedChoice('a').addFixedChoice('b')
+    expect(() => {
+      presetIndexBuilder.setCorrectChoiceIndex(3).build()
+    }).toThrowCustomError(MultipleChoiceError, 'INVALID_INDEX')
+    expect(() => {
+      presetIndexBuilder.setCorrectChoiceIndex(-1).build()
+    }).toThrowCustomError(MultipleChoiceError, 'INVALID_INDEX')
+  })
+
+  it('should reject duplicate answers', () => {
+    expect(() => {
+      presetIndexBuilder.addFixedChoice('a').addNonFixedChoice('a').build()
+    }).toThrowCustomError(MultipleChoiceError, 'DUPLICATE_CHOICES')
+  })
+
+  it('should accept valid correctChoiceIndex', () => {
+    const builder = new MultipleChoiceBuilder()
+      .addFixedChoice('a')
+      .addFixedChoice('b')
+    expect(() => {
+      builder.setCorrectChoiceIndex(0).build()
+    }).not.toThrow()
+    expect(() => {
+      builder.setCorrectChoiceIndex(1).build()
+    }).not.toThrow()
   })
 
   it('should reject number of choices less than 2', () => {
