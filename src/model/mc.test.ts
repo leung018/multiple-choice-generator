@@ -49,6 +49,14 @@ describe('MultipleChoice', () => {
     expect(() => {
       presetIndexBuilder.setCorrectChoiceIndex(-1).build()
     }).toThrowCustomError(MultipleChoiceError, 'INVALID_INDEX')
+
+    // using builder without setting correctChoiceIndex should throw
+    expect(() => {
+      new MultipleChoiceBuilder()
+        .addFixedChoice('a')
+        .addFixedChoice('b')
+        .build()
+    }).toThrowCustomError(MultipleChoiceError, 'INVALID_INDEX')
   })
 
   it('should reject duplicate answers', () => {
