@@ -16,24 +16,23 @@ export interface Choice {
   isFixedPosition: boolean
 }
 
-interface NewVersionMultipleChoiceInput {
+interface MultipleChoiceInput {
   choices: ReadonlyArray<Choice>
   correctChoiceIndex: number
 }
 
-// TODO: Migrate MultipleChoice to NewVersionMultipleChoice
-export class NewVersionMultipleChoice {
+export class MultipleChoice {
   readonly choices: ReadonlyArray<Choice>
 
   readonly correctChoiceIndex: number
 
-  constructor({ choices, correctChoiceIndex }: NewVersionMultipleChoiceInput) {
+  constructor({ choices, correctChoiceIndex }: MultipleChoiceInput) {
     this.validateInput({ choices, correctChoiceIndex })
     this.choices = choices
     this.correctChoiceIndex = correctChoiceIndex
   }
 
-  private validateInput(input: NewVersionMultipleChoiceInput) {
+  private validateInput(input: MultipleChoiceInput) {
     this.validateChoices(input.choices)
 
     if (
@@ -86,8 +85,8 @@ export class MultipleChoiceBuilder {
     return this
   }
 
-  build(): NewVersionMultipleChoice {
-    return new NewVersionMultipleChoice({
+  build(): MultipleChoice {
+    return new MultipleChoice({
       choices: this.choices,
       correctChoiceIndex: this.correctChoiceIndex,
     })

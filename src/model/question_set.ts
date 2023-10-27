@@ -1,10 +1,10 @@
-import { MultipleChoiceBuilder, NewVersionMultipleChoice } from './mc'
+import { MultipleChoiceBuilder, MultipleChoice } from './mc'
 
 export interface QuestionSet {
   name: string
   questions: ReadonlyArray<{
     title: string
-    mc: NewVersionMultipleChoice
+    mc: MultipleChoice
   }>
 }
 
@@ -12,7 +12,7 @@ export class QuestionSetTestBuilder {
   private name: string = 'Dummy question set'
   private questions: {
     title: string
-    mc: NewVersionMultipleChoice
+    mc: MultipleChoice
   }[] = []
 
   appendQuestion({

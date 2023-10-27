@@ -1,5 +1,5 @@
 import { MultipleChoiceSwapper } from './swap'
-import { NewVersionMultipleChoice, MultipleChoiceBuilder } from './mc'
+import { MultipleChoice, MultipleChoiceBuilder } from './mc'
 
 describe('MultipleChoiceSwapper.getSignificantlySwapped', () => {
   let presetIndexBuilder: MultipleChoiceBuilder
@@ -9,7 +9,7 @@ describe('MultipleChoiceSwapper.getSignificantlySwapped', () => {
   })
 
   it('should compute swaps for two choices', () => {
-    const mc = new NewVersionMultipleChoice({
+    const mc = new MultipleChoice({
       choices: [
         { answer: 'a', isFixedPosition: false },
         { answer: 'b', isFixedPosition: false },
@@ -18,7 +18,7 @@ describe('MultipleChoiceSwapper.getSignificantlySwapped', () => {
     })
     expect(MultipleChoiceSwapper.getSignificantlySwapped(mc)).toEqual(
       new Set([
-        new NewVersionMultipleChoice({
+        new MultipleChoice({
           choices: [
             { answer: 'b', isFixedPosition: false },
             { answer: 'a', isFixedPosition: false },
@@ -30,7 +30,7 @@ describe('MultipleChoiceSwapper.getSignificantlySwapped', () => {
   })
 
   it('should compute swaps for three choices', () => {
-    const mc = new NewVersionMultipleChoice({
+    const mc = new MultipleChoice({
       choices: [
         { answer: 'a', isFixedPosition: false },
         { answer: 'b', isFixedPosition: false },
@@ -40,7 +40,7 @@ describe('MultipleChoiceSwapper.getSignificantlySwapped', () => {
     })
     expect(MultipleChoiceSwapper.getSignificantlySwapped(mc)).toEqual(
       new Set([
-        new NewVersionMultipleChoice({
+        new MultipleChoice({
           choices: [
             { answer: 'b', isFixedPosition: false },
             { answer: 'c', isFixedPosition: false },
@@ -48,7 +48,7 @@ describe('MultipleChoiceSwapper.getSignificantlySwapped', () => {
           ],
           correctChoiceIndex: 0,
         }),
-        new NewVersionMultipleChoice({
+        new MultipleChoice({
           choices: [
             { answer: 'c', isFixedPosition: false },
             { answer: 'a', isFixedPosition: false },
@@ -61,7 +61,7 @@ describe('MultipleChoiceSwapper.getSignificantlySwapped', () => {
   })
 
   it('should further limit output when one choice is fixed position', () => {
-    const mc = new NewVersionMultipleChoice({
+    const mc = new MultipleChoice({
       choices: [
         { answer: 'Apple only', isFixedPosition: false },
         { answer: 'Banana only', isFixedPosition: false },
@@ -71,7 +71,7 @@ describe('MultipleChoiceSwapper.getSignificantlySwapped', () => {
     })
     expect(MultipleChoiceSwapper.getSignificantlySwapped(mc)).toEqual(
       new Set([
-        new NewVersionMultipleChoice({
+        new MultipleChoice({
           choices: [
             { answer: 'Banana only', isFixedPosition: false },
             { answer: 'Apple only', isFixedPosition: false },

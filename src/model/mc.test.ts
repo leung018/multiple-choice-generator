@@ -1,7 +1,7 @@
 import {
   MultipleChoiceError,
   MultipleChoiceBuilder,
-  NewVersionMultipleChoice,
+  MultipleChoice,
 } from './mc'
 import { expect } from '@jest/globals'
 import '../test_utils/assert/check_error'
@@ -14,7 +14,7 @@ describe('MultipleChoice', () => {
   })
 
   it('should set choices and correctChoiceIndex', () => {
-    const mc = new NewVersionMultipleChoice({
+    const mc = new MultipleChoice({
       choices: [
         { answer: 'a', isFixedPosition: false },
         { answer: 'b', isFixedPosition: false },

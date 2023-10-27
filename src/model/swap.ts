@@ -1,5 +1,5 @@
 import { getPermutations } from '../utils/permutation'
-import { NewVersionMultipleChoice, Choice } from './mc'
+import { MultipleChoice, Choice } from './mc'
 
 export class MultipleChoiceSwapper {
   /**
@@ -11,20 +11,20 @@ export class MultipleChoiceSwapper {
    * This set must not be empty and will contain the original MultipleChoice object if no swaps are possible due to fixed positions.
    */
   static getSignificantlySwapped(
-    originalMc: NewVersionMultipleChoice,
-  ): Set<NewVersionMultipleChoice> {
+    originalMc: MultipleChoice,
+  ): Set<MultipleChoice> {
     return new MultipleChoiceSwapper(originalMc).getSignificantlySwapped()
   }
 
   private readonly originalChoices: ReadonlyArray<Choice>
   private readonly correctChoice: Choice
 
-  private constructor(originalMc: NewVersionMultipleChoice) {
+  private constructor(originalMc: MultipleChoice) {
     this.originalChoices = originalMc.choices
     this.correctChoice = originalMc.choices[originalMc.correctChoiceIndex]
   }
 
-  private getSignificantlySwapped(): Set<NewVersionMultipleChoice> {
+  private getSignificantlySwapped(): Set<MultipleChoice> {
     const allPossibleChoices = getPermutations(this.originalChoices)
     return new Set(
       this.listOfSignificantlySwapped(allPossibleChoices).map(this.mapToMc),
@@ -66,12 +66,10 @@ export class MultipleChoiceSwapper {
     return newChoice === this.originalChoices[newIndex]
   }
 
-  private mapToMc = (
-    choices: ReadonlyArray<Choice>,
-  ): NewVersionMultipleChoice => {
+  private mapToMc = (choices: ReadonlyArray<Choice>): MultipleChoice => {
     const correctChoiceIndex = choices.findIndex(
       (c) => c === this.correctChoice,
     )
-    return new NewVersionMultipleChoice({ choices, correctChoiceIndex })
+    return new MultipleChoice({ choices, correctChoiceIndex })
   }
 }
