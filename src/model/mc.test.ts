@@ -42,12 +42,14 @@ describe('MultipleChoice', () => {
   })
 
   it('should reject invalid correctChoiceIndex', () => {
-    presetIndexBuilder.appendFixedChoice('a').appendFixedChoice('b')
+    const builder = new MultipleChoiceBuilder()
+      .appendFixedChoice('a')
+      .appendFixedChoice('b')
     expect(() => {
-      presetIndexBuilder.setCorrectChoiceIndex(3).build()
+      builder.setCorrectChoiceIndex(3).build()
     }).toThrowCustomError(MultipleChoiceError, 'INVALID_INDEX')
     expect(() => {
-      presetIndexBuilder.setCorrectChoiceIndex(-1).build()
+      builder.setCorrectChoiceIndex(-1).build()
     }).toThrowCustomError(MultipleChoiceError, 'INVALID_INDEX')
 
     // using builder without setting correctChoiceIndex should throw

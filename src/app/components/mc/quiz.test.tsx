@@ -68,8 +68,6 @@ describe('MultipleChoiceQuiz', () => {
   })
 
   it("should select one choice in a question won't affect other questions", () => {
-    const presetIndexMcBuilder =
-      new MultipleChoiceBuilder().setCorrectChoiceIndex(0)
     const { getByLabelText } = renderMultipleChoicePage({
       questionSet: new QuestionSetBuilderForTest()
         .appendQuestion({
