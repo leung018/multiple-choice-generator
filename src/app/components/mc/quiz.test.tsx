@@ -8,13 +8,16 @@ import {
 } from '../../../model/question_set'
 
 describe('MultipleChoiceQuiz', () => {
+  const presetCorrectChoiceMcBuilder = () => {
+    return new MultipleChoiceBuilder().setCorrectChoiceIndex(0)
+  }
+
   it('should render title and choices of a question', () => {
     const { getByText, getByLabelText } = renderMultipleChoicePage({
       questionSet: new QuestionSetBuilderForTest()
         .appendQuestion({
           title: 'Sample Question?',
-          mc: new MultipleChoiceBuilder()
-            .setCorrectChoiceIndex(0)
+          mc: presetCorrectChoiceMcBuilder()
             .appendNonFixedChoice('Answer 1')
             .appendNonFixedChoice('Answer 2')
             .build(),
@@ -45,8 +48,7 @@ describe('MultipleChoiceQuiz', () => {
     const { getByLabelText } = renderMultipleChoicePage({
       questionSet: new QuestionSetBuilderForTest()
         .appendQuestion({
-          mc: new MultipleChoiceBuilder()
-            .setCorrectChoiceIndex(0)
+          mc: presetCorrectChoiceMcBuilder()
             .appendNonFixedChoice('Choice 1')
             .appendNonFixedChoice('Choice 2')
             .build(),
@@ -71,15 +73,13 @@ describe('MultipleChoiceQuiz', () => {
     const { getByLabelText } = renderMultipleChoicePage({
       questionSet: new QuestionSetBuilderForTest()
         .appendQuestion({
-          mc: new MultipleChoiceBuilder()
-            .setCorrectChoiceIndex(0)
+          mc: presetCorrectChoiceMcBuilder()
             .appendNonFixedChoice('Question 1 Choice A')
             .appendNonFixedChoice('Question 1 Choice B')
             .build(),
         })
         .appendQuestion({
-          mc: new MultipleChoiceBuilder()
-            .setCorrectChoiceIndex(0)
+          mc: presetCorrectChoiceMcBuilder()
             .appendNonFixedChoice('Question 2 Choice A')
             .appendNonFixedChoice('Question 2 Choice B')
             .build(),

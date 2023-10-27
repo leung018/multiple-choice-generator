@@ -2,11 +2,9 @@ import { MultipleChoiceSwapper } from './swap'
 import { MultipleChoice, MultipleChoiceBuilder } from './mc'
 
 describe('MultipleChoiceSwapper.getSignificantlySwapped', () => {
-  let presetIndexBuilder: MultipleChoiceBuilder
-
-  beforeEach(() => {
-    presetIndexBuilder = new MultipleChoiceBuilder().setCorrectChoiceIndex(0)
-  })
+  const presetCorrectChoiceBuilder = () => {
+    return new MultipleChoiceBuilder().setCorrectChoiceIndex(0)
+  }
 
   it('should compute swaps for two choices', () => {
     const mc = new MultipleChoice({
@@ -84,7 +82,7 @@ describe('MultipleChoiceSwapper.getSignificantlySwapped', () => {
   })
 
   it('should return same set when all choices are fixed', () => {
-    const mc = presetIndexBuilder
+    const mc = presetCorrectChoiceBuilder()
       .appendFixedChoice('a')
       .appendFixedChoice('b')
       .appendFixedChoice('c')
@@ -95,7 +93,7 @@ describe('MultipleChoiceSwapper.getSignificantlySwapped', () => {
   })
 
   it('should return same set when all choices are fixed except one', () => {
-    const mc = presetIndexBuilder
+    const mc = presetCorrectChoiceBuilder()
       .appendFixedChoice('a')
       .appendFixedChoice('b')
       .appendNonFixedChoice('c')

@@ -7,11 +7,9 @@ import { expect } from '@jest/globals'
 import '../test_utils/assert/check_error'
 
 describe('MultipleChoice', () => {
-  let presetIndexBuilder: MultipleChoiceBuilder
-
-  beforeEach(() => {
-    presetIndexBuilder = new MultipleChoiceBuilder().setCorrectChoiceIndex(0)
-  })
+  const presetCorrectChoiceBuilder = () => {
+    return new MultipleChoiceBuilder().setCorrectChoiceIndex(0)
+  }
 
   it('should set choices and correctChoiceIndex', () => {
     const mc = new MultipleChoice({
@@ -63,7 +61,7 @@ describe('MultipleChoice', () => {
 
   it('should reject duplicate answers', () => {
     expect(() => {
-      presetIndexBuilder
+      presetCorrectChoiceBuilder()
         .appendFixedChoice('a')
         .appendNonFixedChoice('a')
         .build()
@@ -84,7 +82,7 @@ describe('MultipleChoice', () => {
 
   it('should reject number of choices less than 2', () => {
     expect(() => {
-      presetIndexBuilder.appendFixedChoice('a').build()
+      presetCorrectChoiceBuilder().appendFixedChoice('a').build()
     }).toThrowCustomError(MultipleChoiceError, 'INVALID_NUMBER_OF_CHOICES')
   })
 })
