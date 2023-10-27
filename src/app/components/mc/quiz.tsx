@@ -1,10 +1,15 @@
 'use client'
 
 import { useState } from 'react'
-import { MultipleChoiceQuestion } from '../../../model/question'
 
 interface MultipleChoicePageProps {
-  questions: MultipleChoiceQuestion[]
+  questions: {
+    title: string
+    mc: {
+      choices: ReadonlyArray<string>
+      correctChoiceIndex: number
+    }
+  }[]
 }
 
 // TODO: Noted that won't test the rendering of submit button by now. Test that part later in the feature of submitting the answer is more meaningful.

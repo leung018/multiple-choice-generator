@@ -1,26 +1,35 @@
 import { CustomBaseError } from '../utils/err'
 
+type MultipleChoiceErrorCode =
+  | 'DUPLICATE_CHOICES'
+  | 'INVALID_INDEX'
+  | 'INVALID_NUMBER_OF_CHOICES'
+
+export class MultipleChoiceError extends CustomBaseError {
+  constructor(code: MultipleChoiceErrorCode, message?: string) {
+    super(code, message)
+  }
+}
+
+export interface Choice {
+  answer: string
+  isFixedPosition: boolean
+}
+
 interface MultipleChoiceInput {
-  choices: ReadonlyArray<string>
+  choices: ReadonlyArray<Choice>
   correctChoiceIndex: number
 }
 
 export class MultipleChoice {
-  readonly choices: ReadonlyArray<string>
+  readonly choices: ReadonlyArray<Choice>
+
   readonly correctChoiceIndex: number
 
-  static createTestInstance({
-    choices = ['a', 'b'],
-    correctChoiceIndex = 0,
-  } = {}): MultipleChoice {
-    return new MultipleChoice({ choices, correctChoiceIndex })
-  }
-
-  constructor(input: MultipleChoiceInput) {
-    this.validateInput(input)
-
-    this.choices = input.choices
-    this.correctChoiceIndex = input.correctChoiceIndex
+  constructor({ choices, correctChoiceIndex }: MultipleChoiceInput) {
+    this.validateInput({ choices, correctChoiceIndex })
+    this.choices = choices
+    this.correctChoiceIndex = correctChoiceIndex
   }
 
   private validateInput(input: MultipleChoiceInput) {
@@ -37,14 +46,14 @@ export class MultipleChoice {
     }
   }
 
-  private validateChoices(choices: ReadonlyArray<string>): void {
+  private validateChoices(choices: ReadonlyArray<Choice>): void {
     if (choices.length < 2) {
       throw new MultipleChoiceError(
         'INVALID_NUMBER_OF_CHOICES',
         'MultipleChoice must have at least 2 choices',
       )
     }
-    if (new Set(choices).size !== choices.length) {
+    if (new Set(choices.map((c) => c.answer)).size !== choices.length) {
       throw new MultipleChoiceError(
         'DUPLICATE_CHOICES',
         'MultipleChoice cannot have duplicate choices',
@@ -53,37 +62,33 @@ export class MultipleChoice {
   }
 }
 
-type MultipleChoiceErrorCode =
-  | 'DUPLICATE_CHOICES'
-  | 'INVALID_INDEX'
-  | 'INVALID_NUMBER_OF_CHOICES'
+export class MultipleChoiceBuilder {
+  private choices: Choice[] = []
 
-export class MultipleChoiceError extends CustomBaseError {
-  constructor(code: MultipleChoiceErrorCode, message?: string) {
-    super(code, message)
+  private correctChoiceIndex: number = -1
+
+  appendFixedChoice(answer: string): MultipleChoiceBuilder {
+    return this.appendChoice({ answer, isFixedPosition: true })
   }
-}
 
-// TODO: Migrate MultipleChoice to NewVersionMultipleChoice
-export class NewVersionMultipleChoice {
-  choices: ReadonlyArray<{
-    description: string
-    isFixedPosition: boolean
-  }>
+  appendNonFixedChoice(answer: string): MultipleChoiceBuilder {
+    return this.appendChoice({ answer, isFixedPosition: false })
+  }
 
-  correctChoiceIndex: number
+  appendChoice(choice: Choice): MultipleChoiceBuilder {
+    this.choices.push(choice)
+    return this
+  }
 
-  constructor({
-    choices,
-    correctChoiceIndex,
-  }: {
-    choices: ReadonlyArray<{
-      description: string
-      isFixedPosition: boolean
-    }>
-    correctChoiceIndex: number
-  }) {
-    this.choices = choices
-    this.correctChoiceIndex = correctChoiceIndex
+  setCorrectChoiceIndex(index: number): MultipleChoiceBuilder {
+    this.correctChoiceIndex = index
+    return this
+  }
+
+  build(): MultipleChoice {
+    return new MultipleChoice({
+      choices: this.choices,
+      correctChoiceIndex: this.correctChoiceIndex,
+    })
   }
 }

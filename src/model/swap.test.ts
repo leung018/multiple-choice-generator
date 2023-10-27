@@ -1,82 +1,105 @@
 import { MultipleChoiceSwapper } from './swap'
-import { MultipleChoice } from './mc'
+import { MultipleChoice, MultipleChoiceBuilder } from './mc'
 
 describe('MultipleChoiceSwapper.getSignificantlySwapped', () => {
+  const presetCorrectChoiceBuilder = () => {
+    return new MultipleChoiceBuilder().setCorrectChoiceIndex(0)
+  }
+
   it('should compute swaps for two choices', () => {
     const mc = new MultipleChoice({
-      choices: ['a', 'b'],
+      choices: [
+        { answer: 'a', isFixedPosition: false },
+        { answer: 'b', isFixedPosition: false },
+      ],
       correctChoiceIndex: 0,
     })
     expect(MultipleChoiceSwapper.getSignificantlySwapped(mc)).toEqual(
       new Set([
-        new MultipleChoice({ choices: ['b', 'a'], correctChoiceIndex: 1 }),
+        new MultipleChoice({
+          choices: [
+            { answer: 'b', isFixedPosition: false },
+            { answer: 'a', isFixedPosition: false },
+          ],
+          correctChoiceIndex: 1,
+        }),
       ]),
     )
   })
 
   it('should compute swaps for three choices', () => {
     const mc = new MultipleChoice({
-      choices: ['a', 'b', 'c'],
+      choices: [
+        { answer: 'a', isFixedPosition: false },
+        { answer: 'b', isFixedPosition: false },
+        { answer: 'c', isFixedPosition: false },
+      ],
       correctChoiceIndex: 1,
     })
     expect(MultipleChoiceSwapper.getSignificantlySwapped(mc)).toEqual(
       new Set([
-        new MultipleChoice({ choices: ['b', 'c', 'a'], correctChoiceIndex: 0 }),
-        new MultipleChoice({ choices: ['c', 'a', 'b'], correctChoiceIndex: 2 }),
+        new MultipleChoice({
+          choices: [
+            { answer: 'b', isFixedPosition: false },
+            { answer: 'c', isFixedPosition: false },
+            { answer: 'a', isFixedPosition: false },
+          ],
+          correctChoiceIndex: 0,
+        }),
+        new MultipleChoice({
+          choices: [
+            { answer: 'c', isFixedPosition: false },
+            { answer: 'a', isFixedPosition: false },
+            { answer: 'b', isFixedPosition: false },
+          ],
+          correctChoiceIndex: 2,
+        }),
       ]),
     )
   })
 
-  it('should further limit output when lockedChoiceIndices have one element', () => {
+  it('should further limit output when one choice is fixed position', () => {
     const mc = new MultipleChoice({
-      choices: ['Apple only', 'Banana only', 'None of the above'],
+      choices: [
+        { answer: 'Apple only', isFixedPosition: false },
+        { answer: 'Banana only', isFixedPosition: false },
+        { answer: 'None of the above', isFixedPosition: true },
+      ],
       correctChoiceIndex: 1,
     })
-    const lockedChoiceIndices = new Set([2])
-    expect(
-      MultipleChoiceSwapper.getSignificantlySwapped(mc, lockedChoiceIndices),
-    ).toEqual(
+    expect(MultipleChoiceSwapper.getSignificantlySwapped(mc)).toEqual(
       new Set([
         new MultipleChoice({
-          choices: ['Banana only', 'Apple only', 'None of the above'],
+          choices: [
+            { answer: 'Banana only', isFixedPosition: false },
+            { answer: 'Apple only', isFixedPosition: false },
+            { answer: 'None of the above', isFixedPosition: true },
+          ],
           correctChoiceIndex: 0,
         }),
       ]),
     )
   })
 
-  it('should ignore lockedChoiceIndices when they are out of range', () => {
-    const mc = new MultipleChoice({
-      choices: ['a', 'b'],
-      correctChoiceIndex: 1,
-    })
-    const lockedChoiceIndices = new Set([2])
-    expect(
-      MultipleChoiceSwapper.getSignificantlySwapped(mc, lockedChoiceIndices),
-    ).toEqual(
-      new Set([
-        new MultipleChoice({ choices: ['b', 'a'], correctChoiceIndex: 0 }),
-      ]),
+  it('should return same set when all choices are fixed', () => {
+    const mc = presetCorrectChoiceBuilder()
+      .appendFixedChoice('a')
+      .appendFixedChoice('b')
+      .appendFixedChoice('c')
+      .build()
+    expect(MultipleChoiceSwapper.getSignificantlySwapped(mc)).toEqual(
+      new Set([mc]),
     )
   })
 
-  it('should return same set when lockedChoiceIndices contain all choices', () => {
-    const mc = MultipleChoice.createTestInstance({
-      choices: ['a', 'b', 'c'],
-    })
-    const lockedChoiceIndices = new Set([0, 1, 2])
-    expect(
-      MultipleChoiceSwapper.getSignificantlySwapped(mc, lockedChoiceIndices),
-    ).toEqual(new Set([mc]))
-  })
-
-  it('should return empty set when lockedChoiceIndices contain all choices except one', () => {
-    const mc = MultipleChoice.createTestInstance({
-      choices: ['a', 'b', 'c'],
-    })
-    const lockedChoiceIndices = new Set([0, 1])
-    expect(
-      MultipleChoiceSwapper.getSignificantlySwapped(mc, lockedChoiceIndices),
-    ).toEqual(new Set())
+  it('should return same set when all choices are fixed except one', () => {
+    const mc = presetCorrectChoiceBuilder()
+      .appendFixedChoice('a')
+      .appendFixedChoice('b')
+      .appendNonFixedChoice('c')
+      .build()
+    expect(MultipleChoiceSwapper.getSignificantlySwapped(mc)).toEqual(
+      new Set([mc]),
+    )
   })
 })
