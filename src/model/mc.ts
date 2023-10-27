@@ -69,21 +69,50 @@ export interface Choice {
   isFixedPosition: boolean
 }
 
+interface NewVersionMultipleChoiceInput {
+  choices: ReadonlyArray<Choice>
+  correctChoiceIndex: number
+}
+
 // TODO: Migrate MultipleChoice to NewVersionMultipleChoice
 export class NewVersionMultipleChoice {
-  choices: ReadonlyArray<Choice>
+  readonly choices: ReadonlyArray<Choice>
 
-  correctChoiceIndex: number
+  readonly correctChoiceIndex: number
 
-  constructor({
-    choices,
-    correctChoiceIndex,
-  }: {
-    choices: ReadonlyArray<Choice>
-    correctChoiceIndex: number
-  }) {
+  constructor({ choices, correctChoiceIndex }: NewVersionMultipleChoiceInput) {
+    this.validateInput({ choices, correctChoiceIndex })
     this.choices = choices
     this.correctChoiceIndex = correctChoiceIndex
+  }
+
+  private validateInput(input: NewVersionMultipleChoiceInput) {
+    this.validateChoices(input.choices)
+
+    if (
+      input.correctChoiceIndex < 0 ||
+      input.correctChoiceIndex >= input.choices.length
+    ) {
+      throw new MultipleChoiceError(
+        'INVALID_INDEX',
+        'MultipleChoice correctChoiceIndex must be within range of choices',
+      )
+    }
+  }
+
+  private validateChoices(choices: ReadonlyArray<Choice>): void {
+    if (choices.length < 2) {
+      throw new MultipleChoiceError(
+        'INVALID_NUMBER_OF_CHOICES',
+        'MultipleChoice must have at least 2 choices',
+      )
+    }
+    if (new Set(choices.map((c) => c.answer)).size !== choices.length) {
+      throw new MultipleChoiceError(
+        'DUPLICATE_CHOICES',
+        'MultipleChoice cannot have duplicate choices',
+      )
+    }
   }
 }
 
