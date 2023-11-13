@@ -144,12 +144,27 @@ function QuestionSetEditor({
                   <th className="border border-slate-300">Fixed Position</th>
                 </tr>
               </thead>
-              <tbody>{renderChoiceInputs(0, 2)}</tbody>
+              <tbody>
+                {renderChoiceInputs(
+                  0,
+                  questionIndexToNumOfChoices.get(0) as number,
+                )}
+              </tbody>
             </table>
 
             <button
               type="button"
               className="bg-blue-500 text-white px-4 py-2 rounded"
+              onClick={() => {
+                const newMap = new Map<number, number>(
+                  questionIndexToNumOfChoices,
+                )
+                newMap.set(
+                  0,
+                  (questionIndexToNumOfChoices.get(0) as number) + 1,
+                )
+                setQuestionIndexToNumOfChoices(newMap)
+              }}
             >
               Add Choice
             </button>
