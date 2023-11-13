@@ -136,10 +136,11 @@ function QuestionSetEditor({
             />
           </label>
           <div className="form-group">
+            <h3 className="text-lg font-bold mb-2">Choices:</h3>
             <table className="border-collapse border border-slate-400">
               <thead>
                 <tr>
-                  <th className="border border-slate-300">Choice</th>
+                  <th className="border border-slate-300">Answer</th>
                   <th className="border border-slate-300">Correct</th>
                   <th className="border border-slate-300">Fixed Position</th>
                 </tr>
