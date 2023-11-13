@@ -14,13 +14,15 @@ describe('QuestionSetEditor', () => {
     const questionSetNameInput = getByLabelText('Question Set Name:')
     const questionInput = getByLabelText('Question 1:')
 
-    const choice1Input = getByLabelText('Choice 1:')
+    const choice1Input = getByLabelText('answer of question 1 choice 1')
     const isChoice1FixedPositionInput = getByLabelText(
-      'Choice 1 is fixed position',
+      'question 1 choice 1 is fixed position',
     )
 
-    const choice2Input = getByLabelText('Choice 2:')
-    const isChoice2CorrectInput = getByLabelText('Choice 2 is correct answer')
+    const choice2Input = getByLabelText('answer of question 1 choice 2')
+    const isChoice2CorrectInput = getByLabelText(
+      'question 1 choice 2 is correct answer',
+    )
 
     fireEvent.change(questionSetNameInput, { target: { value: 'Test name' } })
     fireEvent.change(questionInput, { target: { value: 'Am I handsome?' } })

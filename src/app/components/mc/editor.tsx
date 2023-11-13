@@ -47,45 +47,39 @@ function QuestionSetEditor({
   const renderChoiceInputs = (questionIndex: number, numOfChoices: number) => {
     const choiceInputs = []
     for (let i = 0; i < numOfChoices; i++) {
-      // TODO: turn these into one component and use one key only
-
       choiceInputs.push(
-        <div key={i + '-' + 1} className="col-span-3">
-          <label>
-            Choice {i + 1}:
+        <tr key={i}>
+          <td className="border border-slate-300">
             <input
               type="text"
-              className="border border-gray-300 px-2 py-1 ml-2"
+              className="border border-gray-300 px-2 py-1"
               name={`question-${questionIndex}-choice-${i}-answer`}
+              aria-label={`answer of question ${questionIndex + 1} choice ${
+                i + 1
+              }`}
             />
-          </label>
-        </div>,
-      )
-      choiceInputs.push(
-        <div
-          key={i + '-' + 2}
-          className="col-span-1 flex items-center justify-center"
-        >
-          <input
-            type="checkbox"
-            className="mr-1"
-            name={`question-${questionIndex}-choice-${i}-is-correct`}
-            aria-label={`Choice ${i + 1} is correct answer`}
-          />
-        </div>,
-      )
-      choiceInputs.push(
-        <div
-          key={i + '-' + 3}
-          className="col-span-1 flex items-center justify-center"
-        >
-          <input
-            type="checkbox"
-            className="mr-1"
-            name={`question-${questionIndex}-choice-${i}-is-fixed-position`}
-            aria-label={`Choice ${i + 1} is fixed position`}
-          />
-        </div>,
+          </td>
+          <td className="border border-slate-300">
+            <input
+              type="checkbox"
+              className="mr-1"
+              name={`question-${questionIndex}-choice-${i}-is-correct`}
+              aria-label={`question ${questionIndex + 1} choice ${
+                i + 1
+              } is correct answer`}
+            />
+          </td>
+          <td className="border border-slate-300">
+            <input
+              type="checkbox"
+              className="mr-1"
+              name={`question-${questionIndex}-choice-${i}-is-fixed-position`}
+              aria-label={`question ${questionIndex + 1} choice ${
+                i + 1
+              } is fixed position`}
+            />
+          </td>
+        </tr>,
       )
     }
     return choiceInputs
@@ -142,21 +136,23 @@ function QuestionSetEditor({
             />
           </label>
           <div className="form-group">
-            <div className="grid grid-cols-5 gap-4">
-              <div className="col-span-3"></div>
-              <div className="col-span-1 text-center">Correct Answer</div>
-              <div className="col-span-1 text-center">Fixed Position</div>
-              {renderChoiceInputs(0, 2)}
+            <table className="border-collapse border border-slate-400">
+              <thead>
+                <tr>
+                  <th className="border border-slate-300">Choice</th>
+                  <th className="border border-slate-300">Correct</th>
+                  <th className="border border-slate-300">Fixed Position</th>
+                </tr>
+              </thead>
+              <tbody>{renderChoiceInputs(0, 2)}</tbody>
+            </table>
 
-              <div className="col-span-1">
-                <button
-                  type="button"
-                  className="bg-blue-500 text-white px-4 py-2 rounded"
-                >
-                  Add Choice
-                </button>
-              </div>
-            </div>
+            <button
+              type="button"
+              className="bg-blue-500 text-white px-4 py-2 rounded"
+            >
+              Add Choice
+            </button>
           </div>
         </div>
         <button
