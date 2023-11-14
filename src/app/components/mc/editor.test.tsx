@@ -1,36 +1,123 @@
-import { fireEvent, render } from '@testing-library/react'
-import { QuestionSetRepoFactory } from '../../../repo/question_set'
+import { fireEvent, render, screen } from '@testing-library/react'
+import {
+  QuestionSetRepo,
+  QuestionSetRepoFactory,
+} from '../../../repo/question_set'
 import { QuestionSetEditorUIService } from './editor'
 import { MultipleChoice } from '../../../model/mc'
 
-describe('QuestionSetEditor', () => {
-  it('should save question set successfully when no extra choice or question added', () => {
-    const editorRepo = QuestionSetRepoFactory.createTestInstance()
-    const { getByLabelText, getByText } = render(
+class UIServiceInteractor {
+  readonly screen
+  private readonly editorRepo: QuestionSetRepo
+  private questionSetName: string
+  private questionNumberFocus = 1
+
+  constructor({ questionSetName = 'Dummy name' }) {
+    this.editorRepo = QuestionSetRepoFactory.createTestInstance()
+    render(
       QuestionSetEditorUIService.createTestInstance({
-        editorRepo,
+        editorRepo: this.editorRepo,
       }).getElement(),
     )
+    this.screen = screen
 
-    fireEvent.change(getByLabelText('Question Set Name:'), {
-      target: { value: 'Test name' },
-    })
-    fireEvent.change(getByLabelText('Question 1:'), {
-      target: { value: 'Am I handsome?' },
-    })
-    fireEvent.change(getByLabelText('answer of question 1 choice 1'), {
-      target: { value: 'True' },
-    })
-    fireEvent.click(getByLabelText('question 1 choice 1 is fixed position'))
+    this.questionSetName = questionSetName
+    this.syncQuestionSetName()
+  }
 
-    fireEvent.change(getByLabelText('answer of question 1 choice 2'), {
-      target: { value: 'False' },
+  private syncQuestionSetName() {
+    fireEvent.change(screen.getByLabelText('Question Set Name:'), {
+      target: { value: this.questionSetName },
     })
-    fireEvent.click(getByLabelText('question 1 choice 2 is correct answer'))
+    return this
+  }
 
-    fireEvent.click(getByText('Save'))
+  setQuestionNumberFocus(questionNumber: number) {
+    this.questionNumberFocus = questionNumber
+    return this
+  }
 
-    const actualQuestionSet = editorRepo.getQuestionSetByName('Test name')
+  getSavedQuestionSet() {
+    return this.editorRepo.getQuestionSetByName(this.questionSetName)
+  }
+
+  inputQuestionDescription({ description }: { description: string }) {
+    fireEvent.change(
+      screen.getByLabelText(`Question ${this.questionNumberFocus}:`),
+      {
+        target: { value: description },
+      },
+    )
+    return this
+  }
+
+  inputAnswer({
+    choiceNumber,
+    answer,
+  }: {
+    choiceNumber: number
+    answer: string
+  }) {
+    fireEvent.change(
+      screen.getByLabelText(
+        `answer of question ${this.questionNumberFocus} choice ${choiceNumber}`,
+      ),
+      {
+        target: { value: answer },
+      },
+    )
+    return this
+  }
+
+  clickFixedPosition({ choiceNumber }: { choiceNumber: number }) {
+    fireEvent.click(
+      screen.getByLabelText(
+        `question ${this.questionNumberFocus} choice ${choiceNumber} is fixed position`,
+      ),
+    )
+    return this
+  }
+
+  clickCorrectAnswer({ choiceNumber }: { choiceNumber: number }) {
+    fireEvent.click(
+      screen.getByLabelText(
+        `question ${this.questionNumberFocus} choice ${choiceNumber} is correct answer`,
+      ),
+    )
+    return this
+  }
+
+  clickSave() {
+    fireEvent.click(screen.getByText('Save'))
+    return this
+  }
+}
+
+describe('QuestionSetEditorUIService', () => {
+  it('should save question set successfully when no extra choice or question added', () => {
+    const interactor = new UIServiceInteractor({ questionSetName: 'Test name' })
+    interactor
+      .setQuestionNumberFocus(1)
+      .inputQuestionDescription({
+        description: 'Am I handsome?',
+      })
+      .inputAnswer({
+        choiceNumber: 1,
+        answer: 'True',
+      })
+      .clickFixedPosition({
+        choiceNumber: 1,
+      })
+      .inputAnswer({
+        choiceNumber: 2,
+        answer: 'False',
+      })
+      .clickCorrectAnswer({
+        choiceNumber: 2,
+      })
+      .clickSave()
+
+    const actualQuestionSet = interactor.getSavedQuestionSet()
 
     expect(actualQuestionSet.name).toBe('Test name')
     expect(actualQuestionSet.questions).toEqual([
