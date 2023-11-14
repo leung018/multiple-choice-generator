@@ -3,7 +3,7 @@ import { MultipleChoiceBuilder, MultipleChoice } from './mc'
 export interface QuestionSet {
   name: string
   questions: ReadonlyArray<{
-    title: string
+    description: string
     mc: MultipleChoice
   }>
 }
@@ -11,7 +11,7 @@ export interface QuestionSet {
 export class QuestionSetBuilderForTest {
   private name: string = 'Dummy question set'
   private questions: {
-    title: string
+    description: string
     mc: MultipleChoice
   }[] = []
 
@@ -24,7 +24,7 @@ export class QuestionSetBuilderForTest {
       .build(),
   } = {}): QuestionSetBuilderForTest {
     this.questions.push({
-      title: title,
+      description: title,
       mc: mc,
     })
     return this
