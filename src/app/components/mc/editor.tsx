@@ -90,7 +90,7 @@ function QuestionSetEditor({
     numOfQuestions: number,
   ): QuestionSet => {
     const questions: {
-      title: string
+      description: string
       mc: MultipleChoice
     }[] = []
     for (
@@ -122,7 +122,7 @@ function QuestionSetEditor({
       }
 
       questions.push({
-        title: formData.get(`question-${questionIndex}-title`) as string,
+        description: formData.get(`question-${questionIndex}-title`) as string,
         mc: mcBuilder.build(),
       })
     }

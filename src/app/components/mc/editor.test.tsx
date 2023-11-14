@@ -121,7 +121,7 @@ describe('QuestionSetEditorUIService', () => {
     expect(actualQuestionSet.name).toBe('Test name')
     expect(actualQuestionSet.questions).toEqual([
       {
-        title: 'Am I handsome?',
+        description: 'Am I handsome?',
         mc: new MultipleChoice({
           choices: [
             {
@@ -156,7 +156,7 @@ describe('QuestionSetEditorUIService', () => {
 
     const actualQuestionSet = interactor.getSavedQuestionSet()
     expect(actualQuestionSet.questions[0]).toEqual({
-      title: '1 + 1 = ?',
+      description: '1 + 1 = ?',
       mc: new MultipleChoice({
         choices: [
           {
@@ -215,7 +215,7 @@ describe('QuestionSetEditorUIService', () => {
     const actualQuestionSet = interactor.getSavedQuestionSet()
     expect(actualQuestionSet.questions).toEqual([
       {
-        title: '1 + 1 = ?',
+        description: '1 + 1 = ?',
         mc: new MultipleChoice({
           choices: [
             {
@@ -231,7 +231,7 @@ describe('QuestionSetEditorUIService', () => {
         }),
       },
       {
-        title: '1 + 2 = ?',
+        description: '1 + 2 = ?',
         mc: new MultipleChoice({
           choices: [
             {
@@ -247,7 +247,7 @@ describe('QuestionSetEditorUIService', () => {
         }),
       },
       {
-        title: '1 + 3 = ?',
+        description: '1 + 3 = ?',
         mc: new MultipleChoice({
           choices: [
             {
