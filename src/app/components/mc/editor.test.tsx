@@ -109,23 +109,11 @@ describe('QuestionSetEditorUIService', () => {
     const interactor = new UIServiceInteractor({ questionSetName: 'Test name' })
     interactor
       .setQuestionNumberFocus(1)
-      .inputQuestionDescription({
-        description: 'Am I handsome?',
-      })
-      .inputAnswer({
-        choiceNumber: 1,
-        answer: 'True',
-      })
-      .clickFixedPosition({
-        choiceNumber: 1,
-      })
-      .inputAnswer({
-        choiceNumber: 2,
-        answer: 'False',
-      })
-      .clickCorrectAnswer({
-        choiceNumber: 2,
-      })
+      .inputQuestionDescription({ description: 'Am I handsome?' })
+      .inputAnswer({ choiceNumber: 1, answer: 'True' })
+      .clickFixedPosition({ choiceNumber: 1 })
+      .inputAnswer({ choiceNumber: 2, answer: 'False' })
+      .clickCorrectAnswer({ choiceNumber: 2 })
       .clickSave()
 
     const actualQuestionSet = interactor.getSavedQuestionSet()
