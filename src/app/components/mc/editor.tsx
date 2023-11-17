@@ -244,6 +244,13 @@ function ChoicesEditor(props: {
       }
       return oldChoice
     })
+    if (choiceUpdate.isCorrect) {
+      newChoices.forEach((choice, index) => {
+        if (index !== choiceIndex) {
+          choice.isCorrect = false
+        }
+      })
+    }
     onChoicesUpdate(newChoices)
   }
 

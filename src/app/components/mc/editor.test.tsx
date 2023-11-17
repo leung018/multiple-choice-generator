@@ -272,4 +272,25 @@ describe('QuestionSetEditorUIService', () => {
       },
     ])
   })
+
+  it('should only choose one last correct answer no matter how many are clicked as correct answer', () => {
+    const interactor = new UIServiceInteractor({})
+
+    interactor
+      .setQuestionNumberFocus(1)
+      .inputQuestionDescription({ description: '1 + 1 = ?' })
+      .inputAnswer({ choiceNumber: 1, answer: '0' })
+      .inputAnswer({ choiceNumber: 2, answer: '2' })
+      .clickAddChoice()
+      .inputAnswer({ choiceNumber: 3, answer: '1' })
+
+    interactor
+      .clickCorrectAnswer({ choiceNumber: 1 })
+      .clickCorrectAnswer({ choiceNumber: 3 })
+      .clickCorrectAnswer({ choiceNumber: 2 })
+      .clickSave()
+
+    const actualQuestionSet = interactor.getSavedQuestionSet()
+    expect(actualQuestionSet.questions[0].mc.correctChoiceIndex).toBe(1)
+  })
 })
