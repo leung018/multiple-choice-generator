@@ -83,7 +83,30 @@ function QuestionSetEditor({
             <input
               type="text"
               className="border border-gray-300 px-2 py-1"
-              name={`question-${questionIndex}-choice-${i}-answer`}
+              onChange={(e) => {
+                setQuestionSetInput({
+                  ...questionSetInput,
+                  questions: questionSetInput.questions.map(
+                    (question, index) => {
+                      if (index === questionIndex) {
+                        return {
+                          ...question,
+                          choices: question.choices.map((choice, index) => {
+                            if (index === i) {
+                              return {
+                                ...choice,
+                                answer: e.target.value,
+                              }
+                            }
+                            return choice
+                          }),
+                        }
+                      }
+                      return question
+                    },
+                  ),
+                })
+              }}
               aria-label={`answer of question ${questionIndex + 1} choice ${
                 i + 1
               }`}
@@ -93,7 +116,30 @@ function QuestionSetEditor({
             <input
               type="checkbox"
               className="mr-1"
-              name={`question-${questionIndex}-choice-${i}-is-correct`}
+              onChange={(e) => {
+                setQuestionSetInput({
+                  ...questionSetInput,
+                  questions: questionSetInput.questions.map(
+                    (question, index) => {
+                      if (index === questionIndex) {
+                        return {
+                          ...question,
+                          choices: question.choices.map((choice, index) => {
+                            if (index === i) {
+                              return {
+                                ...choice,
+                                isCorrect: e.target.checked,
+                              }
+                            }
+                            return choice
+                          }),
+                        }
+                      }
+                      return question
+                    },
+                  ),
+                })
+              }}
               aria-label={`question ${questionIndex + 1} choice ${
                 i + 1
               } is correct answer`}
@@ -103,10 +149,33 @@ function QuestionSetEditor({
             <input
               type="checkbox"
               className="mr-1"
-              name={`question-${questionIndex}-choice-${i}-is-fixed-position`}
               aria-label={`question ${questionIndex + 1} choice ${
                 i + 1
               } is fixed position`}
+              onChange={(e) => {
+                setQuestionSetInput({
+                  ...questionSetInput,
+                  questions: questionSetInput.questions.map(
+                    (question, index) => {
+                      if (index === questionIndex) {
+                        return {
+                          ...question,
+                          choices: question.choices.map((choice, index) => {
+                            if (index === i) {
+                              return {
+                                ...choice,
+                                isFixedPosition: e.target.checked,
+                              }
+                            }
+                            return choice
+                          }),
+                        }
+                      }
+                      return question
+                    },
+                  ),
+                })
+              }}
             />
           </td>
         </tr>,
@@ -115,46 +184,26 @@ function QuestionSetEditor({
     return choiceInputs
   }
 
-  const mapFormDataToQuestionSet = (
-    formData: FormData,
-    numOfQuestions: number,
-  ): QuestionSet => {
+  const mapQuestionSetInputToQuestionSet = (): QuestionSet => {
     const questions: {
       description: string
       mc: MultipleChoice
-    }[] = []
-    for (
-      let questionIndex = 0;
-      questionIndex < numOfQuestions;
-      questionIndex++
-    ) {
-      const numOfChoices =
-        questionSetInput.questions[questionIndex].choices.length
+    }[] = questionSetInput.questions.map((question) => {
       const mcBuilder = new MultipleChoiceBuilder()
-      for (let choiceIndex = 0; choiceIndex < numOfChoices; choiceIndex++) {
+      question.choices.forEach((choice, choiceIndex) => {
         mcBuilder.appendChoice({
-          answer: formData.get(
-            `question-${questionIndex}-choice-${choiceIndex}-answer`,
-          ) as string,
-          isFixedPosition:
-            formData.get(
-              `question-${questionIndex}-choice-${choiceIndex}-is-fixed-position`,
-            ) === 'on',
+          answer: choice.answer,
+          isFixedPosition: choice.isFixedPosition,
         })
-        if (
-          formData.get(
-            `question-${questionIndex}-choice-${choiceIndex}-is-correct`,
-          ) === 'on'
-        ) {
+        if (choice.isCorrect) {
           mcBuilder.setCorrectChoiceIndex(choiceIndex)
         }
-      }
-
-      questions.push({
-        description: formData.get(`question-${questionIndex}-title`) as string,
-        mc: mcBuilder.build(),
       })
-    }
+      return {
+        description: question.description,
+        mc: mcBuilder.build(),
+      }
+    })
 
     return {
       name: questionSetInput.name,
@@ -191,7 +240,22 @@ function QuestionSetEditor({
                 <input
                   type="text"
                   className="border border-gray-300 px-2 py-1 w-full"
-                  name={`question-${questionIndex}-title`}
+                  onChange={(e) => {
+                    setQuestionSetInput({
+                      ...questionSetInput,
+                      questions: questionSetInput.questions.map(
+                        (question, index) => {
+                          if (index === questionIndex) {
+                            return {
+                              ...question,
+                              description: e.target.value,
+                            }
+                          }
+                          return question
+                        },
+                      ),
+                    })
+                  }}
                 />
               </label>
               <div className="form-group">
@@ -278,14 +342,7 @@ function QuestionSetEditor({
           <button
             type="button"
             className="bg-green-500 text-white px-4 py-2 rounded"
-            onClick={() =>
-              onSave(
-                mapFormDataToQuestionSet(
-                  new FormData(document.forms[0]),
-                  questionSetInput.questions.length,
-                ),
-              )
-            }
+            onClick={() => onSave(mapQuestionSetInputToQuestionSet())}
           >
             Save
           </button>
