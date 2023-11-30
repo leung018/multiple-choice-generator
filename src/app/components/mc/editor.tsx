@@ -36,13 +36,43 @@ export class QuestionSetEditorUIService {
   }
 }
 
+interface QuestionSetInput {
+  name: string
+  questions: {
+    description: string
+    choices: {
+      answer: string
+      isFixedPosition: boolean
+      isCorrect: boolean
+    }[]
+  }[]
+}
+
 function QuestionSetEditor({
   onSave,
 }: {
   onSave: (questionSet: QuestionSet) => void
 }) {
-  const [questionIndexToNumOfChoices, setQuestionIndexToNumOfChoices] =
-    useState<Map<number, number>>(new Map<number, number>([[0, 2]]))
+  const [questionSetInput, setQuestionSetInput] = useState<QuestionSetInput>({
+    name: '',
+    questions: [
+      {
+        description: '',
+        choices: [
+          {
+            answer: '',
+            isFixedPosition: false,
+            isCorrect: false,
+          },
+          {
+            answer: '',
+            isFixedPosition: false,
+            isCorrect: false,
+          },
+        ],
+      },
+    ],
+  })
 
   const renderChoiceInputs = (questionIndex: number, numOfChoices: number) => {
     const choiceInputs = []
@@ -98,9 +128,8 @@ function QuestionSetEditor({
       questionIndex < numOfQuestions;
       questionIndex++
     ) {
-      const numOfChoices = questionIndexToNumOfChoices.get(
-        questionIndex,
-      ) as number
+      const numOfChoices =
+        questionSetInput.questions[questionIndex].choices.length
       const mcBuilder = new MultipleChoiceBuilder()
       for (let choiceIndex = 0; choiceIndex < numOfChoices; choiceIndex++) {
         mcBuilder.appendChoice({
@@ -128,7 +157,7 @@ function QuestionSetEditor({
     }
 
     return {
-      name: formData.get('question-set-name') as string,
+      name: questionSetInput.name,
       questions,
     }
   }
@@ -141,68 +170,105 @@ function QuestionSetEditor({
             <h1 className="text-lg font-bold mb-2">Question Set Name:</h1>
             <input
               type="text"
-              name="question-set-name"
               className="border border-gray-300 px-2 py-1 w-full"
+              onChange={(e) => {
+                setQuestionSetInput({
+                  ...questionSetInput,
+                  name: e.target.value,
+                })
+              }}
             />
           </label>
         </div>
 
-        {Array.from(questionIndexToNumOfChoices).map(
-          ([questionIndex, numOfChoices]) => {
-            return (
-              <div key={questionIndex} className="mb-8">
-                <label>
-                  <h2 className="text-lg font-bold mb-2">
-                    Question {questionIndex + 1}:
-                  </h2>
-                  <input
-                    type="text"
-                    className="border border-gray-300 px-2 py-1 w-full"
-                    name={`question-${questionIndex}-title`}
-                  />
-                </label>
-                <div className="form-group">
-                  <h3 className="text-lg font-bold mb-2">Choices:</h3>
-                  <table className="border-collapse border border-slate-400">
-                    <thead>
-                      <tr>
-                        <th className="border border-slate-300">Answer</th>
-                        <th className="border border-slate-300">Correct</th>
-                        <th className="border border-slate-300">
-                          Fixed Position
-                        </th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {renderChoiceInputs(questionIndex, numOfChoices)}
-                    </tbody>
-                  </table>
+        {questionSetInput.questions.map((question, questionIndex) => {
+          return (
+            <div key={questionIndex} className="mb-8">
+              <label>
+                <h2 className="text-lg font-bold mb-2">
+                  Question {questionIndex + 1}:
+                </h2>
+                <input
+                  type="text"
+                  className="border border-gray-300 px-2 py-1 w-full"
+                  name={`question-${questionIndex}-title`}
+                />
+              </label>
+              <div className="form-group">
+                <h3 className="text-lg font-bold mb-2">Choices:</h3>
+                <table className="border-collapse border border-slate-400">
+                  <thead>
+                    <tr>
+                      <th className="border border-slate-300">Answer</th>
+                      <th className="border border-slate-300">Correct</th>
+                      <th className="border border-slate-300">
+                        Fixed Position
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {renderChoiceInputs(questionIndex, question.choices.length)}
+                  </tbody>
+                </table>
 
-                  <button
-                    type="button"
-                    className="bg-blue-500 text-white px-4 py-2 rounded"
-                    onClick={() => {
-                      const newMap = new Map<number, number>(
-                        questionIndexToNumOfChoices,
-                      )
-                      newMap.set(questionIndex, numOfChoices + 1)
-                      setQuestionIndexToNumOfChoices(newMap)
-                    }}
-                  >
-                    Add Choice
-                  </button>
-                </div>
+                <button
+                  type="button"
+                  className="bg-blue-500 text-white px-4 py-2 rounded"
+                  onClick={() => {
+                    setQuestionSetInput({
+                      ...questionSetInput,
+                      questions: questionSetInput.questions.map(
+                        (question, index) => {
+                          if (index === questionIndex) {
+                            return {
+                              ...question,
+                              choices: [
+                                ...question.choices,
+                                {
+                                  answer: '',
+                                  isFixedPosition: false,
+                                  isCorrect: false,
+                                },
+                              ],
+                            }
+                          }
+                          return question
+                        },
+                      ),
+                    })
+                  }}
+                >
+                  Add Choice
+                </button>
               </div>
-            )
-          },
-        )}
+            </div>
+          )
+        })}
         <button
           type="button"
           className="bg-blue-500 text-white px-4 py-2 rounded"
           onClick={() => {
-            const newMap = new Map<number, number>(questionIndexToNumOfChoices)
-            newMap.set(newMap.size, 2)
-            setQuestionIndexToNumOfChoices(newMap)
+            setQuestionSetInput({
+              ...questionSetInput,
+              questions: [
+                ...questionSetInput.questions,
+                {
+                  description: '',
+                  choices: [
+                    {
+                      answer: '',
+                      isFixedPosition: false,
+                      isCorrect: false,
+                    },
+                    {
+                      answer: '',
+                      isFixedPosition: false,
+                      isCorrect: false,
+                    },
+                  ],
+                },
+              ],
+            })
           }}
         >
           Add Question
@@ -216,7 +282,7 @@ function QuestionSetEditor({
               onSave(
                 mapFormDataToQuestionSet(
                   new FormData(document.forms[0]),
-                  questionIndexToNumOfChoices.size,
+                  questionSetInput.questions.length,
                 ),
               )
             }
