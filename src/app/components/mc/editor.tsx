@@ -69,6 +69,38 @@ function QuestionSetEditor({
     questions: [newQuestion()],
   })
 
+  const handleQuestionUpdate = (
+    questionIndex: number,
+    questionUpdater: (oldQuestion: {
+      description: string
+      choices: {
+        answer: string
+        isFixedPosition: boolean
+        isCorrect: boolean
+      }[]
+    }) => {
+      description: string
+      choices: {
+        answer: string
+        isFixedPosition: boolean
+        isCorrect: boolean
+      }[]
+    },
+  ) => {
+    setQuestionSetInput({
+      ...questionSetInput,
+      questions: questionSetInput.questions.map((oldQuestion, index) => {
+        if (index === questionIndex) {
+          return {
+            ...oldQuestion,
+            ...questionUpdater(oldQuestion),
+          }
+        }
+        return oldQuestion
+      }),
+    })
+  }
+
   const handleChoiceUpdate = (
     questionIndex: number,
     choiceIndex: number,
@@ -78,26 +110,18 @@ function QuestionSetEditor({
       isCorrect?: boolean
     },
   ) => {
-    setQuestionSetInput({
-      ...questionSetInput,
-      questions: questionSetInput.questions.map((question, index) => {
-        if (index === questionIndex) {
+    handleQuestionUpdate(questionIndex, (oldQuestion) => ({
+      ...oldQuestion,
+      choices: oldQuestion.choices.map((oldChoice, index) => {
+        if (index === choiceIndex) {
           return {
-            ...question,
-            choices: question.choices.map((oldChoice, index) => {
-              if (index === choiceIndex) {
-                return {
-                  ...oldChoice,
-                  ...choiceUpdate,
-                }
-              }
-              return oldChoice
-            }),
+            ...oldChoice,
+            ...choiceUpdate,
           }
         }
-        return question
+        return oldChoice
       }),
-    })
+    }))
   }
 
   const renderChoiceInputs = (questionIndex: number, numOfChoices: number) => {
@@ -210,20 +234,10 @@ function QuestionSetEditor({
                   type="text"
                   className="border border-gray-300 px-2 py-1 w-full"
                   onChange={(e) => {
-                    setQuestionSetInput({
-                      ...questionSetInput,
-                      questions: questionSetInput.questions.map(
-                        (question, index) => {
-                          if (index === questionIndex) {
-                            return {
-                              ...question,
-                              description: e.target.value,
-                            }
-                          }
-                          return question
-                        },
-                      ),
-                    })
+                    handleQuestionUpdate(questionIndex, (oldQuestion) => ({
+                      ...oldQuestion,
+                      description: e.target.value,
+                    }))
                   }}
                 />
               </label>
@@ -248,20 +262,10 @@ function QuestionSetEditor({
                   type="button"
                   className="bg-blue-500 text-white px-4 py-2 rounded"
                   onClick={() => {
-                    setQuestionSetInput({
-                      ...questionSetInput,
-                      questions: questionSetInput.questions.map(
-                        (question, index) => {
-                          if (index === questionIndex) {
-                            return {
-                              ...question,
-                              choices: [...question.choices, newChoice()],
-                            }
-                          }
-                          return question
-                        },
-                      ),
-                    })
+                    handleQuestionUpdate(questionIndex, (oldQuestion) => ({
+                      ...oldQuestion,
+                      choices: [...oldQuestion.choices, newChoice()],
+                    }))
                   }}
                 >
                   Add Choice
