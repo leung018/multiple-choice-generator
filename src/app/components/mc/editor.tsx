@@ -91,78 +91,6 @@ function QuestionSetEditor({
     })
   }
 
-  const handleChoiceUpdate = (
-    questionIndex: number,
-    choiceIndex: number,
-    choiceUpdate: Partial<ChoiceInput>,
-  ) => {
-    handleQuestionUpdate(questionIndex, (oldQuestion) => ({
-      ...oldQuestion,
-      choices: oldQuestion.choices.map((oldChoice, index) => {
-        if (index === choiceIndex) {
-          return {
-            ...oldChoice,
-            ...choiceUpdate,
-          }
-        }
-        return oldChoice
-      }),
-    }))
-  }
-
-  const renderChoiceInputs = (questionIndex: number, numOfChoices: number) => {
-    const choiceInputs = []
-    for (let choiceIndex = 0; choiceIndex < numOfChoices; choiceIndex++) {
-      choiceInputs.push(
-        <tr key={choiceIndex}>
-          <td className="border border-slate-300">
-            <input
-              type="text"
-              className="border border-gray-300 px-2 py-1"
-              onChange={(e) => {
-                handleChoiceUpdate(questionIndex, choiceIndex, {
-                  answer: e.target.value,
-                })
-              }}
-              aria-label={`answer of question ${questionIndex + 1} choice ${
-                choiceIndex + 1
-              }`}
-            />
-          </td>
-          <td className="border border-slate-300">
-            <input
-              type="checkbox"
-              className="mr-1"
-              onChange={(e) => {
-                handleChoiceUpdate(questionIndex, choiceIndex, {
-                  isCorrect: e.target.checked,
-                })
-              }}
-              aria-label={`question ${questionIndex + 1} choice ${
-                choiceIndex + 1
-              } is correct answer`}
-            />
-          </td>
-          <td className="border border-slate-300">
-            <input
-              type="checkbox"
-              className="mr-1"
-              aria-label={`question ${questionIndex + 1} choice ${
-                choiceIndex + 1
-              } is fixed position`}
-              onChange={(e) => {
-                handleChoiceUpdate(questionIndex, choiceIndex, {
-                  isFixedPosition: e.target.checked,
-                })
-              }}
-            />
-          </td>
-        </tr>,
-      )
-    }
-    return choiceInputs
-  }
-
   const mapQuestionSetInputToQuestionSet = (): QuestionSet => {
     const questions: {
       description: string
@@ -240,7 +168,16 @@ function QuestionSetEditor({
                     </tr>
                   </thead>
                   <tbody>
-                    {renderChoiceInputs(questionIndex, question.choices.length)}
+                    <ChoicesEditor
+                      questionIndex={questionIndex}
+                      choices={question.choices}
+                      onChoicesUpdate={(choices) => {
+                        handleQuestionUpdate(questionIndex, (oldQuestion) => ({
+                          ...oldQuestion,
+                          choices,
+                        }))
+                      }}
+                    />
                   </tbody>
                 </table>
 
@@ -285,4 +222,79 @@ function QuestionSetEditor({
       </form>
     </div>
   )
+}
+
+function ChoicesEditor(props: {
+  questionIndex: number
+  choices: ChoiceInput[]
+  onChoicesUpdate: (choices: ChoiceInput[]) => void
+}) {
+  const { choices, questionIndex, onChoicesUpdate } = props
+
+  const handleInternalChoiceUpdate = (
+    choiceIndex: number,
+    choiceUpdate: Partial<ChoiceInput>,
+  ) => {
+    const newChoices = choices.map((oldChoice, index) => {
+      if (index === choiceIndex) {
+        return {
+          ...oldChoice,
+          ...choiceUpdate,
+        }
+      }
+      return oldChoice
+    })
+    onChoicesUpdate(newChoices)
+  }
+
+  const choiceEditors = []
+  for (let choiceIndex = 0; choiceIndex < choices.length; choiceIndex++) {
+    choiceEditors.push(
+      <tr key={choiceIndex}>
+        <td className="border border-slate-300">
+          <input
+            type="text"
+            className="border border-gray-300 px-2 py-1"
+            onChange={(e) => {
+              handleInternalChoiceUpdate(choiceIndex, {
+                answer: e.target.value,
+              })
+            }}
+            aria-label={`answer of question ${questionIndex + 1} choice ${
+              choiceIndex + 1
+            }`}
+          />
+        </td>
+        <td className="border border-slate-300">
+          <input
+            type="checkbox"
+            className="mr-1"
+            onChange={(e) => {
+              handleInternalChoiceUpdate(choiceIndex, {
+                isCorrect: e.target.checked,
+              })
+            }}
+            aria-label={`question ${questionIndex + 1} choice ${
+              choiceIndex + 1
+            } is correct answer`}
+          />
+        </td>
+        <td className="border border-slate-300">
+          <input
+            type="checkbox"
+            className="mr-1"
+            aria-label={`question ${questionIndex + 1} choice ${
+              choiceIndex + 1
+            } is fixed position`}
+            onChange={(e) => {
+              handleInternalChoiceUpdate(choiceIndex, {
+                isFixedPosition: e.target.checked,
+              })
+            }}
+          />
+        </td>
+      </tr>,
+    )
+  }
+  return choiceEditors
 }
