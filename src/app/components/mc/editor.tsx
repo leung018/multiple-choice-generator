@@ -53,25 +53,20 @@ function QuestionSetEditor({
 }: {
   onSave: (questionSet: QuestionSet) => void
 }) {
+  const newChoice = () => ({
+    answer: '',
+    isFixedPosition: false,
+    isCorrect: false,
+  })
+
+  const newQuestion = () => ({
+    description: '',
+    choices: [newChoice(), newChoice()],
+  })
+
   const [questionSetInput, setQuestionSetInput] = useState<QuestionSetInput>({
     name: '',
-    questions: [
-      {
-        description: '',
-        choices: [
-          {
-            answer: '',
-            isFixedPosition: false,
-            isCorrect: false,
-          },
-          {
-            answer: '',
-            isFixedPosition: false,
-            isCorrect: false,
-          },
-        ],
-      },
-    ],
+    questions: [newQuestion()],
   })
 
   const handleChoiceUpdate = (
@@ -260,14 +255,7 @@ function QuestionSetEditor({
                           if (index === questionIndex) {
                             return {
                               ...question,
-                              choices: [
-                                ...question.choices,
-                                {
-                                  answer: '',
-                                  isFixedPosition: false,
-                                  isCorrect: false,
-                                },
-                              ],
+                              choices: [...question.choices, newChoice()],
                             }
                           }
                           return question
@@ -288,24 +276,7 @@ function QuestionSetEditor({
           onClick={() => {
             setQuestionSetInput({
               ...questionSetInput,
-              questions: [
-                ...questionSetInput.questions,
-                {
-                  description: '',
-                  choices: [
-                    {
-                      answer: '',
-                      isFixedPosition: false,
-                      isCorrect: false,
-                    },
-                    {
-                      answer: '',
-                      isFixedPosition: false,
-                      isCorrect: false,
-                    },
-                  ],
-                },
-              ],
+              questions: [...questionSetInput.questions, newQuestion()],
             })
           }}
         >
