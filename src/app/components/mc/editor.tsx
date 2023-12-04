@@ -38,14 +38,18 @@ export class QuestionSetEditorUIService {
 
 interface QuestionSetInput {
   name: string
-  questions: {
-    description: string
-    choices: {
-      answer: string
-      isFixedPosition: boolean
-      isCorrect: boolean
-    }[]
-  }[]
+  questions: QuestionInput[]
+}
+
+interface QuestionInput {
+  description: string
+  choices: ChoiceInput[]
+}
+
+interface ChoiceInput {
+  answer: string
+  isFixedPosition: boolean
+  isCorrect: boolean
 }
 
 function QuestionSetEditor({
@@ -71,21 +75,7 @@ function QuestionSetEditor({
 
   const handleQuestionUpdate = (
     questionIndex: number,
-    questionUpdater: (oldQuestion: {
-      description: string
-      choices: {
-        answer: string
-        isFixedPosition: boolean
-        isCorrect: boolean
-      }[]
-    }) => {
-      description: string
-      choices: {
-        answer: string
-        isFixedPosition: boolean
-        isCorrect: boolean
-      }[]
-    },
+    questionUpdater: (oldQuestion: QuestionInput) => QuestionInput,
   ) => {
     setQuestionSetInput({
       ...questionSetInput,
@@ -104,11 +94,7 @@ function QuestionSetEditor({
   const handleChoiceUpdate = (
     questionIndex: number,
     choiceIndex: number,
-    choiceUpdate: {
-      answer?: string
-      isFixedPosition?: boolean
-      isCorrect?: boolean
-    },
+    choiceUpdate: Partial<ChoiceInput>,
   ) => {
     handleQuestionUpdate(questionIndex, (oldQuestion) => ({
       ...oldQuestion,
