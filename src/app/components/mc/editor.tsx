@@ -74,41 +74,53 @@ function QuestionSetEditor({
     ],
   })
 
+  const handleChoiceUpdate = (
+    questionIndex: number,
+    choiceIndex: number,
+    choiceUpdate: {
+      answer?: string
+      isFixedPosition?: boolean
+      isCorrect?: boolean
+    },
+  ) => {
+    setQuestionSetInput({
+      ...questionSetInput,
+      questions: questionSetInput.questions.map((question, index) => {
+        if (index === questionIndex) {
+          return {
+            ...question,
+            choices: question.choices.map((oldChoice, index) => {
+              if (index === choiceIndex) {
+                return {
+                  ...oldChoice,
+                  ...choiceUpdate,
+                }
+              }
+              return oldChoice
+            }),
+          }
+        }
+        return question
+      }),
+    })
+  }
+
   const renderChoiceInputs = (questionIndex: number, numOfChoices: number) => {
     const choiceInputs = []
-    for (let i = 0; i < numOfChoices; i++) {
+    for (let choiceIndex = 0; choiceIndex < numOfChoices; choiceIndex++) {
       choiceInputs.push(
-        <tr key={i}>
+        <tr key={choiceIndex}>
           <td className="border border-slate-300">
             <input
               type="text"
               className="border border-gray-300 px-2 py-1"
               onChange={(e) => {
-                setQuestionSetInput({
-                  ...questionSetInput,
-                  questions: questionSetInput.questions.map(
-                    (question, index) => {
-                      if (index === questionIndex) {
-                        return {
-                          ...question,
-                          choices: question.choices.map((choice, index) => {
-                            if (index === i) {
-                              return {
-                                ...choice,
-                                answer: e.target.value,
-                              }
-                            }
-                            return choice
-                          }),
-                        }
-                      }
-                      return question
-                    },
-                  ),
+                handleChoiceUpdate(questionIndex, choiceIndex, {
+                  answer: e.target.value,
                 })
               }}
               aria-label={`answer of question ${questionIndex + 1} choice ${
-                i + 1
+                choiceIndex + 1
               }`}
             />
           </td>
@@ -117,31 +129,12 @@ function QuestionSetEditor({
               type="checkbox"
               className="mr-1"
               onChange={(e) => {
-                setQuestionSetInput({
-                  ...questionSetInput,
-                  questions: questionSetInput.questions.map(
-                    (question, index) => {
-                      if (index === questionIndex) {
-                        return {
-                          ...question,
-                          choices: question.choices.map((choice, index) => {
-                            if (index === i) {
-                              return {
-                                ...choice,
-                                isCorrect: e.target.checked,
-                              }
-                            }
-                            return choice
-                          }),
-                        }
-                      }
-                      return question
-                    },
-                  ),
+                handleChoiceUpdate(questionIndex, choiceIndex, {
+                  isCorrect: e.target.checked,
                 })
               }}
               aria-label={`question ${questionIndex + 1} choice ${
-                i + 1
+                choiceIndex + 1
               } is correct answer`}
             />
           </td>
@@ -150,30 +143,11 @@ function QuestionSetEditor({
               type="checkbox"
               className="mr-1"
               aria-label={`question ${questionIndex + 1} choice ${
-                i + 1
+                choiceIndex + 1
               } is fixed position`}
               onChange={(e) => {
-                setQuestionSetInput({
-                  ...questionSetInput,
-                  questions: questionSetInput.questions.map(
-                    (question, index) => {
-                      if (index === questionIndex) {
-                        return {
-                          ...question,
-                          choices: question.choices.map((choice, index) => {
-                            if (index === i) {
-                              return {
-                                ...choice,
-                                isFixedPosition: e.target.checked,
-                              }
-                            }
-                            return choice
-                          }),
-                        }
-                      }
-                      return question
-                    },
-                  ),
+                handleChoiceUpdate(questionIndex, choiceIndex, {
+                  isFixedPosition: e.target.checked,
                 })
               }}
             />
