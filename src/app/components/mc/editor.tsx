@@ -52,22 +52,22 @@ interface ChoiceInput {
   isCorrect: boolean
 }
 
+const newChoice = (): ChoiceInput => ({
+  answer: '',
+  isFixedPosition: false,
+  isCorrect: false,
+})
+
+const newQuestion = (): QuestionInput => ({
+  description: '',
+  choices: [newChoice(), newChoice()],
+})
+
 function QuestionSetEditor({
   onSave,
 }: {
   onSave: (questionSet: QuestionSet) => void
 }) {
-  const newChoice = () => ({
-    answer: '',
-    isFixedPosition: false,
-    isCorrect: false,
-  })
-
-  const newQuestion = () => ({
-    description: '',
-    choices: [newChoice(), newChoice()],
-  })
-
   const [questionSetInput, setQuestionSetInput] = useState<QuestionSetInput>({
     name: '',
     questions: [newQuestion()],
