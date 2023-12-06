@@ -81,10 +81,7 @@ function QuestionSetEditor({
       ...questionSetInput,
       questions: questionSetInput.questions.map((oldQuestion, index) => {
         if (index === questionIndex) {
-          return {
-            ...oldQuestion,
-            ...questionUpdater(oldQuestion),
-          }
+          return questionUpdater(oldQuestion)
         }
         return oldQuestion
       }),
