@@ -8,7 +8,6 @@ import { MultipleChoice } from '../../../model/mc'
 import '@testing-library/jest-dom'
 
 class UIServiceInteractor {
-  readonly screen
   private readonly editorRepo: QuestionSetRepo
   private questionSetName: string
   private questionNumberFocus = 1
@@ -20,7 +19,6 @@ class UIServiceInteractor {
         editorRepo: this.editorRepo,
       }).getElement(),
     )
-    this.screen = screen
 
     this.questionSetName = questionSetName
     this.syncQuestionSetName()
@@ -80,28 +78,14 @@ class UIServiceInteractor {
   }
 
   clickCorrectAnswer({ choiceNumber }: { choiceNumber: number }) {
-    fireEvent.click(
-      screen.getByLabelText(
-        `question ${this.questionNumberFocus} choice ${choiceNumber} is correct answer`,
-      ),
-    )
+    fireEvent.click(this.correctAnswerCheckbox({ choiceNumber }))
     return this
   }
 
-  expectCorrectAnswerChecked({ choiceNumber }: { choiceNumber: number }) {
-    expect(
-      screen.getByLabelText(
-        `question ${this.questionNumberFocus} choice ${choiceNumber} is correct answer`,
-      ),
-    ).toBeChecked()
-  }
-
-  expectCorrectAnswerUnchecked({ choiceNumber }: { choiceNumber: number }) {
-    expect(
-      screen.getByLabelText(
-        `question ${this.questionNumberFocus} choice ${choiceNumber} is correct answer`,
-      ),
-    ).not.toBeChecked()
+  correctAnswerCheckbox({ choiceNumber }: { choiceNumber: number }) {
+    return screen.getByLabelText(
+      `question ${this.questionNumberFocus} choice ${choiceNumber} is correct answer`,
+    )
   }
 
   clickAddChoice() {
@@ -311,8 +295,12 @@ describe('QuestionSetEditorUIService', () => {
     expect(actualQuestionSet.questions[0].mc.correctChoiceIndex).toBe(1)
 
     // also check that the UI is updated correctly
-    interactor.expectCorrectAnswerChecked({ choiceNumber: 2 })
-    interactor.expectCorrectAnswerUnchecked({ choiceNumber: 1 })
-    interactor.expectCorrectAnswerUnchecked({ choiceNumber: 3 })
+    expect(interactor.correctAnswerCheckbox({ choiceNumber: 2 })).toBeChecked()
+    expect(
+      interactor.correctAnswerCheckbox({ choiceNumber: 1 }),
+    ).not.toBeChecked()
+    expect(
+      interactor.correctAnswerCheckbox({ choiceNumber: 3 }),
+    ).not.toBeChecked()
   })
 })
