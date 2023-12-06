@@ -276,6 +276,7 @@ function ChoicesEditor(props: {
           <input
             type="checkbox"
             className="mr-1"
+            checked={choices[choiceIndex].isCorrect}
             onChange={(e) => {
               handleInternalChoiceUpdate(choiceIndex, {
                 isCorrect: e.target.checked,

@@ -5,6 +5,7 @@ import {
 } from '../../../repo/question_set'
 import { QuestionSetEditorUIService } from './editor'
 import { MultipleChoice } from '../../../model/mc'
+import '@testing-library/jest-dom'
 
 class UIServiceInteractor {
   readonly screen
@@ -85,6 +86,22 @@ class UIServiceInteractor {
       ),
     )
     return this
+  }
+
+  expectCorrectAnswerChecked({ choiceNumber }: { choiceNumber: number }) {
+    expect(
+      screen.getByLabelText(
+        `question ${this.questionNumberFocus} choice ${choiceNumber} is correct answer`,
+      ),
+    ).toBeChecked()
+  }
+
+  expectCorrectAnswerUnchecked({ choiceNumber }: { choiceNumber: number }) {
+    expect(
+      screen.getByLabelText(
+        `question ${this.questionNumberFocus} choice ${choiceNumber} is correct answer`,
+      ),
+    ).not.toBeChecked()
   }
 
   clickAddChoice() {
@@ -292,5 +309,22 @@ describe('QuestionSetEditorUIService', () => {
 
     const actualQuestionSet = interactor.getSavedQuestionSet()
     expect(actualQuestionSet.questions[0].mc.correctChoiceIndex).toBe(1)
+  })
+
+  it('should uncheck other previously checked correct answer after checking another answer', () => {
+    const interactor = new UIServiceInteractor({})
+
+    interactor
+      .setQuestionNumberFocus(1)
+      .inputQuestionDescription({ description: '1 + 1 = ?' })
+      .inputAnswer({ choiceNumber: 1, answer: '0' })
+      .inputAnswer({ choiceNumber: 2, answer: '2' })
+
+    interactor
+      .clickCorrectAnswer({ choiceNumber: 1 })
+      .clickCorrectAnswer({ choiceNumber: 2 })
+
+    interactor.expectCorrectAnswerChecked({ choiceNumber: 2 })
+    interactor.expectCorrectAnswerUnchecked({ choiceNumber: 1 })
   })
 })
