@@ -1,30 +1,19 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# Multiple Choice Generator
 
-## Getting Started
+## Introduction
 
-First, run the development server:
+This project aims to develop a web application prototype that allows users to play previously saved multiple-choice questions, with the choices generated in a different order each time they play. The project also focuses on incorporating standard engineering practices such as **automated testing**, **continuous integration**, **continuous deployment**, and maintaining descriptive changes through **small pull requests** and **focused commits**.
 
-```bash
-yarn dev
-```
+## Target Features
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Please note that the project is currently a work in progress, and the following features are not yet available:
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+1. **Question Bank Stored in Browser Local Storage**
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
+2. **Score Calculation**
 
-## Learn More
+3. **Randomized Order of Choices**: Each time a user plays, they will experience a different order of choices for each question. This concept was initially inspired by an idea from a friend, and I have made modifications to create my own version of it.
 
-To learn more about Next.js, take a look at the following resources:
+## Technical Structure
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+The project currently utilizes Next.js for web application development and leverages Vercel for continuous deployment. The codebase is a work in progress, and **ongoing refactoring** will be carried out to improve readability and maintainability.
