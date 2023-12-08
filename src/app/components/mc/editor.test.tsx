@@ -5,9 +5,9 @@ import {
 } from '../../../repo/question_set'
 import { QuestionSetEditorUIService } from './editor'
 import { MultipleChoice } from '../../../model/mc'
+import '@testing-library/jest-dom'
 
 class UIServiceInteractor {
-  readonly screen
   private readonly editorRepo: QuestionSetRepo
   private questionSetName: string
   private questionNumberFocus = 1
@@ -19,7 +19,6 @@ class UIServiceInteractor {
         editorRepo: this.editorRepo,
       }).getElement(),
     )
-    this.screen = screen
 
     this.questionSetName = questionSetName
     this.syncQuestionSetName()
@@ -79,12 +78,14 @@ class UIServiceInteractor {
   }
 
   clickCorrectAnswer({ choiceNumber }: { choiceNumber: number }) {
-    fireEvent.click(
-      screen.getByLabelText(
-        `question ${this.questionNumberFocus} choice ${choiceNumber} is correct answer`,
-      ),
-    )
+    fireEvent.click(this.correctAnswerCheckbox({ choiceNumber }))
     return this
+  }
+
+  correctAnswerCheckbox({ choiceNumber }: { choiceNumber: number }) {
+    return screen.getByLabelText(
+      `question ${this.questionNumberFocus} choice ${choiceNumber} is correct answer`,
+    )
   }
 
   clickAddChoice() {
@@ -269,6 +270,69 @@ describe('QuestionSetEditorUIService', () => {
           ],
           correctChoiceIndex: 3,
         }),
+      },
+    ])
+  })
+
+  it('should only choose one correct answer no matter how many are clicked as correct', () => {
+    const interactor = new UIServiceInteractor({})
+
+    interactor
+      .setQuestionNumberFocus(1)
+      .inputQuestionDescription({ description: '1 + 1 = ?' })
+      .inputAnswer({ choiceNumber: 1, answer: '0' })
+      .inputAnswer({ choiceNumber: 2, answer: '2' })
+      .clickAddChoice()
+      .inputAnswer({ choiceNumber: 3, answer: '1' })
+
+    interactor
+      .clickCorrectAnswer({ choiceNumber: 1 })
+      .clickCorrectAnswer({ choiceNumber: 3 })
+      .clickCorrectAnswer({ choiceNumber: 2 })
+      .clickSave()
+
+    const actualQuestionSet = interactor.getSavedQuestionSet()
+    expect(actualQuestionSet.questions[0].mc.correctChoiceIndex).toBe(1)
+
+    // also check that the UI is updated correctly
+    expect(interactor.correctAnswerCheckbox({ choiceNumber: 2 })).toBeChecked()
+    expect(
+      interactor.correctAnswerCheckbox({ choiceNumber: 1 }),
+    ).not.toBeChecked()
+    expect(
+      interactor.correctAnswerCheckbox({ choiceNumber: 3 }),
+    ).not.toBeChecked()
+  })
+
+  it('should allow multiple choices to be fixed position', () => {
+    const interactor = new UIServiceInteractor({})
+
+    interactor
+      .setQuestionNumberFocus(1)
+      .inputQuestionDescription({ description: '1 + 1 = ?' })
+      .inputAnswer({ choiceNumber: 1, answer: 'I. 0' })
+      .inputAnswer({ choiceNumber: 2, answer: 'II. 1' })
+      .clickAddChoice()
+      .inputAnswer({ choiceNumber: 3, answer: 'III. None of the above' })
+      .clickFixedPosition({ choiceNumber: 1 })
+      .clickFixedPosition({ choiceNumber: 2 })
+      .clickFixedPosition({ choiceNumber: 3 })
+      .clickCorrectAnswer({ choiceNumber: 3 })
+      .clickSave()
+
+    const actualQuestionSet = interactor.getSavedQuestionSet()
+    expect(actualQuestionSet.questions[0].mc.choices).toEqual([
+      {
+        answer: 'I. 0',
+        isFixedPosition: true,
+      },
+      {
+        answer: 'II. 1',
+        isFixedPosition: true,
+      },
+      {
+        answer: 'III. None of the above',
+        isFixedPosition: true,
       },
     ])
   })
