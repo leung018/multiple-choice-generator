@@ -303,4 +303,37 @@ describe('QuestionSetEditorUIService', () => {
       interactor.correctAnswerCheckbox({ choiceNumber: 3 }),
     ).not.toBeChecked()
   })
+
+  it('should allow multiple choices to be fixed position', () => {
+    const interactor = new UIServiceInteractor({})
+
+    interactor
+      .setQuestionNumberFocus(1)
+      .inputQuestionDescription({ description: '1 + 1 = ?' })
+      .inputAnswer({ choiceNumber: 1, answer: 'I. 0' })
+      .inputAnswer({ choiceNumber: 2, answer: 'II. 1' })
+      .clickAddChoice()
+      .inputAnswer({ choiceNumber: 3, answer: 'III. None of the above' })
+      .clickFixedPosition({ choiceNumber: 1 })
+      .clickFixedPosition({ choiceNumber: 2 })
+      .clickFixedPosition({ choiceNumber: 3 })
+      .clickCorrectAnswer({ choiceNumber: 3 })
+      .clickSave()
+
+    const actualQuestionSet = interactor.getSavedQuestionSet()
+    expect(actualQuestionSet.questions[0].mc.choices).toEqual([
+      {
+        answer: 'I. 0',
+        isFixedPosition: true,
+      },
+      {
+        answer: 'II. 1',
+        isFixedPosition: true,
+      },
+      {
+        answer: 'III. None of the above',
+        isFixedPosition: true,
+      },
+    ])
+  })
 })
