@@ -16,4 +16,4 @@ Please note that the project is currently a work in progress, and the following 
 
 ## Technical Structure
 
-The project currently utilizes Next.js for web application development and leverages Vercel for continuous deployment. The codebase is a work in progress, and **ongoing refactoring** will be carried out to improve readability and maintainability.
+The project currently utilizes **Next.js** for web application development and leverages **Vercel** for continuous deployment. The codebase is a work in progress, and **ongoing refactoring** will be carried out to improve readability and maintainability.
