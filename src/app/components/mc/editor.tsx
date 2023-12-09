@@ -103,6 +103,19 @@ function QuestionSetEditor({
     if (questionSetInput.name === '') {
       return "Question set name can't be empty"
     }
+
+    for (
+      let questionIndex = 0;
+      questionIndex < questionSetInput.questions.length;
+      questionIndex++
+    ) {
+      const question = questionSetInput.questions[questionIndex]
+      const questionNumber = questionIndex + 1
+      if (question.description === '') {
+        return `Question ${questionNumber}: description can't be empty`
+      }
+    }
+
     return null
   }
 
