@@ -72,6 +72,9 @@ function QuestionSetEditor({
     name: '',
     questions: [newQuestion()],
   })
+  const [errorMessage, setErrorMessage] = useState<string | null>(
+    "Question set name can't be empty",
+  )
 
   const handleQuestionUpdate = (
     questionIndex: number,
@@ -215,6 +218,13 @@ function QuestionSetEditor({
           >
             Save
           </button>
+          <div
+            id="error-message"
+            className="text-red-500 ml-2"
+            aria-label="error prompt"
+          >
+            {errorMessage}
+          </div>
         </div>
       </form>
     </div>

@@ -103,6 +103,10 @@ class UIServiceInteractor {
     fireEvent.click(screen.getByText('Save'))
     return this
   }
+
+  errorPrompt() {
+    return screen.getByLabelText('error prompt')
+  }
 }
 
 describe('QuestionSetEditorUIService', () => {
@@ -335,5 +339,21 @@ describe('QuestionSetEditorUIService', () => {
         isFixedPosition: true,
       },
     ])
+  })
+
+  it('should reject saving question set when question set name is empty', () => {
+    const interactor = new UIServiceInteractor({ questionSetName: '' })
+
+    interactor
+      .setQuestionNumberFocus(1)
+      .inputQuestionDescription({ description: '1 + 1 = ?' })
+      .inputAnswer({ choiceNumber: 1, answer: '2' })
+      .inputAnswer({ choiceNumber: 2, answer: '0' })
+      .clickCorrectAnswer({ choiceNumber: 1 })
+      .clickSave()
+
+    expect(interactor.errorPrompt()).toHaveTextContent(
+      "Question set name can't be empty",
+    )
   })
 })
