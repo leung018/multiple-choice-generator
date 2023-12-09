@@ -114,6 +114,8 @@ function QuestionSetEditor({
       if (question.description === '') {
         return `Question ${questionNumber}: description can't be empty`
       }
+
+      let hasIsCorrect = false
       for (
         let choiceIndex = 0;
         choiceIndex < question.choices.length;
@@ -123,6 +125,12 @@ function QuestionSetEditor({
         if (choice.answer === '') {
           return `Question ${questionNumber}: answer can't be empty`
         }
+        if (choice.isCorrect) {
+          hasIsCorrect = true
+        }
+      }
+      if (!hasIsCorrect) {
+        return `Question ${questionNumber}: please select one correct choice`
       }
     }
 
