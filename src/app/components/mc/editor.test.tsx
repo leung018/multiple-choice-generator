@@ -105,7 +105,7 @@ class UIServiceInteractor {
   }
 
   errorPrompt() {
-    return screen.getByLabelText('error prompt')
+    return screen.queryByLabelText('error prompt')
   }
 }
 
@@ -339,6 +339,19 @@ describe('QuestionSetEditorUIService', () => {
         isFixedPosition: true,
       },
     ])
+  })
+
+  it('should hide error prompt when successful save', () => {
+    const interactor = new UIServiceInteractor({})
+    interactor
+      .setQuestionNumberFocus(1)
+      .inputQuestionDescription({ description: '1 + 1 = ?' })
+      .inputAnswer({ choiceNumber: 1, answer: '2' })
+      .inputAnswer({ choiceNumber: 2, answer: '0' })
+      .clickCorrectAnswer({ choiceNumber: 1 })
+      .clickSave()
+
+    expect(interactor.errorPrompt()).toBeNull()
   })
 
   it('should reject saving question set when question set name is empty', () => {

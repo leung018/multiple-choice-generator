@@ -72,9 +72,7 @@ function QuestionSetEditor({
     name: '',
     questions: [newQuestion()],
   })
-  const [errorMessage, setErrorMessage] = useState<string | null>(
-    "Question set name can't be empty",
-  )
+  const [errorMessage, setErrorMessage] = useState<string | null>(null)
 
   const handleQuestionUpdate = (
     questionIndex: number,
@@ -89,6 +87,23 @@ function QuestionSetEditor({
         return oldQuestion
       }),
     })
+  }
+
+  const handleSaveClick = () => {
+    const questionSet = mapQuestionSetInputToQuestionSet()
+    const errorMessage = validateQuestionSet(questionSet)
+    if (errorMessage) {
+      setErrorMessage(errorMessage)
+    } else {
+      onSave(questionSet)
+    }
+  }
+
+  const validateQuestionSet = (questionSet: QuestionSet): string | null => {
+    if (questionSet.name === '') {
+      return "Question set name can't be empty"
+    }
+    return null
   }
 
   const mapQuestionSetInputToQuestionSet = (): QuestionSet => {
@@ -214,17 +229,19 @@ function QuestionSetEditor({
           <button
             type="button"
             className="bg-green-500 text-white px-4 py-2 rounded"
-            onClick={() => onSave(mapQuestionSetInputToQuestionSet())}
+            onClick={() => handleSaveClick()}
           >
             Save
           </button>
-          <div
-            id="error-message"
-            className="text-red-500 ml-2"
-            aria-label="error prompt"
-          >
-            {errorMessage}
-          </div>
+          {errorMessage && (
+            <div
+              id="error-message"
+              className="text-red-500 ml-2"
+              aria-label="error prompt"
+            >
+              {errorMessage}
+            </div>
+          )}
         </div>
       </form>
     </div>
