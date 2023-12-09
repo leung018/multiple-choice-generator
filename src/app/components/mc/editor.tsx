@@ -90,17 +90,17 @@ function QuestionSetEditor({
   }
 
   const handleSaveClick = () => {
-    const questionSet = mapQuestionSetInputToQuestionSet()
-    const errorMessage = validateQuestionSet(questionSet)
+    const errorMessage = validateQuestionSetInput()
     if (errorMessage) {
       setErrorMessage(errorMessage)
-    } else {
-      onSave(questionSet)
+      return
     }
+    const questionSet = mapQuestionSetInputToQuestionSet()
+    onSave(questionSet)
   }
 
-  const validateQuestionSet = (questionSet: QuestionSet): string | null => {
-    if (questionSet.name === '') {
+  const validateQuestionSetInput = (): string | null => {
+    if (questionSetInput.name === '') {
       return "Question set name can't be empty"
     }
     return null
