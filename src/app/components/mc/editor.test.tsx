@@ -384,4 +384,20 @@ describe('QuestionSetEditorUIService', () => {
       "Question 1: description can't be empty",
     )
   })
+
+  it('should reject saving question set when empty answer', () => {
+    const interactor = new UIServiceInteractor({})
+
+    interactor
+      .setQuestionNumberFocus(1)
+      .inputQuestionDescription({ description: '1 + 1 = ?' })
+      .inputAnswer({ choiceNumber: 1, answer: '2' })
+      .inputAnswer({ choiceNumber: 2, answer: '' })
+      .clickCorrectAnswer({ choiceNumber: 1 })
+      .clickSave()
+
+    expect(interactor.errorPrompt()).toHaveTextContent(
+      "Question 1: answer can't be empty",
+    )
+  })
 })

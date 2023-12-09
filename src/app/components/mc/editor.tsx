@@ -114,6 +114,16 @@ function QuestionSetEditor({
       if (question.description === '') {
         return `Question ${questionNumber}: description can't be empty`
       }
+      for (
+        let choiceIndex = 0;
+        choiceIndex < question.choices.length;
+        choiceIndex++
+      ) {
+        const choice = question.choices[choiceIndex]
+        if (choice.answer === '') {
+          return `Question ${questionNumber}: answer can't be empty`
+        }
+      }
     }
 
     return null
