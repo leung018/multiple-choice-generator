@@ -111,27 +111,39 @@ function QuestionSetEditor({
     ) {
       const question = questionSetInput.questions[questionIndex]
       const questionNumber = questionIndex + 1
-      if (question.description === '') {
-        return `Question ${questionNumber}: description can't be empty`
+      let errorMessage: string | null
+      if ((errorMessage = validateQuestionInput(question, questionNumber))) {
+        return errorMessage
       }
+    }
 
-      let hasIsCorrect = false
-      for (
-        let choiceIndex = 0;
-        choiceIndex < question.choices.length;
-        choiceIndex++
-      ) {
-        const choice = question.choices[choiceIndex]
-        if (choice.answer === '') {
-          return `Question ${questionNumber}: answer can't be empty`
-        }
-        if (choice.isCorrect) {
-          hasIsCorrect = true
-        }
+    return null
+  }
+
+  const validateQuestionInput = (
+    question: QuestionInput,
+    questionNumber: number,
+  ): string | null => {
+    if (question.description === '') {
+      return `Question ${questionNumber}: description can't be empty`
+    }
+
+    let hasIsCorrect = false
+    for (
+      let choiceIndex = 0;
+      choiceIndex < question.choices.length;
+      choiceIndex++
+    ) {
+      const choice = question.choices[choiceIndex]
+      if (choice.answer === '') {
+        return `Question ${questionNumber}: answer can't be empty`
       }
-      if (!hasIsCorrect) {
-        return `Question ${questionNumber}: please select one correct choice`
+      if (choice.isCorrect) {
+        hasIsCorrect = true
       }
+    }
+    if (!hasIsCorrect) {
+      return `Question ${questionNumber}: please select one correct choice`
     }
 
     return null
