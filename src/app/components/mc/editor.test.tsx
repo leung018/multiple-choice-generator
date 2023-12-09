@@ -431,4 +431,27 @@ describe('QuestionSetEditorUIService', () => {
       'Question 1: duplicate answer',
     )
   })
+
+  it('should save if duplicate answer in different questions', () => {
+    const interactor = new UIServiceInteractor({})
+
+    interactor
+      .setQuestionNumberFocus(1)
+      .inputQuestionDescription({ description: '1 + 1 = ?' })
+      .inputAnswer({ choiceNumber: 1, answer: '2' })
+      .inputAnswer({ choiceNumber: 2, answer: '0' })
+      .clickCorrectAnswer({ choiceNumber: 1 })
+
+    interactor
+      .clickAddQuestion()
+      .setQuestionNumberFocus(2)
+      .inputQuestionDescription({ description: '1 + 2 = ?' })
+      .inputAnswer({ choiceNumber: 1, answer: '3' })
+      .inputAnswer({ choiceNumber: 2, answer: '2' })
+      .clickCorrectAnswer({ choiceNumber: 1 })
+      .clickSave()
+
+    expect(interactor.errorPrompt()).toBeNull()
+    interactor.getSavedQuestionSet() // should not throw
+  })
 })
