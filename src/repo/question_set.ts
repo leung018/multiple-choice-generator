@@ -19,6 +19,9 @@ class InMemoryQuestionSetRepo implements QuestionSetRepo {
   }
 
   getQuestionSetByName(questionSetName: string): QuestionSet {
+    if (!this.nameToQuestionSet[questionSetName]) {
+      throw new Error(`QuestionSet with name ${questionSetName} not found`) // TODO: Create custom error
+    }
     return this.nameToQuestionSet[questionSetName]
   }
 }

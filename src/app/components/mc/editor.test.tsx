@@ -365,9 +365,10 @@ describe('QuestionSetEditorUIService', () => {
       .clickCorrectAnswer({ choiceNumber: 1 })
       .clickSave()
 
-    expect(interactor.errorPrompt()).toHaveTextContent(
-      "Question set name can't be empty",
-    )
+    expectCannotSaveQuestionSet({
+      interactor,
+      errorMessage: "Question set name can't be empty",
+    })
   })
 
   it('should reject saving question set when empty question description', () => {
@@ -380,9 +381,10 @@ describe('QuestionSetEditorUIService', () => {
       .clickCorrectAnswer({ choiceNumber: 1 })
       .clickSave()
 
-    expect(interactor.errorPrompt()).toHaveTextContent(
-      "Question 1: description can't be empty",
-    )
+    expectCannotSaveQuestionSet({
+      interactor,
+      errorMessage: "Question 1: description can't be empty",
+    })
   })
 
   it('should reject saving question set when empty answer', () => {
@@ -396,9 +398,10 @@ describe('QuestionSetEditorUIService', () => {
       .clickCorrectAnswer({ choiceNumber: 1 })
       .clickSave()
 
-    expect(interactor.errorPrompt()).toHaveTextContent(
-      "Question 1: answer can't be empty",
-    )
+    expectCannotSaveQuestionSet({
+      interactor,
+      errorMessage: "Question 1: answer can't be empty",
+    })
   })
 
   it('should reject saving question set when no correct answer is selected', () => {
@@ -411,9 +414,10 @@ describe('QuestionSetEditorUIService', () => {
       .inputAnswer({ choiceNumber: 2, answer: '0' })
       .clickSave()
 
-    expect(interactor.errorPrompt()).toHaveTextContent(
-      'Question 1: please select one correct choice',
-    )
+    expectCannotSaveQuestionSet({
+      interactor,
+      errorMessage: 'Question 1: please select one correct choice',
+    })
   })
 
   it('should reject saving question set when duplicate answer in a question', () => {
@@ -427,9 +431,10 @@ describe('QuestionSetEditorUIService', () => {
       .clickCorrectAnswer({ choiceNumber: 1 })
       .clickSave()
 
-    expect(interactor.errorPrompt()).toHaveTextContent(
-      'Question 1: duplicate answer',
-    )
+    expectCannotSaveQuestionSet({
+      interactor,
+      errorMessage: 'Question 1: duplicate answer',
+    })
   })
 
   it('should save if duplicate answer in different questions', () => {
@@ -455,3 +460,16 @@ describe('QuestionSetEditorUIService', () => {
     interactor.getSavedQuestionSet() // should not throw
   })
 })
+
+function expectCannotSaveQuestionSet({
+  interactor,
+  errorMessage,
+}: {
+  interactor: UIServiceInteractor
+  errorMessage: string
+}) {
+  expect(interactor.errorPrompt()).toHaveTextContent(errorMessage)
+  expect(() => {
+    interactor.getSavedQuestionSet()
+  }).toThrow()
+}
