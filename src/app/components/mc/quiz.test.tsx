@@ -12,11 +12,11 @@ describe('MultipleChoiceQuiz', () => {
     return new MultipleChoiceBuilder().setCorrectChoiceIndex(0)
   }
 
-  it('should render title and choices of a question', () => {
+  it('should render attributes of a question', () => {
     const { getByText, getByLabelText } = renderMultipleChoicePage({
       questionSet: new QuestionSetBuilderForTest()
         .appendQuestion({
-          title: 'Sample Question?',
+          description: 'Sample Question?',
           mc: presetCorrectChoiceMcBuilder()
             .appendNonFixedChoice('Answer 1')
             .appendNonFixedChoice('Answer 2')
@@ -33,10 +33,10 @@ describe('MultipleChoiceQuiz', () => {
     const { getByText } = renderMultipleChoicePage({
       questionSet: new QuestionSetBuilderForTest()
         .appendQuestion({
-          title: 'Question 1',
+          description: 'Question 1',
         })
         .appendQuestion({
-          title: 'Question 2',
+          description: 'Question 2',
         })
         .build(),
     })
@@ -109,7 +109,7 @@ function renderMultipleChoicePage({
   // TODO: move this mapping to MultipleChoiceQuizUIService
   const questions = questionSet.questions.map((question) => {
     return {
-      title: question.description,
+      description: question.description,
       mc: {
         choices: question.mc.choices.map((choice) => choice.answer),
         correctChoiceIndex: question.mc.correctChoiceIndex,

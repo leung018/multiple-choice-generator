@@ -4,7 +4,7 @@ import { useState } from 'react'
 
 interface MultipleChoicePageProps {
   questions: {
-    title: string
+    description: string
     mc: {
       choices: ReadonlyArray<string>
       correctChoiceIndex: number
@@ -30,7 +30,9 @@ export default function MultipleChoiceQuiz({
     <div className="p-4">
       {questions.map((question, questionIndex) => (
         <div key={questionIndex} className="mb-4">
-          <p className="font-bold whitespace-pre-line">{question.title}</p>
+          <p className="font-bold whitespace-pre-line">
+            {question.description}
+          </p>
           <div className="ml-4">
             {question.mc.choices.map((choice, choiceIndex) => (
               <label key={choiceIndex} className="flex items-center mb-2">

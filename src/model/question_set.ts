@@ -16,7 +16,7 @@ export class QuestionSetBuilderForTest {
   }[] = []
 
   appendQuestion({
-    title = 'dummy title',
+    description = 'dummy title',
     mc = new MultipleChoiceBuilder()
       .setCorrectChoiceIndex(0)
       .appendNonFixedChoice('dummy choice 1')
@@ -24,7 +24,7 @@ export class QuestionSetBuilderForTest {
       .build(),
   } = {}): QuestionSetBuilderForTest {
     this.questions.push({
-      description: title,
+      description,
       mc: mc,
     })
     return this

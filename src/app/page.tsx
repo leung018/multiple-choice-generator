@@ -3,21 +3,21 @@ import MultipleChoiceQuiz from './components/mc/quiz'
 export default function Home() {
   const questions = [
     {
-      title: 'What is correct color of the sky?',
+      description: 'What is correct color of the sky?',
       mc: {
         choices: ['Red', 'Blue', 'Green'],
         correctChoiceIndex: 1,
       },
     },
     {
-      title: '1 + 1 = ?',
+      description: '1 + 1 = ?',
       mc: {
         choices: ['1', '2', '3'],
         correctChoiceIndex: 0,
       },
     },
     {
-      title:
+      description:
         'Which of the below is a programming language?\n I. Java\n II. Python\n III. JavaScript',
       mc: {
         choices: [
