@@ -6,7 +6,11 @@ import {
   QuestionSetRepoFactory,
 } from '../../../repo/question_set'
 import { QuestionSet } from '../../../model/question_set'
-import { MultipleChoice, MultipleChoiceBuilder } from '../../../model/mc'
+import {
+  MultipleChoice,
+  MultipleChoiceBuilder,
+  MultipleChoiceError,
+} from '../../../model/mc'
 
 export class QuestionSetEditorUIService {
   static create() {
@@ -126,6 +130,13 @@ function QuestionSetEditor({
   ): string | null => {
     if (question.description === '') {
       return `Question ${questionNumber}: description can't be empty`
+    }
+
+    if (
+      new Set(question.choices.map((c) => c.answer)).size !==
+      question.choices.length
+    ) {
+      return `Question ${questionNumber}: duplicate answer`
     }
 
     let hasIsCorrect = false

@@ -415,4 +415,20 @@ describe('QuestionSetEditorUIService', () => {
       'Question 1: please select one correct choice',
     )
   })
+
+  it('should reject saving question set when duplicate answer in a question', () => {
+    const interactor = new UIServiceInteractor({})
+
+    interactor
+      .setQuestionNumberFocus(1)
+      .inputQuestionDescription({ description: '1 + 1 = ?' })
+      .inputAnswer({ choiceNumber: 1, answer: '2' })
+      .inputAnswer({ choiceNumber: 2, answer: '2' })
+      .clickCorrectAnswer({ choiceNumber: 1 })
+      .clickSave()
+
+    expect(interactor.errorPrompt()).toHaveTextContent(
+      'Question 1: duplicate answer',
+    )
+  })
 })
