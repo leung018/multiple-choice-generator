@@ -2,7 +2,7 @@ import { CustomBaseError } from '../utils/err'
 
 type MultipleChoiceErrorCode =
   | 'DUPLICATE_CHOICES'
-  | 'INVALID_INDEX'
+  | 'INVALID_CORRECT_CHOICE_INDEX'
   | 'INVALID_NUMBER_OF_CHOICES'
 
 export class MultipleChoiceError extends CustomBaseError {
@@ -40,7 +40,7 @@ export class MultipleChoice {
       input.correctChoiceIndex >= input.choices.length
     ) {
       throw new MultipleChoiceError(
-        'INVALID_INDEX',
+        'INVALID_CORRECT_CHOICE_INDEX',
         'MultipleChoice correctChoiceIndex must be within range of choices',
       )
     }

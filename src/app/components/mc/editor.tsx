@@ -162,7 +162,7 @@ function QuestionSetEditor({
         if (e.cause.code === 'DUPLICATE_CHOICES') {
           return { error: `Question ${questionNumber}: duplicate answer` }
         }
-        if (e.cause.code === 'INVALID_INDEX') {
+        if (e.cause.code === 'INVALID_CORRECT_CHOICE_INDEX') {
           return {
             error: `Question ${questionNumber}: please select one correct choice`,
           }

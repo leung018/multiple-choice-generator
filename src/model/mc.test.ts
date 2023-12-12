@@ -45,10 +45,10 @@ describe('MultipleChoice', () => {
       .appendFixedChoice('b')
     expect(() => {
       builder.setCorrectChoiceIndex(3).build()
-    }).toThrowCustomError(MultipleChoiceError, 'INVALID_INDEX')
+    }).toThrowCustomError(MultipleChoiceError, 'INVALID_CORRECT_CHOICE_INDEX')
     expect(() => {
       builder.setCorrectChoiceIndex(-1).build()
-    }).toThrowCustomError(MultipleChoiceError, 'INVALID_INDEX')
+    }).toThrowCustomError(MultipleChoiceError, 'INVALID_CORRECT_CHOICE_INDEX')
 
     // using builder without setting correctChoiceIndex should throw
     expect(() => {
@@ -56,7 +56,7 @@ describe('MultipleChoice', () => {
         .appendFixedChoice('a')
         .appendFixedChoice('b')
         .build()
-    }).toThrowCustomError(MultipleChoiceError, 'INVALID_INDEX')
+    }).toThrowCustomError(MultipleChoiceError, 'INVALID_CORRECT_CHOICE_INDEX')
   })
 
   it('should reject duplicate answers', () => {
