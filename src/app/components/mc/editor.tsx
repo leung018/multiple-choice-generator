@@ -21,18 +21,14 @@ export class QuestionSetEditorUIService {
     return new QuestionSetEditorUIService({ editorRepo })
   }
 
-  private editorRepo: QuestionSetRepo
+  private readonly editorRepo: QuestionSetRepo
 
   private constructor({ editorRepo }: { editorRepo: QuestionSetRepo }) {
     this.editorRepo = editorRepo
   }
 
-  private handleSave = (questionSet: QuestionSet) => {
-    this.editorRepo.save(questionSet)
-  }
-
   getElement() {
-    return <QuestionSetEditor onSave={this.handleSave} />
+    return <QuestionSetEditor editorRepo={this.editorRepo} />
   }
 }
 
@@ -63,11 +59,7 @@ const newQuestion = (): QuestionInput => ({
   choices: [newChoice(), newChoice()],
 })
 
-function QuestionSetEditor({
-  onSave,
-}: {
-  onSave: (questionSet: QuestionSet) => void
-}) {
+function QuestionSetEditor({ editorRepo }: { editorRepo: QuestionSetRepo }) {
   const [questionSetInput, setQuestionSetInput] = useState<QuestionSetInput>({
     name: '',
     questions: [newQuestion()],
@@ -118,7 +110,7 @@ function QuestionSetEditor({
       questions,
     }
 
-    onSave(questionSet)
+    editorRepo.save(questionSet)
   }
 
   const createQuestion = (
