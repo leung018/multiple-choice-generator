@@ -2,10 +2,12 @@ import { MultipleChoiceBuilder, MultipleChoice } from './mc'
 
 export interface QuestionSet {
   name: string
-  questions: ReadonlyArray<{
-    description: string
-    mc: MultipleChoice
-  }>
+  questions: ReadonlyArray<Question>
+}
+
+export interface Question {
+  description: string
+  mc: MultipleChoice
 }
 
 export class QuestionSetBuilderForTest {

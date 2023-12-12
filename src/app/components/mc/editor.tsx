@@ -5,12 +5,8 @@ import {
   QuestionSetRepo,
   QuestionSetRepoFactory,
 } from '../../../repo/question_set'
-import { QuestionSet } from '../../../model/question_set'
-import {
-  MultipleChoice,
-  MultipleChoiceBuilder,
-  MultipleChoiceError,
-} from '../../../model/mc'
+import { Question, QuestionSet } from '../../../model/question_set'
+import { MultipleChoiceBuilder, MultipleChoiceError } from '../../../model/mc'
 
 export class QuestionSetEditorUIService {
   static create() {
@@ -94,96 +90,85 @@ function QuestionSetEditor({
   }
 
   const handleSaveClick = () => {
-    const errorMessage = validateQuestionSetInput()
-    if (errorMessage) {
-      setErrorMessage(errorMessage)
+    if (questionSetInput.name === '') {
+      setErrorMessage("Question set name can't be empty")
       return
     }
-    const questionSet = mapQuestionSetInputToQuestionSet()
+
+    const questions: Question[] = []
+
+    for (let i = 0; i < questionSetInput.questions.length; i++) {
+      const questionInput = questionSetInput.questions[i]
+      const questionNumber = i + 1
+
+      const { error, question } = createQuestion(questionInput, questionNumber)
+      if (error) {
+        setErrorMessage(error)
+        return
+      }
+      if (!question) {
+        setErrorMessage('Unexpected error')
+        return
+      }
+      questions.push(question)
+    }
+
+    const questionSet = {
+      name: questionSetInput.name,
+      questions,
+    }
+
     onSave(questionSet)
   }
 
-  const validateQuestionSetInput = (): string | null => {
-    if (questionSetInput.name === '') {
-      return "Question set name can't be empty"
-    }
-
-    for (
-      let questionIndex = 0;
-      questionIndex < questionSetInput.questions.length;
-      questionIndex++
-    ) {
-      const question = questionSetInput.questions[questionIndex]
-      const questionNumber = questionIndex + 1
-      let errorMessage: string | null
-      if ((errorMessage = validateQuestionInput(question, questionNumber))) {
-        return errorMessage
-      }
-    }
-
-    return null
-  }
-
-  const validateQuestionInput = (
-    question: QuestionInput,
+  const createQuestion = (
+    input: QuestionInput,
     questionNumber: number,
-  ): string | null => {
-    if (question.description === '') {
-      return `Question ${questionNumber}: description can't be empty`
-    }
-
-    if (
-      new Set(question.choices.map((c) => c.answer)).size !==
-      question.choices.length
-    ) {
-      return `Question ${questionNumber}: duplicate answer`
-    }
-
-    let hasIsCorrect = false
-    for (
-      let choiceIndex = 0;
-      choiceIndex < question.choices.length;
-      choiceIndex++
-    ) {
-      const choice = question.choices[choiceIndex]
-      if (choice.answer === '') {
-        return `Question ${questionNumber}: answer can't be empty`
-      }
-      if (choice.isCorrect) {
-        hasIsCorrect = true
-      }
-    }
-    if (!hasIsCorrect) {
-      return `Question ${questionNumber}: please select one correct choice`
-    }
-
-    return null
-  }
-
-  const mapQuestionSetInputToQuestionSet = (): QuestionSet => {
-    const questions: {
-      description: string
-      mc: MultipleChoice
-    }[] = questionSetInput.questions.map((question) => {
-      const mcBuilder = new MultipleChoiceBuilder()
-      question.choices.forEach((choice, choiceIndex) => {
-        mcBuilder.appendChoice({
-          answer: choice.answer,
-          isFixedPosition: choice.isFixedPosition,
-        })
-        if (choice.isCorrect) {
-          mcBuilder.setCorrectChoiceIndex(choiceIndex)
-        }
-      })
+  ): {
+    error?: string
+    question?: Question
+  } => {
+    if (input.description === '') {
       return {
-        description: question.description,
-        mc: mcBuilder.build(),
+        error: `Question ${questionNumber}: description can't be empty`,
+      }
+    }
+
+    if (input.choices.filter((choice) => choice.answer === '').length > 0) {
+      return { error: `Question ${questionNumber}: answer can't be empty` }
+    }
+
+    const mcBuilder = new MultipleChoiceBuilder()
+    input.choices.forEach((choice, choiceIndex) => {
+      mcBuilder.appendChoice({
+        answer: choice.answer,
+        isFixedPosition: choice.isFixedPosition,
+      })
+      if (choice.isCorrect) {
+        mcBuilder.setCorrectChoiceIndex(choiceIndex)
       }
     })
 
-    return {
-      name: questionSetInput.name,
-      questions,
+    try {
+      const mc = mcBuilder.build()
+      return {
+        question: {
+          description: input.description,
+          mc,
+        },
+      }
+    } catch (e) {
+      if (e instanceof MultipleChoiceError) {
+        if (e.cause.code === 'DUPLICATE_CHOICES') {
+          return { error: `Question ${questionNumber}: duplicate answer` }
+        }
+        if (e.cause.code === 'INVALID_INDEX') {
+          return {
+            error: `Question ${questionNumber}: please select one correct choice`,
+          }
+        }
+      }
+      throw e
     }
   }
 
