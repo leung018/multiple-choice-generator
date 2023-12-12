@@ -12,8 +12,11 @@ class UIServiceInteractor {
   private questionSetName: string
   private questionNumberFocus = 1
 
-  constructor({ questionSetName = 'Dummy name' }) {
-    this.editorRepo = QuestionSetRepoFactory.createTestInstance()
+  constructor({
+    questionSetName = 'Dummy name',
+    editorRepo = QuestionSetRepoFactory.createTestInstance(),
+  }) {
+    this.editorRepo = editorRepo
     render(
       QuestionSetEditorUIService.createTestInstance({
         editorRepo: this.editorRepo,
@@ -21,10 +24,11 @@ class UIServiceInteractor {
     )
 
     this.questionSetName = questionSetName
-    this.syncQuestionSetName()
+    this.setQuestionSetName(questionSetName)
   }
 
-  private syncQuestionSetName() {
+  setQuestionSetName(questionSetName: string) {
+    this.questionSetName = questionSetName
     fireEvent.change(screen.getByLabelText('Question Set Name:'), {
       target: { value: this.questionSetName },
     })
@@ -458,6 +462,52 @@ describe('QuestionSetEditorUIService', () => {
 
     expect(interactor.errorPrompt()).toBeNull()
     interactor.getSavedQuestionSet() // should not throw
+  })
+
+  it('should not save if same name as existing question set', () => {
+    const editorRepo = QuestionSetRepoFactory.createTestInstance()
+    editorRepo.save({
+      name: 'Test name',
+      questions: [
+        {
+          description: '1 + 1 = ?',
+          mc: new MultipleChoice({
+            choices: [
+              {
+                answer: '2',
+                isFixedPosition: false,
+              },
+              {
+                answer: '0',
+                isFixedPosition: false,
+              },
+            ],
+            correctChoiceIndex: 0,
+          }),
+        },
+      ],
+    })
+
+    const interactor = new UIServiceInteractor({
+      questionSetName: 'Test name',
+      editorRepo,
+    })
+    interactor
+      .setQuestionNumberFocus(1)
+      .inputQuestionDescription({ description: '1 + 3 = ?' })
+      .inputAnswer({ choiceNumber: 1, answer: '2' })
+      .inputAnswer({ choiceNumber: 2, answer: '0' })
+      .clickCorrectAnswer({ choiceNumber: 1 })
+      .clickSave()
+
+    expect(interactor.errorPrompt()).toHaveTextContent(
+      'Question set with same name already exists',
+    )
+
+    // change name and save again
+    interactor.setQuestionSetName('Test name 2').clickSave()
+
+    expect(interactor.getSavedQuestionSet()['name']).toBe('Test name 2')
   })
 })
 
