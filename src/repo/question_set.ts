@@ -6,12 +6,23 @@ export interface QuestionSetRepo {
    * @throws {QuestionSetSaveError}
    */
   save(questionSet: QuestionSet): void
+
+  /**
+   * @throws {QuestionSetGetError}
+   */
   getQuestionSetByName(questionSetName: string): QuestionSet
 }
 
 type QuestionSetSaveErrorCode = 'DUPLICATE_QUESTION_SET_NAME'
 export class QuestionSetSaveError extends CustomBaseError {
   constructor(code: QuestionSetSaveErrorCode, message?: string) {
+    super(code, message)
+  }
+}
+
+type QuestionSetGetErrorCode = 'QUESTION_SET_NOT_FOUND'
+export class QuestionSetGetError extends CustomBaseError {
+  constructor(code: QuestionSetGetErrorCode, message?: string) {
     super(code, message)
   }
 }
@@ -37,7 +48,10 @@ class InMemoryQuestionSetRepo implements QuestionSetRepo {
 
   getQuestionSetByName(questionSetName: string): QuestionSet {
     if (!this.nameToQuestionSet[questionSetName]) {
-      throw new Error(`QuestionSet with name ${questionSetName} not found`) // TODO: Create custom error
+      throw new QuestionSetGetError(
+        'QUESTION_SET_NOT_FOUND',
+        `QuestionSet with name ${questionSetName} not found`,
+      )
     }
     return this.nameToQuestionSet[questionSetName]
   }
