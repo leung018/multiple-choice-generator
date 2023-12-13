@@ -4,9 +4,10 @@ import { useState } from 'react'
 import {
   QuestionSetRepo,
   QuestionSetRepoFactory,
+  QuestionSetSaveError,
 } from '../../../repo/question_set'
-import { QuestionSet } from '../../../model/question_set'
-import { MultipleChoice, MultipleChoiceBuilder } from '../../../model/mc'
+import { Question, QuestionSet } from '../../../model/question_set'
+import { MultipleChoiceBuilder, MultipleChoiceError } from '../../../model/mc'
 
 export class QuestionSetEditorUIService {
   static create() {
@@ -21,18 +22,14 @@ export class QuestionSetEditorUIService {
     return new QuestionSetEditorUIService({ editorRepo })
   }
 
-  private editorRepo: QuestionSetRepo
+  private readonly editorRepo: QuestionSetRepo
 
   private constructor({ editorRepo }: { editorRepo: QuestionSetRepo }) {
     this.editorRepo = editorRepo
   }
 
-  private handleSave = (questionSet: QuestionSet) => {
-    this.editorRepo.save(questionSet)
-  }
-
   getElement() {
-    return <QuestionSetEditor onSave={this.handleSave} />
+    return <QuestionSetEditor editorRepo={this.editorRepo} />
   }
 }
 
@@ -63,15 +60,12 @@ const newQuestion = (): QuestionInput => ({
   choices: [newChoice(), newChoice()],
 })
 
-function QuestionSetEditor({
-  onSave,
-}: {
-  onSave: (questionSet: QuestionSet) => void
-}) {
+function QuestionSetEditor({ editorRepo }: { editorRepo: QuestionSetRepo }) {
   const [questionSetInput, setQuestionSetInput] = useState<QuestionSetInput>({
     name: '',
     questions: [newQuestion()],
   })
+  const [errorMessage, setErrorMessage] = useState<string | null>(null)
 
   const handleQuestionUpdate = (
     questionIndex: number,
@@ -88,30 +82,96 @@ function QuestionSetEditor({
     })
   }
 
-  const mapQuestionSetInputToQuestionSet = (): QuestionSet => {
-    const questions: {
-      description: string
-      mc: MultipleChoice
-    }[] = questionSetInput.questions.map((question) => {
-      const mcBuilder = new MultipleChoiceBuilder()
-      question.choices.forEach((choice, choiceIndex) => {
-        mcBuilder.appendChoice({
-          answer: choice.answer,
-          isFixedPosition: choice.isFixedPosition,
-        })
-        if (choice.isCorrect) {
-          mcBuilder.setCorrectChoiceIndex(choiceIndex)
+  const handleSaveClick = () => {
+    if (questionSetInput.name === '') {
+      setErrorMessage("Question set name can't be empty")
+      return
+    }
+
+    const questions: Question[] = []
+
+    for (let i = 0; i < questionSetInput.questions.length; i++) {
+      const questionInput = questionSetInput.questions[i]
+      const questionNumber = i + 1
+
+      const { error, question } = createQuestion(questionInput, questionNumber)
+      if (error) {
+        setErrorMessage(error)
+        return
+      }
+      if (!question) {
+        setErrorMessage('Unexpected error')
+        return
+      }
+      questions.push(question)
+    }
+
+    const questionSet = {
+      name: questionSetInput.name,
+      questions,
+    }
+
+    try {
+      editorRepo.save(questionSet)
+    } catch (e) {
+      if (e instanceof QuestionSetSaveError) {
+        if (e.cause.code === 'DUPLICATE_QUESTION_SET_NAME') {
+          setErrorMessage('Question set with same name already exists')
+          return
         }
-      })
+      }
+      throw e
+    }
+  }
+
+  const createQuestion = (
+    input: QuestionInput,
+    questionNumber: number,
+  ): {
+    error?: string
+    question?: Question
+  } => {
+    if (input.description === '') {
       return {
-        description: question.description,
-        mc: mcBuilder.build(),
+        error: `Question ${questionNumber}: description can't be empty`,
+      }
+    }
+
+    if (input.choices.filter((choice) => choice.answer === '').length > 0) {
+      return { error: `Question ${questionNumber}: answer can't be empty` }
+    }
+
+    const mcBuilder = new MultipleChoiceBuilder()
+    input.choices.forEach((choice, choiceIndex) => {
+      mcBuilder.appendChoice({
+        answer: choice.answer,
+        isFixedPosition: choice.isFixedPosition,
+      })
+      if (choice.isCorrect) {
+        mcBuilder.setCorrectChoiceIndex(choiceIndex)
       }
     })
 
-    return {
-      name: questionSetInput.name,
-      questions,
+    try {
+      const mc = mcBuilder.build()
+      return {
+        question: {
+          description: input.description,
+          mc,
+        },
+      }
+    } catch (e) {
+      if (e instanceof MultipleChoiceError) {
+        if (e.cause.code === 'DUPLICATE_CHOICES') {
+          return { error: `Question ${questionNumber}: duplicate answer` }
+        }
+        if (e.cause.code === 'INVALID_CORRECT_CHOICE_INDEX') {
+          return {
+            error: `Question ${questionNumber}: please select one correct choice`,
+          }
+        }
+      }
+      throw e
     }
   }
 
@@ -211,10 +271,19 @@ function QuestionSetEditor({
           <button
             type="button"
             className="bg-green-500 text-white px-4 py-2 rounded"
-            onClick={() => onSave(mapQuestionSetInputToQuestionSet())}
+            onClick={() => handleSaveClick()}
           >
             Save
           </button>
+          {errorMessage && (
+            <div
+              id="error-message"
+              className="text-red-500 ml-2"
+              aria-label="error prompt"
+            >
+              {errorMessage}
+            </div>
+          )}
         </div>
       </form>
     </div>

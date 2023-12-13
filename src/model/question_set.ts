@@ -2,10 +2,12 @@ import { MultipleChoiceBuilder, MultipleChoice } from './mc'
 
 export interface QuestionSet {
   name: string
-  questions: ReadonlyArray<{
-    description: string
-    mc: MultipleChoice
-  }>
+  questions: ReadonlyArray<Question>
+}
+
+export interface Question {
+  description: string
+  mc: MultipleChoice
 }
 
 export class QuestionSetBuilderForTest {
@@ -16,7 +18,7 @@ export class QuestionSetBuilderForTest {
   }[] = []
 
   appendQuestion({
-    title = 'dummy title',
+    description = 'dummy title',
     mc = new MultipleChoiceBuilder()
       .setCorrectChoiceIndex(0)
       .appendNonFixedChoice('dummy choice 1')
@@ -24,7 +26,7 @@ export class QuestionSetBuilderForTest {
       .build(),
   } = {}): QuestionSetBuilderForTest {
     this.questions.push({
-      description: title,
+      description,
       mc: mc,
     })
     return this

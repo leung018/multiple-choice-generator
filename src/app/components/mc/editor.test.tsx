@@ -12,8 +12,11 @@ class UIServiceInteractor {
   private questionSetName: string
   private questionNumberFocus = 1
 
-  constructor({ questionSetName = 'Dummy name' }) {
-    this.editorRepo = QuestionSetRepoFactory.createTestInstance()
+  constructor({
+    questionSetName = 'Dummy name',
+    editorRepo = QuestionSetRepoFactory.createTestInstance(),
+  }) {
+    this.editorRepo = editorRepo
     render(
       QuestionSetEditorUIService.createTestInstance({
         editorRepo: this.editorRepo,
@@ -21,10 +24,11 @@ class UIServiceInteractor {
     )
 
     this.questionSetName = questionSetName
-    this.syncQuestionSetName()
+    this.setQuestionSetName(questionSetName)
   }
 
-  private syncQuestionSetName() {
+  setQuestionSetName(questionSetName: string) {
+    this.questionSetName = questionSetName
     fireEvent.change(screen.getByLabelText('Question Set Name:'), {
       target: { value: this.questionSetName },
     })
@@ -102,6 +106,10 @@ class UIServiceInteractor {
   clickSave() {
     fireEvent.click(screen.getByText('Save'))
     return this
+  }
+
+  errorPrompt() {
+    return screen.queryByLabelText('error prompt')
   }
 }
 
@@ -336,4 +344,176 @@ describe('QuestionSetEditorUIService', () => {
       },
     ])
   })
+
+  it('should hide error prompt when successful save', () => {
+    const interactor = new UIServiceInteractor({})
+    setFirstValidQuestion(interactor)
+    interactor.clickSave()
+
+    expect(interactor.errorPrompt()).toBeNull()
+  })
+
+  it('should reject saving question set when question set name is empty', () => {
+    const interactor = new UIServiceInteractor({ questionSetName: '' })
+    setFirstValidQuestion(interactor)
+    interactor.clickSave()
+
+    expectCannotSaveQuestionSet({
+      interactor,
+      errorMessage: "Question set name can't be empty",
+    })
+  })
+
+  it('should reject saving question set when empty question description', () => {
+    const interactor = new UIServiceInteractor({})
+    setFirstValidQuestion(interactor)
+    interactor
+      .setQuestionNumberFocus(1)
+      .inputQuestionDescription({ description: '' })
+      .clickSave()
+
+    expectCannotSaveQuestionSet({
+      interactor,
+      errorMessage: "Question 1: description can't be empty",
+    })
+  })
+
+  it('should reject saving question set when empty answer', () => {
+    const interactor = new UIServiceInteractor({})
+
+    interactor
+      .setQuestionNumberFocus(1)
+      .inputQuestionDescription({ description: '1 + 1 = ?' })
+      .inputAnswer({ choiceNumber: 1, answer: '2' })
+      .inputAnswer({ choiceNumber: 2, answer: '' })
+      .clickCorrectAnswer({ choiceNumber: 1 })
+      .clickSave()
+
+    expectCannotSaveQuestionSet({
+      interactor,
+      errorMessage: "Question 1: answer can't be empty",
+    })
+  })
+
+  it('should reject saving question set when no correct answer is selected', () => {
+    const interactor = new UIServiceInteractor({})
+
+    interactor
+      .setQuestionNumberFocus(1)
+      .inputQuestionDescription({ description: '1 + 1 = ?' })
+      .inputAnswer({ choiceNumber: 1, answer: '2' })
+      .inputAnswer({ choiceNumber: 2, answer: '0' })
+      .clickSave()
+
+    expectCannotSaveQuestionSet({
+      interactor,
+      errorMessage: 'Question 1: please select one correct choice',
+    })
+  })
+
+  it('should reject saving question set when duplicate answer in a question', () => {
+    const interactor = new UIServiceInteractor({})
+
+    interactor
+      .setQuestionNumberFocus(1)
+      .inputQuestionDescription({ description: '1 + 1 = ?' })
+      .inputAnswer({ choiceNumber: 1, answer: '2' })
+      .inputAnswer({ choiceNumber: 2, answer: '2' })
+      .clickCorrectAnswer({ choiceNumber: 1 })
+      .clickSave()
+
+    expectCannotSaveQuestionSet({
+      interactor,
+      errorMessage: 'Question 1: duplicate answer',
+    })
+  })
+
+  it('should save if duplicate answer in different questions', () => {
+    const interactor = new UIServiceInteractor({})
+
+    interactor
+      .setQuestionNumberFocus(1)
+      .inputQuestionDescription({ description: '1 + 1 = ?' })
+      .inputAnswer({ choiceNumber: 1, answer: '2' })
+      .inputAnswer({ choiceNumber: 2, answer: '0' })
+      .clickCorrectAnswer({ choiceNumber: 1 })
+
+    interactor
+      .clickAddQuestion()
+      .setQuestionNumberFocus(2)
+      .inputQuestionDescription({ description: '1 + 2 = ?' })
+      .inputAnswer({ choiceNumber: 1, answer: '3' })
+      .inputAnswer({ choiceNumber: 2, answer: '2' })
+      .clickCorrectAnswer({ choiceNumber: 1 })
+      .clickSave()
+
+    expect(interactor.errorPrompt()).toBeNull()
+    interactor.getSavedQuestionSet() // should not throw
+  })
+
+  it('should not save if same name as existing question set', () => {
+    const editorRepo = QuestionSetRepoFactory.createTestInstance()
+    const questionSet = {
+      name: 'Test name',
+      questions: [validQuestion()],
+    }
+    editorRepo.save(questionSet)
+
+    const interactor = new UIServiceInteractor({
+      questionSetName: 'Test name',
+      editorRepo,
+    })
+    setFirstValidQuestion(interactor)
+    interactor.clickSave()
+
+    expect(interactor.errorPrompt()).toHaveTextContent(
+      'Question set with same name already exists',
+    )
+
+    // change name and save again
+    interactor.setQuestionSetName('Test name 2').clickSave()
+
+    expect(interactor.getSavedQuestionSet()['name']).toBe('Test name 2')
+  })
 })
+
+function expectCannotSaveQuestionSet({
+  interactor,
+  errorMessage,
+}: {
+  interactor: UIServiceInteractor
+  errorMessage: string
+}) {
+  expect(interactor.errorPrompt()).toHaveTextContent(errorMessage)
+  expect(() => {
+    interactor.getSavedQuestionSet()
+  }).toThrow()
+}
+
+function setFirstValidQuestion(interactor: UIServiceInteractor) {
+  interactor
+    .setQuestionNumberFocus(1)
+    .inputQuestionDescription({ description: '1 + 1 = ?' })
+    .inputAnswer({ choiceNumber: 1, answer: '2' })
+    .inputAnswer({ choiceNumber: 2, answer: '0' })
+    .clickCorrectAnswer({ choiceNumber: 1 })
+}
+
+function validQuestion() {
+  return {
+    description: '1 + 1 = ?',
+    mc: new MultipleChoice({
+      choices: [
+        {
+          answer: '2',
+          isFixedPosition: false,
+        },
+        {
+          answer: '0',
+          isFixedPosition: false,
+        },
+      ],
+      correctChoiceIndex: 0,
+    }),
+  }
+}
