@@ -347,27 +347,16 @@ describe('QuestionSetEditorUIService', () => {
 
   it('should hide error prompt when successful save', () => {
     const interactor = new UIServiceInteractor({})
-    interactor
-      .setQuestionNumberFocus(1)
-      .inputQuestionDescription({ description: '1 + 1 = ?' })
-      .inputAnswer({ choiceNumber: 1, answer: '2' })
-      .inputAnswer({ choiceNumber: 2, answer: '0' })
-      .clickCorrectAnswer({ choiceNumber: 1 })
-      .clickSave()
+    setFirstValidQuestion(interactor)
+    interactor.clickSave()
 
     expect(interactor.errorPrompt()).toBeNull()
   })
 
   it('should reject saving question set when question set name is empty', () => {
     const interactor = new UIServiceInteractor({ questionSetName: '' })
-
-    interactor
-      .setQuestionNumberFocus(1)
-      .inputQuestionDescription({ description: '1 + 1 = ?' })
-      .inputAnswer({ choiceNumber: 1, answer: '2' })
-      .inputAnswer({ choiceNumber: 2, answer: '0' })
-      .clickCorrectAnswer({ choiceNumber: 1 })
-      .clickSave()
+    setFirstValidQuestion(interactor)
+    interactor.clickSave()
 
     expectCannotSaveQuestionSet({
       interactor,
@@ -377,12 +366,10 @@ describe('QuestionSetEditorUIService', () => {
 
   it('should reject saving question set when empty question description', () => {
     const interactor = new UIServiceInteractor({})
-
+    setFirstValidQuestion(interactor)
     interactor
       .setQuestionNumberFocus(1)
-      .inputAnswer({ choiceNumber: 1, answer: '2' })
-      .inputAnswer({ choiceNumber: 2, answer: '0' })
-      .clickCorrectAnswer({ choiceNumber: 1 })
+      .inputQuestionDescription({ description: '' })
       .clickSave()
 
     expectCannotSaveQuestionSet({
@@ -466,39 +453,18 @@ describe('QuestionSetEditorUIService', () => {
 
   it('should not save if same name as existing question set', () => {
     const editorRepo = QuestionSetRepoFactory.createTestInstance()
-    editorRepo.save({
+    const questionSet = {
       name: 'Test name',
-      questions: [
-        {
-          description: '1 + 1 = ?',
-          mc: new MultipleChoice({
-            choices: [
-              {
-                answer: '2',
-                isFixedPosition: false,
-              },
-              {
-                answer: '0',
-                isFixedPosition: false,
-              },
-            ],
-            correctChoiceIndex: 0,
-          }),
-        },
-      ],
-    })
+      questions: [validQuestion()],
+    }
+    editorRepo.save(questionSet)
 
     const interactor = new UIServiceInteractor({
       questionSetName: 'Test name',
       editorRepo,
     })
-    interactor
-      .setQuestionNumberFocus(1)
-      .inputQuestionDescription({ description: '1 + 3 = ?' })
-      .inputAnswer({ choiceNumber: 1, answer: '2' })
-      .inputAnswer({ choiceNumber: 2, answer: '0' })
-      .clickCorrectAnswer({ choiceNumber: 1 })
-      .clickSave()
+    setFirstValidQuestion(interactor)
+    interactor.clickSave()
 
     expect(interactor.errorPrompt()).toHaveTextContent(
       'Question set with same name already exists',
@@ -522,4 +488,32 @@ function expectCannotSaveQuestionSet({
   expect(() => {
     interactor.getSavedQuestionSet()
   }).toThrow()
+}
+
+function setFirstValidQuestion(interactor: UIServiceInteractor) {
+  interactor
+    .setQuestionNumberFocus(1)
+    .inputQuestionDescription({ description: '1 + 1 = ?' })
+    .inputAnswer({ choiceNumber: 1, answer: '2' })
+    .inputAnswer({ choiceNumber: 2, answer: '0' })
+    .clickCorrectAnswer({ choiceNumber: 1 })
+}
+
+function validQuestion() {
+  return {
+    description: '1 + 1 = ?',
+    mc: new MultipleChoice({
+      choices: [
+        {
+          answer: '2',
+          isFixedPosition: false,
+        },
+        {
+          answer: '0',
+          isFixedPosition: false,
+        },
+      ],
+      correctChoiceIndex: 0,
+    }),
+  }
 }
