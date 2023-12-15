@@ -6,7 +6,7 @@ import {
   QuestionSetRepoFactory,
   QuestionSetSaveError,
 } from '../../../repo/question_set'
-import { Question } from '../../../model/question_set'
+import { Question, QuestionSet } from '../../../model/question_set'
 import { MultipleChoiceBuilder, MultipleChoiceError } from '../../../model/mc'
 
 export class QuestionSetEditorUIService {
@@ -106,10 +106,10 @@ function QuestionSetEditor({ editorRepo }: { editorRepo: QuestionSetRepo }) {
       questions.push(question)
     }
 
-    const questionSet = {
+    const questionSet = new QuestionSet({
       name: questionSetInput.name,
       questions,
-    }
+    })
 
     try {
       editorRepo.save(questionSet)

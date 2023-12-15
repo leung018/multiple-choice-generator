@@ -6,6 +6,7 @@ import {
 import { QuestionSetEditorUIService } from './editor'
 import { MultipleChoice } from '../../../model/mc'
 import '@testing-library/jest-dom'
+import { QuestionSet } from '../../../model/question_set'
 
 class UIServiceInteractor {
   private readonly editorRepo: QuestionSetRepo
@@ -453,10 +454,10 @@ describe('QuestionSetEditorUIService', () => {
 
   it('should not save if same name as existing question set', () => {
     const editorRepo = QuestionSetRepoFactory.createTestInstance()
-    const questionSet = {
+    const questionSet = new QuestionSet({
       name: 'Test name',
       questions: [validQuestion()],
-    }
+    })
     editorRepo.save(questionSet)
 
     const interactor = new UIServiceInteractor({

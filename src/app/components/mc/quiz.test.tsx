@@ -3,8 +3,8 @@ import { render, fireEvent } from '@testing-library/react'
 import '@testing-library/jest-dom'
 import MultipleChoiceQuiz from './quiz'
 import {
-  QuestionSet,
   QuestionSetBuilderForTest,
+  QuestionSet,
 } from '../../../model/question_set'
 
 describe('MultipleChoiceQuiz', () => {
