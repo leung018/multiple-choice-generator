@@ -11,6 +11,8 @@ export interface QuestionSetRepo {
    * @throws {QuestionSetGetError}
    */
   getQuestionSetByName(questionSetName: string): QuestionSet
+
+  getQuestionSets(): ReadonlyArray<QuestionSet>
 }
 
 type QuestionSetSaveErrorCode = 'DUPLICATE_QUESTION_SET_NAME'
@@ -54,5 +56,9 @@ class InMemoryQuestionSetRepo implements QuestionSetRepo {
       )
     }
     return this.nameToQuestionSet[questionSetName]
+  }
+
+  getQuestionSets(): readonly QuestionSet[] {
+    return Object.values(this.nameToQuestionSet)
   }
 }
