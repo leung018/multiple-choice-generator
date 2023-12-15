@@ -1,10 +1,11 @@
 import { expect } from '@jest/globals'
 import type { MatcherFunction } from 'expect'
 import { CustomBaseError } from '../../utils/err'
-import { Newable } from '@/utils/newable'
+
+type CustomBaseErrorType = { new (...args: never[]): CustomBaseError }
 
 const toThrowCustomError: MatcherFunction<
-  [expectedErrorType: Newable<CustomBaseError>, expectedErrorCode?: string]
+  [expectedErrorType: CustomBaseErrorType, expectedErrorCode?: string]
 > = function (received, expectedErrorType, expectedErrorCode) {
   if (typeof received !== 'function') {
     throw new Error('This should be type function!')
@@ -73,7 +74,7 @@ expect.extend({ toThrowCustomError })
 declare module 'expect' {
   interface Matchers<R> {
     toThrowCustomError(
-      expectedErrorType: Newable<CustomBaseError>,
+      expectedErrorType: CustomBaseErrorType,
       expectedCode?: string,
     ): R
   }
