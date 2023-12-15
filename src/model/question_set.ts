@@ -32,6 +32,11 @@ export class QuestionSetBuilderForTest {
     mc: MultipleChoice
   }[] = []
 
+  setName(name: string): QuestionSetBuilderForTest {
+    this.name = name
+    return this
+  }
+
   appendQuestion({
     description = 'dummy title',
     mc = new MultipleChoiceBuilder()
