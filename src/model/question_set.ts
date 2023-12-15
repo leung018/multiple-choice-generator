@@ -38,7 +38,7 @@ export class QuestionSetBuilderForTest {
   }
 
   appendQuestion({
-    description = 'dummy title',
+    description = 'dummy question',
     mc = new MultipleChoiceBuilder()
       .setCorrectChoiceIndex(0)
       .appendNonFixedChoice('dummy choice 1')
