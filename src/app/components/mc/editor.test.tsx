@@ -458,7 +458,7 @@ describe('QuestionSetEditorUIService', () => {
       .setName('Test name')
       .appendQuestion()
       .build()
-    editorRepo.createQuestionSet(questionSet)
+    editorRepo.addQuestionSet(questionSet)
 
     const interactor = new UIServiceInteractor({
       questionSetName: 'Test name',

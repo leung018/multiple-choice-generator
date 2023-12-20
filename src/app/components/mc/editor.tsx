@@ -112,7 +112,7 @@ function QuestionSetEditor({ editorRepo }: { editorRepo: QuestionSetRepo }) {
     })
 
     try {
-      editorRepo.createQuestionSet(questionSet)
+      editorRepo.addQuestionSet(questionSet)
     } catch (e) {
       if (e instanceof QuestionSetCreateError) {
         if (e.cause.code === 'DUPLICATE_QUESTION_SET_NAME') {

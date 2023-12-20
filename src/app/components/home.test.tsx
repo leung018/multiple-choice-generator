@@ -52,7 +52,7 @@ function renderHomePage({
   questionSets: readonly QuestionSet[]
 }) {
   const questionSetRepo = QuestionSetRepoFactory.createTestInstance()
-  questionSets.forEach((set) => questionSetRepo.createQuestionSet(set))
+  questionSets.forEach((set) => questionSetRepo.addQuestionSet(set))
   return render(
     HomePageUIService.createTestInstance({ questionSetRepo }).getElement(),
   )

@@ -105,7 +105,7 @@ function renderMultipleChoicePage({
   questionSet: QuestionSet
 }) {
   const questionSetRepo = QuestionSetRepoFactory.createTestInstance()
-  questionSetRepo.createQuestionSet(questionSet)
+  questionSetRepo.addQuestionSet(questionSet)
   return render(
     MultipleChoiceQuizUIService.createTestInstance({
       questionSetRepo,

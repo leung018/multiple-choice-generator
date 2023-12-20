@@ -5,7 +5,7 @@ export interface QuestionSetRepo {
   /**
    * @throws {QuestionSetCreateError}
    */
-  createQuestionSet(questionSet: QuestionSet): void
+  addQuestionSet(questionSet: QuestionSet): void
 
   /**
    * @throws {QuestionSetGetError}
@@ -40,7 +40,7 @@ export class QuestionSetRepoFactory {
 class InMemoryQuestionSetRepo implements QuestionSetRepo {
   private nameToQuestionSet: { [name: string]: QuestionSet } = {}
 
-  createQuestionSet(questionSet: QuestionSet): void {
+  addQuestionSet(questionSet: QuestionSet): void {
     if (this.nameToQuestionSet[questionSet.name]) {
       throw new QuestionSetCreateError(
         'DUPLICATE_QUESTION_SET_NAME',
