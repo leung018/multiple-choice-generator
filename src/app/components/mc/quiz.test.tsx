@@ -106,15 +106,5 @@ function renderMultipleChoicePage({
 }: {
   questionSet: QuestionSet
 }) {
-  // TODO: move this mapping to MultipleChoiceQuizUIService
-  const questions = questionSet.questions.map((question) => {
-    return {
-      description: question.description,
-      mc: {
-        choices: question.mc.choices.map((choice) => choice.answer),
-        correctChoiceIndex: question.mc.correctChoiceIndex,
-      },
-    }
-  })
-  return render(<MultipleChoiceQuiz questions={questions} />)
+  return render(<MultipleChoiceQuiz questions={questionSet.questions} />)
 }
