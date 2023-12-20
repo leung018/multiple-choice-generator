@@ -56,14 +56,17 @@ function HomePage({ questionSets }: { questionSets: readonly QuestionSet[] }) {
                 >
                   Take Quiz
                 </button>
-                <button
+                {
+                  // TODO: Add Edit feature with the button as below
+                  /* <button
                   className="ml-2 px-4 py-2 bg-green-500 text-white rounded hover:bg-green-700 transition-colors"
                   onClick={() => {
                     // Logic to navigate to the Edit Question Set page
                   }}
                 >
                   Edit
-                </button>
+                </button> */
+                }
               </div>
             </div>
           </li>
