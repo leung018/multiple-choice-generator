@@ -12,6 +12,9 @@ export interface QuestionSetRepo {
    */
   getQuestionSetByName(questionSetName: string): QuestionSet
 
+  /**
+   * @throws {QuestionSetGetError}
+   */
   getQuestionSetById(questionSetId: string): QuestionSet
 
   getQuestionSets(): ReadonlyArray<QuestionSet>
