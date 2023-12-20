@@ -3,9 +3,9 @@ import { CustomBaseError } from '../utils/err'
 
 export interface QuestionSetRepo {
   /**
-   * @throws {QuestionSetSaveError}
+   * @throws {QuestionSetCreateError}
    */
-  save(questionSet: QuestionSet): void
+  createQuestionSet(questionSet: QuestionSet): void
 
   /**
    * @throws {QuestionSetGetError}
@@ -15,9 +15,9 @@ export interface QuestionSetRepo {
   getQuestionSets(): ReadonlyArray<QuestionSet>
 }
 
-type QuestionSetSaveErrorCode = 'DUPLICATE_QUESTION_SET_NAME'
-export class QuestionSetSaveError extends CustomBaseError {
-  constructor(code: QuestionSetSaveErrorCode, message?: string) {
+type QuestionSetCreateErrorCode = 'DUPLICATE_QUESTION_SET_NAME'
+export class QuestionSetCreateError extends CustomBaseError {
+  constructor(code: QuestionSetCreateErrorCode, message?: string) {
     super(code, message)
   }
 }
@@ -38,9 +38,9 @@ export class QuestionSetRepoFactory {
 class InMemoryQuestionSetRepo implements QuestionSetRepo {
   private nameToQuestionSet: { [name: string]: QuestionSet } = {}
 
-  save(questionSet: QuestionSet): void {
+  createQuestionSet(questionSet: QuestionSet): void {
     if (this.nameToQuestionSet[questionSet.name]) {
-      throw new QuestionSetSaveError(
+      throw new QuestionSetCreateError(
         'DUPLICATE_QUESTION_SET_NAME',
         `QuestionSet with name ${questionSet.name} already exists`,
       )
