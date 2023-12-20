@@ -6,9 +6,14 @@ import { HomePageUIService } from './components/home'
 
 export default function Home() {
   const questionSetRepo = QuestionSetRepoFactory.createTestInstance()
-  questionSetRepo.createQuestionSet(new QuestionSetBuilderForTest().build())
   questionSetRepo.createQuestionSet(
-    new QuestionSetBuilderForTest().setName('Question Set 2').build(),
+    new QuestionSetBuilderForTest().setName('Banana').build(),
+  )
+  questionSetRepo.createQuestionSet(
+    new QuestionSetBuilderForTest().setName('Apple').build(),
+  )
+  questionSetRepo.createQuestionSet(
+    new QuestionSetBuilderForTest().setName('Orange').build(),
   )
   return HomePageUIService.createTestInstance({ questionSetRepo }).getElement()
 }

@@ -18,6 +18,32 @@ describe('HomePage', () => {
     })
     expect(getByText('Question Set')).toBeInTheDocument()
   })
+
+  it('should render multiple question sets in alphabetical order', () => {
+    const { getByText } = renderHomePage({
+      questionSets: [
+        new QuestionSetBuilderForTest().setName('Banana').build(),
+        new QuestionSetBuilderForTest().setName('Apple').build(),
+        new QuestionSetBuilderForTest().setName('Orange').build(),
+        new QuestionSetBuilderForTest().setName('durian').build(), // should be case insensitive
+      ],
+    })
+
+    const apple = getByText('Apple')
+    const banana = getByText('Banana')
+    const durian = getByText('durian')
+    const orange = getByText('Orange')
+
+    expect(apple.compareDocumentPosition(banana)).toBe(
+      Node.DOCUMENT_POSITION_FOLLOWING,
+    )
+    expect(banana.compareDocumentPosition(durian)).toBe(
+      Node.DOCUMENT_POSITION_FOLLOWING,
+    )
+    expect(durian.compareDocumentPosition(orange)).toBe(
+      Node.DOCUMENT_POSITION_FOLLOWING,
+    )
+  })
 })
 
 function renderHomePage({

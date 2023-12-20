@@ -29,12 +29,16 @@ export class HomePageUIService {
     this.questionSetRepo = questionSetRepo
   }
 
-  getElement() {
-    return (
-      <HomePage
-        questionSets={this.questionSetRepo.getQuestionSets()}
-      ></HomePage>
+  private getSortedQuestionSets() {
+    // Ideally perhaps this should be done in the repo layer with a more generic method
+    // But for current project scope, this is fine
+    return [...this.questionSetRepo.getQuestionSets()].sort((a, b) =>
+      a.name.localeCompare(b.name),
     )
+  }
+
+  getElement() {
+    return <HomePage questionSets={this.getSortedQuestionSets()}></HomePage>
   }
 }
 
