@@ -1,11 +1,12 @@
 import { MultipleChoiceBuilder } from '../../../model/mc'
 import { render, fireEvent } from '@testing-library/react'
 import '@testing-library/jest-dom'
-import MultipleChoiceQuiz from './quiz'
+import { MultipleChoiceQuizUIService } from './quiz'
 import {
-  QuestionSet,
   QuestionSetBuilderForTest,
+  QuestionSet,
 } from '../../../model/question_set'
+import { QuestionSetRepoFactory } from '../../../repo/question_set'
 
 describe('MultipleChoiceQuiz', () => {
   const presetCorrectChoiceMcBuilder = () => {
@@ -98,23 +99,17 @@ describe('MultipleChoiceQuiz', () => {
   })
 })
 
-/* This wrapper function exist because in future, may need to move this test to other layer and the setup for it will be different too.
- * So, with this wrapper function, it will be easier to change in the future.
- */
 function renderMultipleChoicePage({
   questionSet,
 }: {
   questionSet: QuestionSet
 }) {
-  // TODO: move this mapping to MultipleChoiceQuizUIService
-  const questions = questionSet.questions.map((question) => {
-    return {
-      description: question.description,
-      mc: {
-        choices: question.mc.choices.map((choice) => choice.answer),
-        correctChoiceIndex: question.mc.correctChoiceIndex,
-      },
-    }
-  })
-  return render(<MultipleChoiceQuiz questions={questions} />)
+  const questionSetRepo = QuestionSetRepoFactory.createTestInstance()
+  questionSetRepo.addQuestionSet(questionSet)
+  return render(
+    MultipleChoiceQuizUIService.createTestInstance({
+      questionSetRepo,
+      questionSetId: questionSet.id,
+    }).getElement(),
+  )
 }

@@ -3,19 +3,26 @@ import { CustomBaseError } from '../utils/err'
 
 export interface QuestionSetRepo {
   /**
-   * @throws {QuestionSetSaveError}
+   * @throws {QuestionSetCreateError}
    */
-  save(questionSet: QuestionSet): void
+  addQuestionSet(questionSet: QuestionSet): void
 
   /**
    * @throws {QuestionSetGetError}
    */
   getQuestionSetByName(questionSetName: string): QuestionSet
+
+  /**
+   * @throws {QuestionSetGetError}
+   */
+  getQuestionSetById(questionSetId: string): QuestionSet
+
+  getQuestionSets(): ReadonlyArray<QuestionSet>
 }
 
-type QuestionSetSaveErrorCode = 'DUPLICATE_QUESTION_SET_NAME'
-export class QuestionSetSaveError extends CustomBaseError {
-  constructor(code: QuestionSetSaveErrorCode, message?: string) {
+type QuestionSetCreateErrorCode = 'DUPLICATE_QUESTION_SET_NAME'
+export class QuestionSetCreateError extends CustomBaseError {
+  constructor(code: QuestionSetCreateErrorCode, message?: string) {
     super(code, message)
   }
 }
@@ -36,9 +43,9 @@ export class QuestionSetRepoFactory {
 class InMemoryQuestionSetRepo implements QuestionSetRepo {
   private nameToQuestionSet: { [name: string]: QuestionSet } = {}
 
-  save(questionSet: QuestionSet): void {
+  addQuestionSet(questionSet: QuestionSet): void {
     if (this.nameToQuestionSet[questionSet.name]) {
-      throw new QuestionSetSaveError(
+      throw new QuestionSetCreateError(
         'DUPLICATE_QUESTION_SET_NAME',
         `QuestionSet with name ${questionSet.name} already exists`,
       )
@@ -54,5 +61,22 @@ class InMemoryQuestionSetRepo implements QuestionSetRepo {
       )
     }
     return this.nameToQuestionSet[questionSetName]
+  }
+
+  getQuestionSetById(questionSetId: string): QuestionSet {
+    const questionSet = Object.values(this.nameToQuestionSet).find(
+      (questionSet) => questionSet.id === questionSetId,
+    )
+    if (!questionSet) {
+      throw new QuestionSetGetError(
+        'QUESTION_SET_NOT_FOUND',
+        `QuestionSet with id ${questionSetId} not found`,
+      )
+    }
+    return questionSet
+  }
+
+  getQuestionSets(): readonly QuestionSet[] {
+    return Object.values(this.nameToQuestionSet)
   }
 }

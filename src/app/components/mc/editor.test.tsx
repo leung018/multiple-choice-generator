@@ -6,6 +6,7 @@ import {
 import { QuestionSetEditorUIService } from './editor'
 import { MultipleChoice } from '../../../model/mc'
 import '@testing-library/jest-dom'
+import { QuestionSetBuilderForTest } from '../../../model/question_set'
 
 class UIServiceInteractor {
   private readonly editorRepo: QuestionSetRepo
@@ -453,11 +454,11 @@ describe('QuestionSetEditorUIService', () => {
 
   it('should not save if same name as existing question set', () => {
     const editorRepo = QuestionSetRepoFactory.createTestInstance()
-    const questionSet = {
-      name: 'Test name',
-      questions: [validQuestion()],
-    }
-    editorRepo.save(questionSet)
+    const questionSet = new QuestionSetBuilderForTest()
+      .setName('Test name')
+      .appendQuestion()
+      .build()
+    editorRepo.addQuestionSet(questionSet)
 
     const interactor = new UIServiceInteractor({
       questionSetName: 'Test name',
@@ -497,23 +498,4 @@ function setFirstValidQuestion(interactor: UIServiceInteractor) {
     .inputAnswer({ choiceNumber: 1, answer: '2' })
     .inputAnswer({ choiceNumber: 2, answer: '0' })
     .clickCorrectAnswer({ choiceNumber: 1 })
-}
-
-function validQuestion() {
-  return {
-    description: '1 + 1 = ?',
-    mc: new MultipleChoice({
-      choices: [
-        {
-          answer: '2',
-          isFixedPosition: false,
-        },
-        {
-          answer: '0',
-          isFixedPosition: false,
-        },
-      ],
-      correctChoiceIndex: 0,
-    }),
-  }
 }

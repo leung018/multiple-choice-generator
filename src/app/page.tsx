@@ -1,34 +1,19 @@
-import MultipleChoiceQuiz from './components/mc/quiz'
+'use client'
+
+import { QuestionSetBuilderForTest } from '../model/question_set'
+import { QuestionSetRepoFactory } from '../repo/question_set'
+import { HomePageUIService } from './components/home'
 
 export default function Home() {
-  const questions = [
-    {
-      description: 'What is correct color of the sky?',
-      mc: {
-        choices: ['Red', 'Blue', 'Green'],
-        correctChoiceIndex: 1,
-      },
-    },
-    {
-      description: '1 + 1 = ?',
-      mc: {
-        choices: ['1', '2', '3'],
-        correctChoiceIndex: 0,
-      },
-    },
-    {
-      description:
-        'Which of the below is a programming language?\n I. Java\n II. Python\n III. JavaScript',
-      mc: {
-        choices: [
-          'I Only',
-          'I and II Only',
-          'II and III Only',
-          'All of the above',
-        ],
-        correctChoiceIndex: 3,
-      },
-    },
-  ]
-  return <MultipleChoiceQuiz questions={questions} />
+  const questionSetRepo = QuestionSetRepoFactory.createTestInstance()
+  questionSetRepo.addQuestionSet(
+    new QuestionSetBuilderForTest().setName('Banana').build(),
+  )
+  questionSetRepo.addQuestionSet(
+    new QuestionSetBuilderForTest().setName('Apple').build(),
+  )
+  questionSetRepo.addQuestionSet(
+    new QuestionSetBuilderForTest().setName('Orange').build(),
+  )
+  return HomePageUIService.createTestInstance({ questionSetRepo }).getElement()
 }

@@ -4,9 +4,9 @@ import { useState } from 'react'
 import {
   QuestionSetRepo,
   QuestionSetRepoFactory,
-  QuestionSetSaveError,
+  QuestionSetCreateError,
 } from '../../../repo/question_set'
-import { Question } from '../../../model/question_set'
+import { Question, QuestionSet } from '../../../model/question_set'
 import { MultipleChoiceBuilder, MultipleChoiceError } from '../../../model/mc'
 
 export class QuestionSetEditorUIService {
@@ -106,15 +106,15 @@ function QuestionSetEditor({ editorRepo }: { editorRepo: QuestionSetRepo }) {
       questions.push(question)
     }
 
-    const questionSet = {
+    const questionSet = new QuestionSet({
       name: questionSetInput.name,
       questions,
-    }
+    })
 
     try {
-      editorRepo.save(questionSet)
+      editorRepo.addQuestionSet(questionSet)
     } catch (e) {
-      if (e instanceof QuestionSetSaveError) {
+      if (e instanceof QuestionSetCreateError) {
         if (e.cause.code === 'DUPLICATE_QUESTION_SET_NAME') {
           setErrorMessage('Question set with same name already exists')
           return
