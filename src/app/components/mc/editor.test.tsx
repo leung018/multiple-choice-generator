@@ -6,10 +6,7 @@ import {
 import { QuestionSetEditorUIService } from './editor'
 import { MultipleChoice } from '../../../model/mc'
 import '@testing-library/jest-dom'
-import {
-  QuestionSet,
-  QuestionSetBuilderForTest,
-} from '../../../model/question_set'
+import { QuestionSetBuilderForTest } from '../../../model/question_set'
 
 class UIServiceInteractor {
   private readonly editorRepo: QuestionSetRepo
