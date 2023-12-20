@@ -2,6 +2,53 @@
 
 import { useState } from 'react'
 import { Question } from '../../../model/question_set'
+import {
+  QuestionSetRepo,
+  QuestionSetRepoFactory,
+} from '../../../repo/question_set'
+
+export class MultipleChoiceQuizUIService {
+  static create({ questionSetId }: { questionSetId: string }) {
+    return new MultipleChoiceQuizUIService({
+      questionSetRepo: QuestionSetRepoFactory.createTestInstance(), // TODO: replace with real repo
+      questionSetId,
+    })
+  }
+
+  static createTestInstance({
+    questionSetRepo,
+    questionSetId,
+  }: {
+    questionSetRepo: QuestionSetRepo
+    questionSetId: string
+  }) {
+    return new MultipleChoiceQuizUIService({ questionSetRepo, questionSetId })
+  }
+
+  private readonly questionSetRepo: QuestionSetRepo
+  private readonly questionSetId: string
+
+  private constructor({
+    questionSetRepo,
+    questionSetId,
+  }: {
+    questionSetRepo: QuestionSetRepo
+    questionSetId: string
+  }) {
+    this.questionSetRepo = questionSetRepo
+    this.questionSetId = questionSetId
+  }
+
+  getElement() {
+    return (
+      <MultipleChoiceQuiz
+        questions={
+          this.questionSetRepo.getQuestionSetById(this.questionSetId).questions
+        }
+      ></MultipleChoiceQuiz>
+    )
+  }
+}
 
 // TODO: Noted that won't test the rendering of submit button by now. Test that part later in the feature of submitting the answer is more meaningful.
 export default function MultipleChoiceQuiz({

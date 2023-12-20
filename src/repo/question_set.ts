@@ -12,6 +12,8 @@ export interface QuestionSetRepo {
    */
   getQuestionSetByName(questionSetName: string): QuestionSet
 
+  getQuestionSetById(questionSetId: string): QuestionSet
+
   getQuestionSets(): ReadonlyArray<QuestionSet>
 }
 
@@ -56,6 +58,19 @@ class InMemoryQuestionSetRepo implements QuestionSetRepo {
       )
     }
     return this.nameToQuestionSet[questionSetName]
+  }
+
+  getQuestionSetById(questionSetId: string): QuestionSet {
+    const questionSet = Object.values(this.nameToQuestionSet).find(
+      (questionSet) => questionSet.id === questionSetId,
+    )
+    if (!questionSet) {
+      throw new QuestionSetGetError(
+        'QUESTION_SET_NOT_FOUND',
+        `QuestionSet with id ${questionSetId} not found`,
+      )
+    }
+    return questionSet
   }
 
   getQuestionSets(): readonly QuestionSet[] {
