@@ -21,14 +21,14 @@ export interface QuestionSetRepo {
 }
 
 type QuestionSetCreateErrorCode = 'DUPLICATE_QUESTION_SET_NAME'
-export class QuestionSetCreateError extends CustomBaseError {
+export class QuestionSetCreateError extends CustomBaseError<QuestionSetCreateErrorCode> {
   constructor(code: QuestionSetCreateErrorCode, message?: string) {
     super(code, message)
   }
 }
 
 type QuestionSetGetErrorCode = 'QUESTION_SET_NOT_FOUND'
-export class QuestionSetGetError extends CustomBaseError {
+export class QuestionSetGetError extends CustomBaseError<QuestionSetGetErrorCode> {
   constructor(code: QuestionSetGetErrorCode, message?: string) {
     super(code, message)
   }

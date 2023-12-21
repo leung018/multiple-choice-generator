@@ -5,7 +5,7 @@ type MultipleChoiceErrorCode =
   | 'INVALID_CORRECT_CHOICE_INDEX'
   | 'INVALID_NUMBER_OF_CHOICES'
 
-export class MultipleChoiceError extends CustomBaseError {
+export class MultipleChoiceError extends CustomBaseError<MultipleChoiceErrorCode> {
   constructor(code: MultipleChoiceErrorCode, message?: string) {
     super(code, message)
   }
