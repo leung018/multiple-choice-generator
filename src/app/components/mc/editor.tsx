@@ -12,24 +12,28 @@ import { MultipleChoiceBuilder, MultipleChoiceError } from '../../../model/mc'
 export class QuestionSetEditorUIService {
   static create() {
     return new QuestionSetEditorUIService({
-      editorRepo: QuestionSetRepoFactory.createTestInstance(), // TODO: replace with real repo
+      questionSetRepo: QuestionSetRepoFactory.createTestInstance(), // TODO: replace with real repo
     })
   }
 
   static createTestInstance({
-    editorRepo = QuestionSetRepoFactory.createTestInstance(),
+    questionSetRepo = QuestionSetRepoFactory.createTestInstance(),
   }) {
-    return new QuestionSetEditorUIService({ editorRepo })
+    return new QuestionSetEditorUIService({ questionSetRepo })
   }
 
-  private readonly editorRepo: QuestionSetRepo
+  private readonly questionSetRepo: QuestionSetRepo
 
-  private constructor({ editorRepo }: { editorRepo: QuestionSetRepo }) {
-    this.editorRepo = editorRepo
+  private constructor({
+    questionSetRepo: questionSetRepo,
+  }: {
+    questionSetRepo: QuestionSetRepo
+  }) {
+    this.questionSetRepo = questionSetRepo
   }
 
   getElement() {
-    return <QuestionSetEditor editorRepo={this.editorRepo} />
+    return <QuestionSetEditor questionSetRepo={this.questionSetRepo} />
   }
 }
 
@@ -60,7 +64,11 @@ const newQuestion = (): QuestionInput => ({
   choices: [newChoice(), newChoice()],
 })
 
-function QuestionSetEditor({ editorRepo }: { editorRepo: QuestionSetRepo }) {
+function QuestionSetEditor({
+  questionSetRepo,
+}: {
+  questionSetRepo: QuestionSetRepo
+}) {
   const [questionSetInput, setQuestionSetInput] = useState<QuestionSetInput>({
     name: '',
     questions: [newQuestion()],
@@ -112,7 +120,7 @@ function QuestionSetEditor({ editorRepo }: { editorRepo: QuestionSetRepo }) {
     })
 
     try {
-      editorRepo.addQuestionSet(questionSet)
+      questionSetRepo.addQuestionSet(questionSet)
     } catch (e) {
       if (e instanceof QuestionSetCreateError) {
         if (e.cause.code === 'DUPLICATE_QUESTION_SET_NAME') {
