@@ -1,10 +1,6 @@
 import { QuestionSet } from '../model/question_set'
 import { CustomBaseError } from '../utils/err'
-import {
-  FakeLocalStorageOperator,
-  LocalStorageOperator,
-  LocalStorageOperatorImpl,
-} from '../utils/local_storage'
+import { LocalStorageObjectOperator } from '../utils/local_storage'
 
 export interface QuestionSetRepo {
   /**
@@ -46,36 +42,43 @@ export class QuestionSetRepoFactory {
 }
 
 export class LocalStorageQuestionSetRepo implements QuestionSetRepo {
+  static readonly STORAGE_PATH = 'questionSets'
+
   static createTestInstance(): LocalStorageQuestionSetRepo {
-    return new LocalStorageQuestionSetRepo(new FakeLocalStorageOperator())
-  }
-
-  static create(): LocalStorageQuestionSetRepo {
-    return new LocalStorageQuestionSetRepo(new LocalStorageOperatorImpl())
-  }
-
-  private constructor(localStorageOperator: LocalStorageOperator) {
-    this.localStorageOperator = localStorageOperator
-  }
-
-  private localStorageOperator: LocalStorageOperator
-
-  addQuestionSet(questionSet: QuestionSet): void {
-    this.localStorageOperator.setItem(
-      questionSet.name,
-      JSON.stringify(questionSet),
+    return new LocalStorageQuestionSetRepo(
+      LocalStorageObjectOperator.createTestInstance(this.STORAGE_PATH),
     )
   }
 
+  static create(): LocalStorageQuestionSetRepo {
+    return new LocalStorageQuestionSetRepo(
+      LocalStorageObjectOperator.create(this.STORAGE_PATH),
+    )
+  }
+
+  private constructor(
+    localStorageObjectOperator: LocalStorageObjectOperator<QuestionSet>,
+  ) {
+    this.localStorageOperator = localStorageObjectOperator
+  }
+
+  private localStorageOperator: LocalStorageObjectOperator<QuestionSet>
+
+  addQuestionSet(questionSet: QuestionSet): void {
+    this.localStorageOperator.add(questionSet)
+  }
+
   getQuestionSetByName(questionSetName: string): QuestionSet {
-    const questionSet = this.localStorageOperator.getItem(questionSetName)
+    const questionSet = this.localStorageOperator.getByFilter(
+      (questionSet) => questionSet.name === questionSetName,
+    )
     if (!questionSet) {
       throw new QuestionSetGetError(
         'QUESTION_SET_NOT_FOUND',
         `QuestionSet with name ${questionSetName} not found`,
       )
     }
-    return JSON.parse(questionSet)
+    return questionSet
   }
 
   getQuestionSetById(questionSetId: string): QuestionSet {
