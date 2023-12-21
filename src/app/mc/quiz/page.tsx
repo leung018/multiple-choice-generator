@@ -18,7 +18,7 @@ export default function MultipleChoiceQuizPage() {
     }).getElement()
   } catch (e) {
     if (
-      e instanceof QuestionSetGetError &&
+      e instanceof QuestionSetGetError && // TODO: Perhaps here should not acknowledge the error type from repo layer. Reorganize the error handling in later task.
       e.cause.code === 'QUESTION_SET_NOT_FOUND'
     ) {
       notFound()
