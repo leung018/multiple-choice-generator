@@ -61,11 +61,21 @@ export class LocalStorageQuestionSetRepo implements QuestionSetRepo {
   private localStorageOperator: LocalStorageOperator
 
   addQuestionSet(questionSet: QuestionSet): void {
-    throw new Error('Method not implemented.')
+    this.localStorageOperator.setItem(
+      questionSet.name,
+      JSON.stringify(questionSet),
+    )
   }
 
   getQuestionSetByName(questionSetName: string): QuestionSet {
-    throw new Error('Method not implemented.')
+    const questionSet = this.localStorageOperator.getItem(questionSetName)
+    if (!questionSet) {
+      throw new QuestionSetGetError(
+        'QUESTION_SET_NOT_FOUND',
+        `QuestionSet with name ${questionSetName} not found`,
+      )
+    }
+    return JSON.parse(questionSet)
   }
 
   getQuestionSetById(questionSetId: string): QuestionSet {
