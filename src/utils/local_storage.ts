@@ -3,9 +3,7 @@ export interface LocalStorageOperator {
 
   setItem(key: string, value: string): void
 
-  removeItem(key: string): void
-
-  clear(): void
+  // TODO: add other methods (can refer to commit:0d3d2b that have drafted those before)
 }
 
 export class FakeLocalStorageOperator implements LocalStorageOperator {
@@ -18,14 +16,6 @@ export class FakeLocalStorageOperator implements LocalStorageOperator {
   setItem(key: string, value: string): void {
     this.storage.set(key, value)
   }
-
-  removeItem(key: string): void {
-    this.storage.delete(key)
-  }
-
-  clear(): void {
-    this.storage.clear()
-  }
 }
 
 export class LocalStorageOperatorImpl implements LocalStorageOperator {
@@ -35,13 +25,5 @@ export class LocalStorageOperatorImpl implements LocalStorageOperator {
 
   setItem(key: string, value: string): void {
     localStorage.setItem(key, value)
-  }
-
-  removeItem(key: string): void {
-    localStorage.removeItem(key)
-  }
-
-  clear(): void {
-    localStorage.clear()
   }
 }
