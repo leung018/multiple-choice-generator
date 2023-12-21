@@ -1,5 +1,10 @@
 import { QuestionSet } from '../model/question_set'
 import { CustomBaseError } from '../utils/err'
+import {
+  FakeLocalStorageOperator,
+  LocalStorageOperator,
+  LocalStorageOperatorImpl,
+} from '../utils/local_storage'
 
 export interface QuestionSetRepo {
   /**
@@ -37,6 +42,38 @@ export class QuestionSetGetError extends CustomBaseError<QuestionSetGetErrorCode
 export class QuestionSetRepoFactory {
   static createTestInstance(): QuestionSetRepo {
     return new InMemoryQuestionSetRepo()
+  }
+}
+
+export class LocalStorageQuestionSetRepo implements QuestionSetRepo {
+  static createTestInstance(): LocalStorageQuestionSetRepo {
+    return new LocalStorageQuestionSetRepo(new FakeLocalStorageOperator())
+  }
+
+  static create(): LocalStorageQuestionSetRepo {
+    return new LocalStorageQuestionSetRepo(new LocalStorageOperatorImpl())
+  }
+
+  private constructor(localStorageOperator: LocalStorageOperator) {
+    this.localStorageOperator = localStorageOperator
+  }
+
+  private localStorageOperator: LocalStorageOperator
+
+  addQuestionSet(questionSet: QuestionSet): void {
+    throw new Error('Method not implemented.')
+  }
+
+  getQuestionSetByName(questionSetName: string): QuestionSet {
+    throw new Error('Method not implemented.')
+  }
+
+  getQuestionSetById(questionSetId: string): QuestionSet {
+    throw new Error('Method not implemented.')
+  }
+
+  getQuestionSets(): readonly QuestionSet[] {
+    throw new Error('Method not implemented.')
   }
 }
 
