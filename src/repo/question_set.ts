@@ -42,6 +42,10 @@ export class QuestionSetRepoFactory {
   static createTestInstance(): QuestionSetRepo {
     return LocalStorageQuestionSetRepo.createTestInstance()
   }
+
+  static create(): QuestionSetRepo {
+    return LocalStorageQuestionSetRepo.create()
+  }
 }
 
 export class LocalStorageQuestionSetRepo implements QuestionSetRepo {

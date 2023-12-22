@@ -12,7 +12,7 @@ import { MultipleChoiceBuilder, MultipleChoiceError } from '../../../model/mc'
 export class QuestionSetEditorUIService {
   static create() {
     return new QuestionSetEditorUIService({
-      questionSetRepo: QuestionSetRepoFactory.createTestInstance(), // TODO: replace with real repo
+      questionSetRepo: QuestionSetRepoFactory.create(),
     })
   }
 
