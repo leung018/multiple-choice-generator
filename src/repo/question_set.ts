@@ -65,6 +65,14 @@ export class LocalStorageQuestionSetRepo implements QuestionSetRepo {
   private localStorageOperator: LocalStorageObjectOperator<QuestionSet>
 
   addQuestionSet(questionSet: QuestionSet): void {
+    if (
+      this.localStorageOperator.getByFilter((q) => q.name === questionSet.name)
+    ) {
+      throw new QuestionSetCreateError(
+        'DUPLICATE_QUESTION_SET_NAME',
+        `QuestionSet with name ${questionSet.name} already exists`,
+      )
+    }
     this.localStorageOperator.add(questionSet)
   }
 
