@@ -92,7 +92,16 @@ export class LocalStorageQuestionSetRepo implements QuestionSetRepo {
   }
 
   getQuestionSetById(questionSetId: string): QuestionSet {
-    throw new Error('Method not implemented.')
+    const questionSet = this.localStorageOperator.findOneByFilter(
+      (questionSet) => questionSet.id === questionSetId,
+    )
+    if (!questionSet) {
+      throw new GetQuestionSetError(
+        'QUESTION_SET_NOT_FOUND',
+        `QuestionSet with id ${questionSetId} not found`,
+      )
+    }
+    return questionSet
   }
 
   getQuestionSets(): readonly QuestionSet[] {

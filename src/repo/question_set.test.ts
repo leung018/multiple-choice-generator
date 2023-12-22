@@ -45,4 +45,16 @@ describe('QuestionSetRepo', () => {
       'DUPLICATE_QUESTION_SET_NAME',
     )
   })
+
+  it('should add question set and get question set by id', () => {
+    repo.addQuestionSet(questionSet)
+    expect(repo.getQuestionSetById(questionSet.id)).toEqual(questionSet)
+  })
+
+  it("should throw error when question set id doesn't exist", () => {
+    expect(() => repo.getQuestionSetById('unknown_id')).toThrowCustomError(
+      GetQuestionSetError,
+      'QUESTION_SET_NOT_FOUND',
+    )
+  })
 })
