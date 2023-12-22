@@ -10,7 +10,7 @@ import {
 export class HomePageUIService {
   static create() {
     return new HomePageUIService({
-      questionSetRepo: QuestionSetRepoFactory.create(),
+      questionSetRepo: QuestionSetRepoFactory.createLocalStorageInstance(),
     })
   }
 

@@ -10,7 +10,7 @@ import {
 export class MultipleChoiceQuizUIService {
   static create({ questionSetId }: { questionSetId: string }) {
     return new MultipleChoiceQuizUIService({
-      questionSetRepo: QuestionSetRepoFactory.create(),
+      questionSetRepo: QuestionSetRepoFactory.createLocalStorageInstance(),
       questionSetId,
     })
   }
