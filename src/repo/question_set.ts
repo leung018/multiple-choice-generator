@@ -40,7 +40,7 @@ export class GetQuestionSetError extends CustomBaseError<GetQuestionSetErrorCode
 
 export class QuestionSetRepoFactory {
   static createTestInstance(): QuestionSetRepo {
-    return new InMemoryQuestionSetRepo()
+    return LocalStorageQuestionSetRepo.createTestInstance()
   }
 }
 
@@ -109,46 +109,5 @@ export class LocalStorageQuestionSetRepo implements QuestionSetRepo {
 
   getQuestionSets(): readonly QuestionSet[] {
     return this.localStorageOperator.getAll()
-  }
-}
-
-class InMemoryQuestionSetRepo implements QuestionSetRepo {
-  private nameToQuestionSet: { [name: string]: QuestionSet } = {}
-
-  addQuestionSet(questionSet: QuestionSet): void {
-    if (this.nameToQuestionSet[questionSet.name]) {
-      throw new AddQuestionSetError(
-        'DUPLICATE_QUESTION_SET_NAME',
-        `QuestionSet with name ${questionSet.name} already exists`,
-      )
-    }
-    this.nameToQuestionSet[questionSet.name] = questionSet
-  }
-
-  getQuestionSetByName(questionSetName: string): QuestionSet {
-    if (!this.nameToQuestionSet[questionSetName]) {
-      throw new GetQuestionSetError(
-        'QUESTION_SET_NOT_FOUND',
-        `QuestionSet with name ${questionSetName} not found`,
-      )
-    }
-    return this.nameToQuestionSet[questionSetName]
-  }
-
-  getQuestionSetById(questionSetId: string): QuestionSet {
-    const questionSet = Object.values(this.nameToQuestionSet).find(
-      (questionSet) => questionSet.id === questionSetId,
-    )
-    if (!questionSet) {
-      throw new GetQuestionSetError(
-        'QUESTION_SET_NOT_FOUND',
-        `QuestionSet with id ${questionSetId} not found`,
-      )
-    }
-    return questionSet
-  }
-
-  getQuestionSets(): readonly QuestionSet[] {
-    return Object.values(this.nameToQuestionSet)
   }
 }
