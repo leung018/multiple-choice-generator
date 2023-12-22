@@ -66,7 +66,9 @@ export class LocalStorageQuestionSetRepo implements QuestionSetRepo {
 
   addQuestionSet(questionSet: QuestionSet): void {
     if (
-      this.localStorageOperator.getByFilter((q) => q.name === questionSet.name)
+      this.localStorageOperator.findOneByFilter(
+        (q) => q.name === questionSet.name,
+      )
     ) {
       throw new AddQuestionSetError(
         'DUPLICATE_QUESTION_SET_NAME',
@@ -77,7 +79,7 @@ export class LocalStorageQuestionSetRepo implements QuestionSetRepo {
   }
 
   getQuestionSetByName(questionSetName: string): QuestionSet {
-    const questionSet = this.localStorageOperator.getByFilter(
+    const questionSet = this.localStorageOperator.findOneByFilter(
       (questionSet) => questionSet.name === questionSetName,
     )
     if (!questionSet) {
