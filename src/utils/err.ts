@@ -1,13 +1,15 @@
-interface CustomBaseErrorOptions extends ErrorOptions {
+interface CustomBaseErrorOptions<ErrorCode> extends ErrorOptions {
   cause: {
-    code: string
+    code: ErrorCode
   }
 }
 
-export abstract class CustomBaseError extends Error {
-  readonly cause!: CustomBaseErrorOptions['cause']
+export abstract class CustomBaseError<
+  ErrorCode extends string = string,
+> extends Error {
+  readonly cause!: CustomBaseErrorOptions<ErrorCode>['cause']
 
-  constructor(code: string, message?: string) {
+  constructor(code: ErrorCode, message?: string) {
     super(message, { cause: { code } })
   }
 }

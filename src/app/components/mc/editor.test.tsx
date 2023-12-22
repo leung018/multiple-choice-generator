@@ -9,18 +9,18 @@ import '@testing-library/jest-dom'
 import { QuestionSetBuilderForTest } from '../../../model/question_set'
 
 class UIServiceInteractor {
-  private readonly editorRepo: QuestionSetRepo
+  private readonly questionSetRepo: QuestionSetRepo
   private questionSetName: string
   private questionNumberFocus = 1
 
   constructor({
     questionSetName = 'Dummy name',
-    editorRepo = QuestionSetRepoFactory.createTestInstance(),
+    questionSetRepo = QuestionSetRepoFactory.createTestInstance(),
   }) {
-    this.editorRepo = editorRepo
+    this.questionSetRepo = questionSetRepo
     render(
       QuestionSetEditorUIService.createTestInstance({
-        editorRepo: this.editorRepo,
+        questionSetRepo: this.questionSetRepo,
       }).getElement(),
     )
 
@@ -42,7 +42,7 @@ class UIServiceInteractor {
   }
 
   getSavedQuestionSet() {
-    return this.editorRepo.getQuestionSetByName(this.questionSetName)
+    return this.questionSetRepo.getQuestionSetByName(this.questionSetName)
   }
 
   inputQuestionDescription({ description }: { description: string }) {
@@ -453,16 +453,16 @@ describe('QuestionSetEditorUIService', () => {
   })
 
   it('should not save if same name as existing question set', () => {
-    const editorRepo = QuestionSetRepoFactory.createTestInstance()
+    const questionSetRepo = QuestionSetRepoFactory.createTestInstance()
     const questionSet = new QuestionSetBuilderForTest()
       .setName('Test name')
       .appendQuestion()
       .build()
-    editorRepo.addQuestionSet(questionSet)
+    questionSetRepo.addQuestionSet(questionSet)
 
     const interactor = new UIServiceInteractor({
       questionSetName: 'Test name',
-      editorRepo,
+      questionSetRepo,
     })
     setFirstValidQuestion(interactor)
     interactor.clickSave()
