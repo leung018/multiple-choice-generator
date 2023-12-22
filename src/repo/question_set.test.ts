@@ -2,8 +2,8 @@ import { MultipleChoiceBuilder } from '../model/mc'
 import { QuestionSet, QuestionSetBuilderForTest } from '../model/question_set'
 import {
   LocalStorageQuestionSetRepo,
-  QuestionSetCreateError,
-  QuestionSetGetError,
+  AddQuestionSetError,
+  GetQuestionSetError,
   QuestionSetRepo,
 } from './question_set'
 import { expect } from '@jest/globals'
@@ -33,7 +33,7 @@ describe('QuestionSetRepo', () => {
 
   it("should throw error when question set name doesn't exist", () => {
     expect(() => repo.getQuestionSetByName('unknown')).toThrowCustomError(
-      QuestionSetGetError,
+      GetQuestionSetError,
       'QUESTION_SET_NOT_FOUND',
     )
   })
@@ -41,7 +41,7 @@ describe('QuestionSetRepo', () => {
   it('should throw error when question set name is taken', () => {
     repo.addQuestionSet(questionSet)
     expect(() => repo.addQuestionSet(questionSet)).toThrowCustomError(
-      QuestionSetCreateError,
+      AddQuestionSetError,
       'DUPLICATE_QUESTION_SET_NAME',
     )
   })

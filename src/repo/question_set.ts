@@ -4,33 +4,33 @@ import { LocalStorageObjectOperator } from '../utils/local_storage'
 
 export interface QuestionSetRepo {
   /**
-   * @throws {QuestionSetCreateError}
+   * @throws {AddQuestionSetError}
    */
   addQuestionSet(questionSet: QuestionSet): void
 
   /**
-   * @throws {QuestionSetGetError}
+   * @throws {GetQuestionSetError}
    */
   getQuestionSetByName(questionSetName: string): QuestionSet
 
   /**
-   * @throws {QuestionSetGetError}
+   * @throws {GetQuestionSetError}
    */
   getQuestionSetById(questionSetId: string): QuestionSet
 
   getQuestionSets(): ReadonlyArray<QuestionSet>
 }
 
-type QuestionSetCreateErrorCode = 'DUPLICATE_QUESTION_SET_NAME'
-export class QuestionSetCreateError extends CustomBaseError<QuestionSetCreateErrorCode> {
-  constructor(code: QuestionSetCreateErrorCode, message?: string) {
+type AddQuestionSetErrorCode = 'DUPLICATE_QUESTION_SET_NAME'
+export class AddQuestionSetError extends CustomBaseError<AddQuestionSetErrorCode> {
+  constructor(code: AddQuestionSetErrorCode, message?: string) {
     super(code, message)
   }
 }
 
-type QuestionSetGetErrorCode = 'QUESTION_SET_NOT_FOUND'
-export class QuestionSetGetError extends CustomBaseError<QuestionSetGetErrorCode> {
-  constructor(code: QuestionSetGetErrorCode, message?: string) {
+type GetQuestionSetErrorCode = 'QUESTION_SET_NOT_FOUND'
+export class GetQuestionSetError extends CustomBaseError<GetQuestionSetErrorCode> {
+  constructor(code: GetQuestionSetErrorCode, message?: string) {
     super(code, message)
   }
 }
@@ -68,7 +68,7 @@ export class LocalStorageQuestionSetRepo implements QuestionSetRepo {
     if (
       this.localStorageOperator.getByFilter((q) => q.name === questionSet.name)
     ) {
-      throw new QuestionSetCreateError(
+      throw new AddQuestionSetError(
         'DUPLICATE_QUESTION_SET_NAME',
         `QuestionSet with name ${questionSet.name} already exists`,
       )
@@ -81,7 +81,7 @@ export class LocalStorageQuestionSetRepo implements QuestionSetRepo {
       (questionSet) => questionSet.name === questionSetName,
     )
     if (!questionSet) {
-      throw new QuestionSetGetError(
+      throw new GetQuestionSetError(
         'QUESTION_SET_NOT_FOUND',
         `QuestionSet with name ${questionSetName} not found`,
       )
@@ -103,7 +103,7 @@ class InMemoryQuestionSetRepo implements QuestionSetRepo {
 
   addQuestionSet(questionSet: QuestionSet): void {
     if (this.nameToQuestionSet[questionSet.name]) {
-      throw new QuestionSetCreateError(
+      throw new AddQuestionSetError(
         'DUPLICATE_QUESTION_SET_NAME',
         `QuestionSet with name ${questionSet.name} already exists`,
       )
@@ -113,7 +113,7 @@ class InMemoryQuestionSetRepo implements QuestionSetRepo {
 
   getQuestionSetByName(questionSetName: string): QuestionSet {
     if (!this.nameToQuestionSet[questionSetName]) {
-      throw new QuestionSetGetError(
+      throw new GetQuestionSetError(
         'QUESTION_SET_NOT_FOUND',
         `QuestionSet with name ${questionSetName} not found`,
       )
@@ -126,7 +126,7 @@ class InMemoryQuestionSetRepo implements QuestionSetRepo {
       (questionSet) => questionSet.id === questionSetId,
     )
     if (!questionSet) {
-      throw new QuestionSetGetError(
+      throw new GetQuestionSetError(
         'QUESTION_SET_NOT_FOUND',
         `QuestionSet with id ${questionSetId} not found`,
       )
