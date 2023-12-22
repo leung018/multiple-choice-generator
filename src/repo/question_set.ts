@@ -18,6 +18,9 @@ export interface QuestionSetRepo {
    */
   getQuestionSetById(questionSetId: string): QuestionSet
 
+  /**
+   * Sorted by order that they are added from oldest to newest
+   */
   getQuestionSets(): ReadonlyArray<QuestionSet>
 }
 
@@ -105,7 +108,7 @@ export class LocalStorageQuestionSetRepo implements QuestionSetRepo {
   }
 
   getQuestionSets(): readonly QuestionSet[] {
-    throw new Error('Method not implemented.')
+    return this.localStorageOperator.getAll()
   }
 }
 

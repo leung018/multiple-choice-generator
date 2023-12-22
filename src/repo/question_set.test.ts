@@ -57,4 +57,15 @@ describe('QuestionSetRepo', () => {
       'QUESTION_SET_NOT_FOUND',
     )
   })
+
+  it('should get all question sets for added', () => {
+    const questionSet2 = new QuestionSetBuilderForTest().setName('2').build()
+    repo.addQuestionSet(questionSet)
+    repo.addQuestionSet(questionSet2)
+    expect(repo.getQuestionSets()).toEqual([questionSet, questionSet2])
+  })
+
+  it('should get empty list for getQuestionSets when no question set added', () => {
+    expect(repo.getQuestionSets()).toEqual([])
+  })
 })
