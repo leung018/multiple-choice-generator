@@ -9,7 +9,7 @@ import {
 import { expect } from '@jest/globals'
 import '../test_utils/assert/check_error'
 
-describe('QuestionSetRepo', () => {
+describe('LocalStorageQuestionSetRepo', () => {
   let repo: QuestionSetRepo
   let questionSet: QuestionSet
 
