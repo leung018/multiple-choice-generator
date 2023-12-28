@@ -6,6 +6,7 @@ import {
   QuestionSetRepo,
   QuestionSetRepoFactory,
 } from '../../repo/question_set'
+import { useEffect, useState } from 'react'
 
 export class HomePageUIService {
   static create() {
@@ -30,7 +31,7 @@ export class HomePageUIService {
     this.questionSetRepo = questionSetRepo
   }
 
-  private getSortedQuestionSets() {
+  private getSortedQuestionSets = () => {
     // Ideally perhaps this should be done in the repo layer with a more generic method
     // But for current project scope, this is fine
     return [...this.questionSetRepo.getQuestionSets()].sort((a, b) =>
@@ -39,12 +40,21 @@ export class HomePageUIService {
   }
 
   getElement() {
-    return <HomePage questionSets={this.getSortedQuestionSets()}></HomePage>
+    return <HomePage getQuestionSets={this.getSortedQuestionSets}></HomePage>
   }
 }
 
-function HomePage({ questionSets }: { questionSets: readonly QuestionSet[] }) {
+function HomePage({
+  getQuestionSets,
+}: {
+  getQuestionSets: () => readonly QuestionSet[]
+}) {
   const router = useRouter()
+
+  const [questionSets, setQuestionSets] = useState<readonly QuestionSet[]>([])
+  useEffect(() => {
+    setQuestionSets(getQuestionSets())
+  }, [getQuestionSets])
 
   return (
     <div className="p-4">
