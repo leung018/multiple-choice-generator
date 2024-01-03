@@ -56,9 +56,12 @@ export default function MultipleChoiceQuiz({
 }: {
   getQuestions: () => readonly Question[]
 }) {
+  const [isLoading, setLoading] = useState(true)
+
   const [questions, setQuestions] = useState<readonly Question[]>([])
   useEffect(() => {
     setQuestions(getQuestions())
+    setLoading(false)
   }, [getQuestions])
 
   const [questionToCheckedChoiceMap, setCheckedChoice] = useState<
@@ -69,6 +72,10 @@ export default function MultipleChoiceQuiz({
     const newMap = new Map<number, number>(questionToCheckedChoiceMap)
     newMap.set(questionIndex, choiceIndex)
     setCheckedChoice(newMap)
+  }
+
+  if (isLoading) {
+    return <div>Loading...</div>
   }
 
   return (

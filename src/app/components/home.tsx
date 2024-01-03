@@ -50,11 +50,17 @@ function HomePage({
   getQuestionSets: () => readonly QuestionSet[]
 }) {
   const router = useRouter()
+  const [isLoading, setLoading] = useState(true)
 
   const [questionSets, setQuestionSets] = useState<readonly QuestionSet[]>([])
   useEffect(() => {
     setQuestionSets(getQuestionSets())
+    setLoading(false)
   }, [getQuestionSets])
+
+  if (isLoading) {
+    return <div>Loading...</div>
+  }
 
   return (
     <div className="p-4">
