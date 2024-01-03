@@ -1,11 +1,12 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Question } from '../../../model/question_set'
 import {
   QuestionSetRepo,
   QuestionSetRepoFactory,
 } from '../../../repo/question_set'
+import LoadingSpinner from '../loading'
 
 export class MultipleChoiceQuizUIService {
   static create({ questionSetId }: { questionSetId: string }) {
@@ -42,7 +43,7 @@ export class MultipleChoiceQuizUIService {
   getElement() {
     return (
       <MultipleChoiceQuiz
-        questions={
+        getQuestions={() =>
           this.questionSetRepo.getQuestionSetById(this.questionSetId).questions
         }
       ></MultipleChoiceQuiz>
@@ -52,10 +53,18 @@ export class MultipleChoiceQuizUIService {
 
 // TODO: Noted that won't test the rendering of submit button by now. Test that part later in the feature of submitting the answer is more meaningful.
 export default function MultipleChoiceQuiz({
-  questions,
+  getQuestions,
 }: {
-  questions: readonly Question[]
+  getQuestions: () => readonly Question[]
 }) {
+  const [isLoading, setLoading] = useState(true)
+
+  const [questions, setQuestions] = useState<readonly Question[]>([])
+  useEffect(() => {
+    setQuestions(getQuestions())
+    setLoading(false)
+  }, [getQuestions])
+
   const [questionToCheckedChoiceMap, setCheckedChoice] = useState<
     Map<number, number>
   >(new Map<number, number>())
@@ -64,6 +73,10 @@ export default function MultipleChoiceQuiz({
     const newMap = new Map<number, number>(questionToCheckedChoiceMap)
     newMap.set(questionIndex, choiceIndex)
     setCheckedChoice(newMap)
+  }
+
+  if (isLoading) {
+    return <LoadingSpinner />
   }
 
   return (
