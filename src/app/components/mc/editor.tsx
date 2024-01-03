@@ -8,6 +8,7 @@ import {
 } from '../../../repo/question_set'
 import { Question, QuestionSet } from '../../../model/question_set'
 import { MultipleChoiceBuilder, MultipleChoiceError } from '../../../model/mc'
+import { useRouter } from 'next/navigation'
 
 export class QuestionSetEditorUIService {
   static create() {
@@ -69,6 +70,8 @@ function QuestionSetEditor({
 }: {
   questionSetRepo: QuestionSetRepo
 }) {
+  const router = useRouter()
+
   const [questionSetInput, setQuestionSetInput] = useState<QuestionSetInput>({
     name: '',
     questions: [newQuestion()],
@@ -279,7 +282,10 @@ function QuestionSetEditor({
           <button
             type="button"
             className="bg-green-500 text-white px-4 py-2 rounded"
-            onClick={() => handleSaveClick()}
+            onClick={() => {
+              handleSaveClick()
+              router.push('/')
+            }}
           >
             Save
           </button>
