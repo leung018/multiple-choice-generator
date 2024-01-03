@@ -7,6 +7,7 @@ import {
   QuestionSetRepoFactory,
 } from '../../repo/question_set'
 import { useEffect, useState } from 'react'
+import LoadingSpinner from './loading'
 
 export class HomePageUIService {
   static create() {
@@ -59,7 +60,7 @@ function HomePage({
   }, [getQuestionSets])
 
   if (isLoading) {
-    return <div>Loading...</div>
+    return <LoadingSpinner />
   }
 
   return (

@@ -6,6 +6,7 @@ import {
   QuestionSetRepo,
   QuestionSetRepoFactory,
 } from '../../../repo/question_set'
+import LoadingSpinner from '../loading'
 
 export class MultipleChoiceQuizUIService {
   static create({ questionSetId }: { questionSetId: string }) {
@@ -75,7 +76,7 @@ export default function MultipleChoiceQuiz({
   }
 
   if (isLoading) {
-    return <div>Loading...</div>
+    return <LoadingSpinner />
   }
 
   return (
