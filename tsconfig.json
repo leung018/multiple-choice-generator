@@ -29,5 +29,13 @@
     ".next/types/**/*.ts",
     "jest.setup.ts"
   ],
-  "exclude": ["node_modules"]
+  "exclude": ["node_modules"],
+  // Workaround from https://github.com/cypress-io/cypress/issues/27731#issuecomment-1715685684
+  // TODO: Remove when issue is resolved https://github.com/cypress-io/cypress/issues/27448
+  "ts-node": {
+    "compilerOptions": {
+      "module": "ESNext",
+      "moduleResolution": "Node"
+    }
+  }
 }
