@@ -14,7 +14,7 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "checks": "yarn ts:check && yarn lint && yarn format:check",
-    "cypress:open": "cypress open"
+    "cy:open": "cypress open"
   },
   "dependencies": {
     "next": "^14.0.4",
