@@ -13,6 +13,15 @@ describe('MultipleChoiceQuiz', () => {
     return new MultipleChoiceBuilder().setCorrectChoiceIndex(0)
   }
 
+  it('should render name of question set', () => {
+    const { getByText } = renderMultipleChoicePage({
+      questionSet: new QuestionSetBuilderForTest()
+        .setName('My Question Set')
+        .build(),
+    })
+    expect(getByText('My Question Set')).toBeInTheDocument()
+  })
+
   it('should render attributes of a question', () => {
     const { getByText, getByLabelText } = renderMultipleChoicePage({
       questionSet: new QuestionSetBuilderForTest()
