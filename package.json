@@ -14,7 +14,10 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "checks": "yarn ts:check && yarn lint && yarn format:check",
-    "cy:open": "cypress open"
+    "cy:open": "cypress open",
+    "cy:run": "cypress run",
+    "e2e": "start-server-and-test start 3000 \"yarn cy:open --e2e\"",
+    "e2e:headless": "start-server-and-test start 3000 \"yarn cy:run --e2e\""
   },
   "dependencies": {
     "next": "^14.0.4",
