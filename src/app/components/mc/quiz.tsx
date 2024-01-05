@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { Question } from '../../../model/question_set'
+import { Question, QuestionSet } from '../../../model/question_set'
 import {
   QuestionSetRepo,
   QuestionSetRepoFactory,
@@ -43,8 +43,8 @@ export class MultipleChoiceQuizUIService {
   getElement() {
     return (
       <MultipleChoiceQuiz
-        getQuestions={() =>
-          this.questionSetRepo.getQuestionSetById(this.questionSetId).questions
+        getQuestionSet={() =>
+          this.questionSetRepo.getQuestionSetById(this.questionSetId)
         }
       ></MultipleChoiceQuiz>
     )
@@ -53,17 +53,22 @@ export class MultipleChoiceQuizUIService {
 
 // TODO: Noted that won't test the rendering of submit button by now. Test that part later in the feature of submitting the answer is more meaningful.
 export default function MultipleChoiceQuiz({
-  getQuestions,
+  getQuestionSet,
 }: {
-  getQuestions: () => readonly Question[]
+  getQuestionSet: () => QuestionSet
 }) {
   const [isLoading, setLoading] = useState(true)
 
   const [questions, setQuestions] = useState<readonly Question[]>([])
+  const [questionSetName, setQuestionSetName] = useState('')
+
   useEffect(() => {
-    setQuestions(getQuestions())
+    const questionSet = getQuestionSet()
+    setQuestions(questionSet.questions)
+    setQuestionSetName(questionSet.name)
+
     setLoading(false)
-  }, [getQuestions])
+  }, [getQuestionSet])
 
   const [questionToCheckedChoiceMap, setCheckedChoice] = useState<
     Map<number, number>
@@ -81,6 +86,7 @@ export default function MultipleChoiceQuiz({
 
   return (
     <div className="p-4">
+      <h1 className="text-xl font-semibold mb-6">{questionSetName}</h1>
       {questions.map((question, questionIndex) => (
         <div key={questionIndex} className="mb-4">
           <p className="font-bold whitespace-pre-line">
