@@ -10,6 +10,42 @@ import { Question, QuestionSet } from '../../../model/question_set'
 import { MultipleChoiceBuilder, MultipleChoiceError } from '../../../model/mc'
 import { useRouter } from 'next/navigation'
 
+export class QuestionSetEditorAriaLabel {
+  // If update of labels in this class, may need also to update e2e test
+
+  static readonly ERROR_PROMPT = 'error prompt'
+
+  static answerInput({
+    choiceNumber,
+    questionNumber,
+  }: {
+    choiceNumber: number
+    questionNumber: number
+  }) {
+    return `answer of question ${questionNumber} choice ${choiceNumber}`
+  }
+
+  static isCorrectAnswerCheckbox({
+    choiceNumber,
+    questionNumber,
+  }: {
+    choiceNumber: number
+    questionNumber: number
+  }) {
+    return `question ${questionNumber} choice ${choiceNumber} is correct answer`
+  }
+
+  static isFixedPositionCheckbox({
+    choiceNumber,
+    questionNumber,
+  }: {
+    choiceNumber: number
+    questionNumber: number
+  }) {
+    return `question ${questionNumber} choice ${choiceNumber} is fixed position`
+  }
+}
+
 export class QuestionSetEditorUIService {
   static create() {
     return new QuestionSetEditorUIService({
@@ -293,7 +329,7 @@ function QuestionSetEditor({
             <div
               id="error-message"
               className="text-red-500 ml-2"
-              aria-label="error prompt"
+              aria-label={QuestionSetEditorAriaLabel.ERROR_PROMPT}
             >
               {errorMessage}
             </div>
@@ -347,9 +383,10 @@ function ChoicesEditor(props: {
                 answer: e.target.value,
               })
             }}
-            aria-label={`answer of question ${questionIndex + 1} choice ${
-              choiceIndex + 1
-            }`}
+            aria-label={QuestionSetEditorAriaLabel.answerInput({
+              choiceNumber: choiceIndex + 1,
+              questionNumber: questionIndex + 1,
+            })}
           />
         </td>
         <td className="border border-slate-300">
@@ -362,18 +399,20 @@ function ChoicesEditor(props: {
                 isCorrect: e.target.checked,
               })
             }}
-            aria-label={`question ${questionIndex + 1} choice ${
-              choiceIndex + 1
-            } is correct answer`}
+            aria-label={QuestionSetEditorAriaLabel.isCorrectAnswerCheckbox({
+              choiceNumber: choiceIndex + 1,
+              questionNumber: questionIndex + 1,
+            })}
           />
         </td>
         <td className="border border-slate-300">
           <input
             type="checkbox"
             className="mr-1"
-            aria-label={`question ${questionIndex + 1} choice ${
-              choiceIndex + 1
-            } is fixed position`}
+            aria-label={QuestionSetEditorAriaLabel.isFixedPositionCheckbox({
+              choiceNumber: choiceIndex + 1,
+              questionNumber: questionIndex + 1,
+            })}
             onChange={(e) => {
               handleInternalChoiceUpdate(choiceIndex, {
                 isFixedPosition: e.target.checked,
