@@ -3,7 +3,10 @@ import {
   QuestionSetRepo,
   QuestionSetRepoFactory,
 } from '../../../repo/question_set'
-import { QuestionSetEditorUIService } from './editor'
+import {
+  QuestionSetEditorAriaLabel,
+  QuestionSetEditorUIService,
+} from './editor'
 import { MultipleChoice } from '../../../model/mc'
 import '@testing-library/jest-dom'
 import { QuestionSetBuilderForTest } from '../../../model/question_set'
@@ -64,7 +67,10 @@ class UIServiceInteractor {
   }) {
     fireEvent.change(
       screen.getByLabelText(
-        `answer of question ${this.questionNumberFocus} choice ${choiceNumber}`,
+        QuestionSetEditorAriaLabel.answerInput({
+          questionNumber: this.questionNumberFocus,
+          choiceNumber,
+        }),
       ),
       {
         target: { value: answer },
@@ -76,7 +82,10 @@ class UIServiceInteractor {
   clickFixedPosition({ choiceNumber }: { choiceNumber: number }) {
     fireEvent.click(
       screen.getByLabelText(
-        `question ${this.questionNumberFocus} choice ${choiceNumber} is fixed position`,
+        QuestionSetEditorAriaLabel.isFixedPositionCheckbox({
+          questionNumber: this.questionNumberFocus,
+          choiceNumber,
+        }),
       ),
     )
     return this
@@ -89,7 +98,10 @@ class UIServiceInteractor {
 
   correctAnswerCheckbox({ choiceNumber }: { choiceNumber: number }) {
     return screen.getByLabelText(
-      `question ${this.questionNumberFocus} choice ${choiceNumber} is correct answer`,
+      QuestionSetEditorAriaLabel.isCorrectAnswerCheckbox({
+        questionNumber: this.questionNumberFocus,
+        choiceNumber,
+      }),
     )
   }
 
@@ -110,7 +122,7 @@ class UIServiceInteractor {
   }
 
   errorPrompt() {
-    return screen.queryByLabelText('error prompt')
+    return screen.queryByLabelText(QuestionSetEditorAriaLabel.ERROR_PROMPT)
   }
 }
 
