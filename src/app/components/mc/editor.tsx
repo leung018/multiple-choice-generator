@@ -11,6 +11,8 @@ import { MultipleChoiceBuilder, MultipleChoiceError } from '../../../model/mc'
 import { useRouter } from 'next/navigation'
 
 export class QuestionSetEditorAriaLabel {
+  // If update of labels in this class, may need also to update e2e test
+
   static readonly ERROR_PROMPT = 'error prompt'
 
   static answerInput({
