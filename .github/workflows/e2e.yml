@@ -1,4 +1,6 @@
-on: [pull_request]
+on:
+  pull_request:
+    branches: [main]
 name: End to end tests
 jobs:
   e2e:
