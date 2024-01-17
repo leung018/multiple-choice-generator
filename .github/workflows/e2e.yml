@@ -11,5 +11,7 @@ jobs:
           node-version: '18.x'
           cache: 'yarn'
       - run: yarn install --immutable --immutable-cache # If accept PR from third party in future, please also add --check-cache
+      - name: Build
+        run: yarn build
       - name: Run end to end tests
         run: yarn e2e:headless
