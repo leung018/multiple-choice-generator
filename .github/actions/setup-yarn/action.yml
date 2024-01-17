@@ -1,0 +1,12 @@
+name: 'Setup by yarn'
+description: 'Setup dependencies for this project'
+runs:
+  using: 'composite'
+  steps:
+    - name: Use Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18.x'
+        cache: 'yarn'
+    - run: yarn install --immutable --immutable-cache # If accept PR from third party in future, please also add --check-cache
+      shell: bash

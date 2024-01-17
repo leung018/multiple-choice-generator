@@ -1,0 +1,14 @@
+on:
+  pull_request:
+    branches: [main]
+name: End to end tests
+jobs:
+  e2e:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup-yarn
+      - name: Build
+        run: yarn build
+      - name: Run end to end tests
+        run: yarn e2e:headless
