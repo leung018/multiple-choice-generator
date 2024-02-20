@@ -5,6 +5,14 @@ import { MultipleChoiceQuizUIService } from '../../components/mc/quiz'
 import { Suspense } from 'react'
 
 export default function MultipleChoiceQuizPage() {
+  return (
+    <Suspense>
+      <MyMultipleChoiceQuizPage />
+    </Suspense>
+  )
+}
+
+function MyMultipleChoiceQuizPage() {
   const searchParams = useSearchParams()
   const id = searchParams.get('id')
 
@@ -12,9 +20,7 @@ export default function MultipleChoiceQuizPage() {
     notFound()
   }
 
-  const element = MultipleChoiceQuizUIService.create({
+  return MultipleChoiceQuizUIService.create({
     questionSetId: id,
   }).getElement()
-
-  return <Suspense>{element}</Suspense>
 }
