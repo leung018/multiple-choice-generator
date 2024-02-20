@@ -114,7 +114,7 @@ describe('MultipleChoiceQuiz', () => {
       }).getElement(),
     )
 
-    expect(getByText('Not Found')).toBeInTheDocument()
+    expect(getByText('404')).toBeInTheDocument()
   })
 })
 

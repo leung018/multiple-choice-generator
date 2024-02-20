@@ -8,6 +8,7 @@ import {
   QuestionSetRepoFactory,
 } from '../../../repo/question_set'
 import LoadingSpinner from '../loading'
+import Error from 'next/error'
 
 export class MultipleChoiceQuizUIService {
   static create({ questionSetId }: { questionSetId: string }) {
@@ -91,7 +92,7 @@ export default function MultipleChoiceQuiz({
   }
 
   if (isNotFound) {
-    return <div>Not Found</div>
+    return <Error statusCode={404} />
   }
 
   if (isLoading) {
