@@ -2,6 +2,7 @@
 
 import { notFound, useSearchParams } from 'next/navigation'
 import { MultipleChoiceQuizUIService } from '../../components/mc/quiz'
+import { Suspense } from 'react'
 
 export default function MultipleChoiceQuizPage() {
   const searchParams = useSearchParams()
@@ -11,7 +12,9 @@ export default function MultipleChoiceQuizPage() {
     notFound()
   }
 
-  return MultipleChoiceQuizUIService.create({
+  const element = MultipleChoiceQuizUIService.create({
     questionSetId: id,
   }).getElement()
+
+  return <Suspense>{element}</Suspense>
 }
