@@ -2,7 +2,6 @@
 
 import { notFound, useSearchParams } from 'next/navigation'
 import { MultipleChoiceQuizUIService } from '../../components/mc/quiz'
-import { GetQuestionSetError } from '../../../repo/question_set'
 
 export default function MultipleChoiceQuizPage() {
   const searchParams = useSearchParams()
@@ -12,17 +11,7 @@ export default function MultipleChoiceQuizPage() {
     notFound()
   }
 
-  try {
-    return MultipleChoiceQuizUIService.create({
-      questionSetId: id,
-    }).getElement()
-  } catch (e) {
-    if (
-      e instanceof GetQuestionSetError && // TODO: Perhaps here should not acknowledge the error type from repo layer. Reorganize the error handling in later task.
-      e.cause.code === 'QUESTION_SET_NOT_FOUND'
-    ) {
-      notFound()
-    }
-    throw e
-  }
+  return MultipleChoiceQuizUIService.create({
+    questionSetId: id,
+  }).getElement()
 }
