@@ -106,6 +106,16 @@ describe('MultipleChoiceQuiz', () => {
     expect(question1ChoiceA).toBeChecked()
     expect(question2ChoiceB).toBeChecked()
   })
+
+  it("should render not found when question set doesn't exist", () => {
+    const { getByText } = render(
+      MultipleChoiceQuizUIService.createTestInstance({
+        questionSetId: 'unknown',
+      }).getElement(),
+    )
+
+    expect(getByText('Not Found')).toBeInTheDocument()
+  })
 })
 
 function renderMultipleChoicePage({

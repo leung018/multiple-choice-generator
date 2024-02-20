@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react'
 import { Question, QuestionSet } from '../../../model/question_set'
 import {
+  GetQuestionSetError,
   QuestionSetRepo,
   QuestionSetRepoFactory,
 } from '../../../repo/question_set'
@@ -17,10 +18,10 @@ export class MultipleChoiceQuizUIService {
   }
 
   static createTestInstance({
-    questionSetRepo,
+    questionSetRepo = QuestionSetRepoFactory.createTestInstance(),
     questionSetId,
   }: {
-    questionSetRepo: QuestionSetRepo
+    questionSetRepo?: QuestionSetRepo
     questionSetId: string
   }) {
     return new MultipleChoiceQuizUIService({ questionSetRepo, questionSetId })
@@ -58,16 +59,25 @@ export default function MultipleChoiceQuiz({
   getQuestionSet: () => QuestionSet
 }) {
   const [isLoading, setLoading] = useState(true)
+  const [isNotFound, setNotFound] = useState(false)
 
   const [questions, setQuestions] = useState<readonly Question[]>([])
   const [questionSetName, setQuestionSetName] = useState('')
 
   useEffect(() => {
-    const questionSet = getQuestionSet()
-    setQuestions(questionSet.questions)
-    setQuestionSetName(questionSet.name)
-
-    setLoading(false)
+    try {
+      const questionSet = getQuestionSet()
+      setQuestions(questionSet.questions)
+      setQuestionSetName(questionSet.name)
+      setLoading(false)
+    } catch (e) {
+      if (
+        e instanceof GetQuestionSetError &&
+        e.cause.code === 'QUESTION_SET_NOT_FOUND'
+      ) {
+        setNotFound(true)
+      }
+    }
   }, [getQuestionSet])
 
   const [questionToCheckedChoiceMap, setCheckedChoice] = useState<
@@ -78,6 +88,10 @@ export default function MultipleChoiceQuiz({
     const newMap = new Map<number, number>(questionToCheckedChoiceMap)
     newMap.set(questionIndex, choiceIndex)
     setCheckedChoice(newMap)
+  }
+
+  if (isNotFound) {
+    return <div>Not Found</div>
   }
 
   if (isLoading) {
