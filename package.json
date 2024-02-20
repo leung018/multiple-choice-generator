@@ -20,7 +20,7 @@
     "e2e:headless": "start-server-and-test start 3000 \"yarn cy:run --e2e\""
   },
   "dependencies": {
-    "next": "^14.0.4",
+    "next": "14.1.0",
     "react": "^18",
     "react-dom": "^18",
     "uuid": "^9.0.1"
