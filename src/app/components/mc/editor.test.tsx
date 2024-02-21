@@ -1,7 +1,7 @@
 import { fireEvent, render, screen } from '@testing-library/react'
 import {
   QuestionSetRepo,
-  QuestionSetRepoFactory,
+  LocalStorageQuestionSetRepo,
 } from '../../../repo/question_set'
 import {
   QuestionSetEditorAriaLabel,
@@ -18,11 +18,11 @@ class UIServiceInteractor {
 
   constructor({
     questionSetName = 'Dummy name',
-    questionSetRepo = QuestionSetRepoFactory.createTestInstance(),
+    questionSetRepo = LocalStorageQuestionSetRepo.createNull(),
   }) {
     this.questionSetRepo = questionSetRepo
     render(
-      QuestionSetEditorUIService.createTestInstance({
+      QuestionSetEditorUIService.createNull({
         questionSetRepo: this.questionSetRepo,
       }).getElement(),
     )
@@ -465,7 +465,7 @@ describe('QuestionSetEditorUIService', () => {
   })
 
   it('should not save if same name as existing question set', () => {
-    const questionSetRepo = QuestionSetRepoFactory.createTestInstance()
+    const questionSetRepo = LocalStorageQuestionSetRepo.createNull()
     const questionSet = new QuestionSetBuilderForTest()
       .setName('Test name')
       .appendQuestion()

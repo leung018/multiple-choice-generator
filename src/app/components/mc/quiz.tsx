@@ -5,7 +5,7 @@ import { Question, QuestionSet } from '../../../model/question_set'
 import {
   GetQuestionSetError,
   QuestionSetRepo,
-  QuestionSetRepoFactory,
+  LocalStorageQuestionSetRepo,
 } from '../../../repo/question_set'
 import LoadingSpinner from '../loading'
 import Error from 'next/error'
@@ -13,13 +13,13 @@ import Error from 'next/error'
 export class MultipleChoiceQuizUIService {
   static create({ questionSetId }: { questionSetId: string }) {
     return new MultipleChoiceQuizUIService({
-      questionSetRepo: QuestionSetRepoFactory.createLocalStorageInstance(),
+      questionSetRepo: LocalStorageQuestionSetRepo.create(),
       questionSetId,
     })
   }
 
-  static createTestInstance({
-    questionSetRepo = QuestionSetRepoFactory.createTestInstance(),
+  static createNull({
+    questionSetRepo = LocalStorageQuestionSetRepo.createNull(),
     questionSetId,
   }: {
     questionSetRepo?: QuestionSetRepo

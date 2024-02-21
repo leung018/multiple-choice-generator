@@ -4,7 +4,7 @@ import { useRouter } from 'next/navigation'
 import { QuestionSet } from '../../model/question_set'
 import {
   QuestionSetRepo,
-  QuestionSetRepoFactory,
+  LocalStorageQuestionSetRepo,
 } from '../../repo/question_set'
 import { useEffect, useState } from 'react'
 import LoadingSpinner from './loading'
@@ -12,12 +12,12 @@ import LoadingSpinner from './loading'
 export class HomePageUIService {
   static create() {
     return new HomePageUIService({
-      questionSetRepo: QuestionSetRepoFactory.createLocalStorageInstance(),
+      questionSetRepo: LocalStorageQuestionSetRepo.create(),
     })
   }
 
-  static createTestInstance({
-    questionSetRepo = QuestionSetRepoFactory.createTestInstance(),
+  static createNull({
+    questionSetRepo = LocalStorageQuestionSetRepo.createNull(),
   }) {
     return new HomePageUIService({ questionSetRepo })
   }

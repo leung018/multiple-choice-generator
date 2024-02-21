@@ -6,7 +6,7 @@ import {
   QuestionSetBuilderForTest,
   QuestionSet,
 } from '../../../model/question_set'
-import { QuestionSetRepoFactory } from '../../../repo/question_set'
+import { LocalStorageQuestionSetRepo } from '../../../repo/question_set'
 
 describe('MultipleChoiceQuiz', () => {
   const presetCorrectChoiceMcBuilder = () => {
@@ -109,7 +109,7 @@ describe('MultipleChoiceQuiz', () => {
 
   it("should render not found when question set doesn't exist", () => {
     const { getByText } = render(
-      MultipleChoiceQuizUIService.createTestInstance({
+      MultipleChoiceQuizUIService.createNull({
         questionSetId: 'unknown',
       }).getElement(),
     )
@@ -123,10 +123,10 @@ function renderMultipleChoicePage({
 }: {
   questionSet: QuestionSet
 }) {
-  const questionSetRepo = QuestionSetRepoFactory.createTestInstance()
+  const questionSetRepo = LocalStorageQuestionSetRepo.createNull()
   questionSetRepo.addQuestionSet(questionSet)
   return render(
-    MultipleChoiceQuizUIService.createTestInstance({
+    MultipleChoiceQuizUIService.createNull({
       questionSetRepo,
       questionSetId: questionSet.id,
     }).getElement(),

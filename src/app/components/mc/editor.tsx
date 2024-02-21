@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import {
   QuestionSetRepo,
-  QuestionSetRepoFactory,
+  LocalStorageQuestionSetRepo,
   AddQuestionSetError,
 } from '../../../repo/question_set'
 import { Question, QuestionSet } from '../../../model/question_set'
@@ -49,12 +49,14 @@ export class QuestionSetEditorAriaLabel {
 export class QuestionSetEditorUIService {
   static create() {
     return new QuestionSetEditorUIService({
-      questionSetRepo: QuestionSetRepoFactory.createLocalStorageInstance(),
+      questionSetRepo: LocalStorageQuestionSetRepo.create(),
     })
   }
 
-  static createTestInstance({
-    questionSetRepo = QuestionSetRepoFactory.createTestInstance(),
+  static createNull({
+    questionSetRepo = LocalStorageQuestionSetRepo.createNull(),
+  }: {
+    questionSetRepo?: QuestionSetRepo
   }) {
     return new QuestionSetEditorUIService({ questionSetRepo })
   }

@@ -5,7 +5,7 @@ import {
 import { render } from '@testing-library/react'
 import '@testing-library/jest-dom'
 import { HomePageUIService } from './home'
-import { QuestionSetRepoFactory } from '../../repo/question_set'
+import { LocalStorageQuestionSetRepo } from '../../repo/question_set'
 
 describe('HomePage', () => {
   // Detail of testing of the navigation of this page should be in the integration test combine with saving question set
@@ -51,9 +51,7 @@ function renderHomePage({
 }: {
   questionSets: readonly QuestionSet[]
 }) {
-  const questionSetRepo = QuestionSetRepoFactory.createTestInstance()
+  const questionSetRepo = LocalStorageQuestionSetRepo.createNull()
   questionSets.forEach((set) => questionSetRepo.addQuestionSet(set))
-  return render(
-    HomePageUIService.createTestInstance({ questionSetRepo }).getElement(),
-  )
+  return render(HomePageUIService.createNull({ questionSetRepo }).getElement())
 }
