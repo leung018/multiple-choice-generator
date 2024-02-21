@@ -53,7 +53,7 @@ export class QuestionSetEditorUIService {
     })
   }
 
-  static createTestInstance({
+  static createNull({
     questionSetRepo = LocalStorageQuestionSetRepo.createNull(),
   }) {
     return new QuestionSetEditorUIService({ questionSetRepo })

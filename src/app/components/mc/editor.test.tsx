@@ -22,7 +22,7 @@ class UIServiceInteractor {
   }) {
     this.questionSetRepo = questionSetRepo
     render(
-      QuestionSetEditorUIService.createTestInstance({
+      QuestionSetEditorUIService.createNull({
         questionSetRepo: this.questionSetRepo,
       }).getElement(),
     )
