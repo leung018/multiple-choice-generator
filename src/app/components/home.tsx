@@ -16,7 +16,7 @@ export class HomePageUIService {
     })
   }
 
-  static createTestInstance({
+  static createNull({
     questionSetRepo = LocalStorageQuestionSetRepo.createNull(),
   }) {
     return new HomePageUIService({ questionSetRepo })
