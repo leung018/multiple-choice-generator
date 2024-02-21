@@ -109,7 +109,7 @@ describe('MultipleChoiceQuiz', () => {
 
   it("should render not found when question set doesn't exist", () => {
     const { getByText } = render(
-      MultipleChoiceQuizUIService.createTestInstance({
+      MultipleChoiceQuizUIService.createNull({
         questionSetId: 'unknown',
       }).getElement(),
     )
@@ -126,7 +126,7 @@ function renderMultipleChoicePage({
   const questionSetRepo = LocalStorageQuestionSetRepo.createNull()
   questionSetRepo.addQuestionSet(questionSet)
   return render(
-    MultipleChoiceQuizUIService.createTestInstance({
+    MultipleChoiceQuizUIService.createNull({
       questionSetRepo,
       questionSetId: questionSet.id,
     }).getElement(),

@@ -18,7 +18,7 @@ export class MultipleChoiceQuizUIService {
     })
   }
 
-  static createTestInstance({
+  static createNull({
     questionSetRepo = LocalStorageQuestionSetRepo.createNull(),
     questionSetId,
   }: {
