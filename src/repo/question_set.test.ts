@@ -14,7 +14,7 @@ describe('LocalStorageQuestionSetRepo', () => {
   let questionSet: QuestionSet
 
   beforeEach(() => {
-    repo = LocalStorageQuestionSetRepo.createTestInstance()
+    repo = LocalStorageQuestionSetRepo.createNull()
     questionSet = new QuestionSetBuilderForTest()
       .appendQuestion({
         mc: new MultipleChoiceBuilder()

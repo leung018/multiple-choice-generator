@@ -38,22 +38,12 @@ export class GetQuestionSetError extends CustomBaseError<GetQuestionSetErrorCode
   }
 }
 
-export class QuestionSetRepoFactory {
-  static createTestInstance(): QuestionSetRepo {
-    return LocalStorageQuestionSetRepo.createTestInstance()
-  }
-
-  static createLocalStorageInstance(): QuestionSetRepo {
-    return LocalStorageQuestionSetRepo.create()
-  }
-}
-
 export class LocalStorageQuestionSetRepo implements QuestionSetRepo {
   static readonly STORAGE_PATH = 'questionSets'
 
-  static createTestInstance(): LocalStorageQuestionSetRepo {
+  static createNull(): LocalStorageQuestionSetRepo {
     return new LocalStorageQuestionSetRepo(
-      LocalStorageObjectOperator.createTestInstance(this.STORAGE_PATH),
+      LocalStorageObjectOperator.createNull(this.STORAGE_PATH),
     )
   }
 

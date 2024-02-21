@@ -6,7 +6,7 @@ import {
   QuestionSetBuilderForTest,
   QuestionSet,
 } from '../../../model/question_set'
-import { QuestionSetRepoFactory } from '../../../repo/question_set'
+import { LocalStorageQuestionSetRepo } from '../../../repo/question_set'
 
 describe('MultipleChoiceQuiz', () => {
   const presetCorrectChoiceMcBuilder = () => {
@@ -123,7 +123,7 @@ function renderMultipleChoicePage({
 }: {
   questionSet: QuestionSet
 }) {
-  const questionSetRepo = QuestionSetRepoFactory.createTestInstance()
+  const questionSetRepo = LocalStorageQuestionSetRepo.createNull()
   questionSetRepo.addQuestionSet(questionSet)
   return render(
     MultipleChoiceQuizUIService.createTestInstance({

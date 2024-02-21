@@ -35,9 +35,7 @@ export class LocalStorageObjectOperator<T> {
     )
   }
 
-  static createTestInstance<T>(
-    storagePath: string,
-  ): LocalStorageObjectOperator<T> {
+  static createNull<T>(storagePath: string): LocalStorageObjectOperator<T> {
     return new LocalStorageObjectOperator(
       new FakeLocalStorageWrapper(),
       storagePath,
