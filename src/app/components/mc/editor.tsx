@@ -55,6 +55,8 @@ export class QuestionSetEditorUIService {
 
   static createNull({
     questionSetRepo = LocalStorageQuestionSetRepo.createNull(),
+  }: {
+    questionSetRepo?: QuestionSetRepo
   }) {
     return new QuestionSetEditorUIService({ questionSetRepo })
   }
