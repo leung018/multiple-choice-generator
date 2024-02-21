@@ -1,6 +1,6 @@
 import { QuestionSet } from '../model/question_set'
 import { CustomBaseError } from '../utils/err'
-import { LocalStorageObjectOperator } from '../utils/local_storage'
+import { LocalStorageOperator } from '../utils/local_storage'
 
 export interface QuestionSetRepo {
   /**
@@ -43,23 +43,21 @@ export class LocalStorageQuestionSetRepo implements QuestionSetRepo {
 
   static createNull(): LocalStorageQuestionSetRepo {
     return new LocalStorageQuestionSetRepo(
-      LocalStorageObjectOperator.createNull(this.STORAGE_PATH),
+      LocalStorageOperator.createNull(this.STORAGE_PATH),
     )
   }
 
   static create(): LocalStorageQuestionSetRepo {
     return new LocalStorageQuestionSetRepo(
-      LocalStorageObjectOperator.create(this.STORAGE_PATH),
+      LocalStorageOperator.create(this.STORAGE_PATH),
     )
   }
 
-  private constructor(
-    localStorageObjectOperator: LocalStorageObjectOperator<QuestionSet>,
-  ) {
-    this.localStorageOperator = localStorageObjectOperator
+  private constructor(localStorageOperator: LocalStorageOperator<QuestionSet>) {
+    this.localStorageOperator = localStorageOperator
   }
 
-  private localStorageOperator: LocalStorageObjectOperator<QuestionSet>
+  private localStorageOperator: LocalStorageOperator<QuestionSet>
 
   addQuestionSet(questionSet: QuestionSet): void {
     if (

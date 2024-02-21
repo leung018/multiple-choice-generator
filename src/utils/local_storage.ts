@@ -27,19 +27,13 @@ class LocalStorageWrapperImpl implements LocalStorageWrapper {
   }
 }
 
-export class LocalStorageObjectOperator<T> {
-  static create<T>(storagePath: string): LocalStorageObjectOperator<T> {
-    return new LocalStorageObjectOperator(
-      new LocalStorageWrapperImpl(),
-      storagePath,
-    )
+export class LocalStorageOperator<T> {
+  static create<T>(storagePath: string): LocalStorageOperator<T> {
+    return new LocalStorageOperator(new LocalStorageWrapperImpl(), storagePath)
   }
 
-  static createNull<T>(storagePath: string): LocalStorageObjectOperator<T> {
-    return new LocalStorageObjectOperator(
-      new FakeLocalStorageWrapper(),
-      storagePath,
-    )
+  static createNull<T>(storagePath: string): LocalStorageOperator<T> {
+    return new LocalStorageOperator(new FakeLocalStorageWrapper(), storagePath)
   }
 
   private constructor(
