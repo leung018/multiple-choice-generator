@@ -2,14 +2,14 @@ import { fireEvent, render, screen } from '@testing-library/react'
 import {
   QuestionSetRepo,
   LocalStorageQuestionSetRepo,
-} from '../../../repo/question_set'
+} from '../../repo/question_set'
 import {
   QuestionSetEditorAriaLabel,
   QuestionSetEditorUIService,
 } from './editor'
-import { MultipleChoice } from '../../../model/mc'
+import { MultipleChoice } from '../../model/mc'
 import '@testing-library/jest-dom'
-import { QuestionSetBuilderForTest } from '../../../model/question_set'
+import { QuestionSetBuilderForTest } from '../../model/question_set'
 
 class UIServiceInteractor {
   private readonly questionSetRepo: QuestionSetRepo

@@ -1,12 +1,12 @@
-import { MultipleChoiceBuilder } from '../../../model/mc'
+import { MultipleChoiceBuilder } from '../../model/mc'
 import { render, fireEvent } from '@testing-library/react'
 import '@testing-library/jest-dom'
 import { MultipleChoiceQuizUIService } from './quiz'
 import {
   QuestionSetBuilderForTest,
   QuestionSet,
-} from '../../../model/question_set'
-import { LocalStorageQuestionSetRepo } from '../../../repo/question_set'
+} from '../../model/question_set'
+import { LocalStorageQuestionSetRepo } from '../../repo/question_set'
 
 describe('MultipleChoiceQuiz', () => {
   const presetCorrectChoiceMcBuilder = () => {

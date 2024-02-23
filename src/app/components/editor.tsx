@@ -5,9 +5,9 @@ import {
   QuestionSetRepo,
   LocalStorageQuestionSetRepo,
   AddQuestionSetError,
-} from '../../../repo/question_set'
-import { Question, QuestionSet } from '../../../model/question_set'
-import { MultipleChoiceBuilder, MultipleChoiceError } from '../../../model/mc'
+} from '../../repo/question_set'
+import { Question, QuestionSet } from '../../model/question_set'
+import { MultipleChoiceBuilder, MultipleChoiceError } from '../../model/mc'
 import { useRouter } from 'next/navigation'
 
 export class QuestionSetEditorAriaLabel {

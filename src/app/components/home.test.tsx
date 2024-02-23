@@ -8,7 +8,7 @@ import { HomePageUIService } from './home'
 import { LocalStorageQuestionSetRepo } from '../../repo/question_set'
 
 describe('HomePage', () => {
-  // Detail of testing of the navigation of this page should be in the integration test combine with saving question set
+  // Detail of testing of the navigation of this page should be in larger scope tests like e2e tests
 
   it('should render single question set', () => {
     const { getByText } = renderHomePage({
