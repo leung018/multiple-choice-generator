@@ -1,13 +1,13 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { Question, QuestionSet } from '../../../model/question_set'
+import { Question, QuestionSet } from '../../model/question_set'
 import {
   GetQuestionSetError,
   QuestionSetRepo,
   LocalStorageQuestionSetRepo,
-} from '../../../repo/question_set'
-import LoadingSpinner from '../loading'
+} from '../../repo/question_set'
+import LoadingSpinner from './loading'
 import Error from 'next/error'
 
 export class MultipleChoiceQuizUIService {
