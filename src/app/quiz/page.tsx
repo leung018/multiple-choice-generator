@@ -1,7 +1,7 @@
 'use client'
 
 import { notFound, useSearchParams } from 'next/navigation'
-import { MultipleChoiceQuizUIService } from '../../components/mc/quiz'
+import { MultipleChoiceQuizUIService } from '../components/mc/quiz'
 import { Suspense } from 'react'
 
 export default function MultipleChoiceQuizPage() {
