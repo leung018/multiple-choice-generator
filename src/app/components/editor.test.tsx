@@ -126,7 +126,7 @@ class UIServiceInteractor {
   }
 }
 
-describe('QuestionSetEditorUIService', () => {
+describe('QuestionSetEditor', () => {
   it('should save question set successfully when no extra choice or question added', () => {
     const interactor = new UIServiceInteractor({ questionSetName: 'Test name' })
     interactor
