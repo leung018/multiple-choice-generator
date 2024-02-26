@@ -138,6 +138,7 @@ export default function MultipleChoiceQuiz({
                   onChange={() =>
                     handleChoiceChange(questionIndex, choiceIndex)
                   }
+                  disabled={score !== null}
                 />
                 {choice.answer}
               </label>
@@ -150,6 +151,7 @@ export default function MultipleChoiceQuiz({
         onClick={() => {
           handleSubmit()
         }}
+        disabled={score !== null}
       >
         Submit
       </button>

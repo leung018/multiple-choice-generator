@@ -144,6 +144,26 @@ describe('MultipleChoiceQuiz', () => {
 
     expect(await findByText('Your score: 1/2')).toBeVisible()
   })
+
+  it('should submit button and choices are disabled after submitting', async () => {
+    const { getByText, getByLabelText } = renderMultipleChoicePage({
+      questionSet: new QuestionSetBuilderForTest()
+        .appendQuestion({
+          mc: presetCorrectChoiceMcBuilder()
+            .appendNonFixedChoice('Question 1 Choice 1')
+            .appendNonFixedChoice('Question 1 Choice 2')
+            .build(),
+        })
+        .build(),
+    })
+
+    fireEvent.click(getByLabelText('Question 1 Choice 1'))
+    fireEvent.click(getByText('Submit'))
+
+    expect(getByText('Submit')).toBeDisabled()
+    expect(getByLabelText('Question 1 Choice 1')).toBeDisabled()
+    expect(getByLabelText('Question 1 Choice 2')).toBeDisabled()
+  })
 })
 
 function renderMultipleChoicePage({
