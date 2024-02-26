@@ -64,6 +64,7 @@ export default function MultipleChoiceQuiz({
 
   const [questions, setQuestions] = useState<readonly Question[]>([])
   const [questionSetName, setQuestionSetName] = useState('')
+  const [score, setScore] = useState<number | null>(null)
 
   useEffect(() => {
     try {
@@ -89,6 +90,23 @@ export default function MultipleChoiceQuiz({
     const newMap = new Map<number, number>(questionToCheckedChoiceMap)
     newMap.set(questionIndex, choiceIndex)
     setCheckedChoice(newMap)
+  }
+
+  const handleSubmit = () => {
+    setScore(calculateScore())
+  }
+
+  const calculateScore = () => {
+    let score = 0
+    questions.forEach((question, questionIndex) => {
+      if (
+        question.mc.correctChoiceIndex ===
+        questionToCheckedChoiceMap.get(questionIndex)
+      ) {
+        score++
+      }
+    })
+    return score
   }
 
   if (isNotFound) {
@@ -127,9 +145,21 @@ export default function MultipleChoiceQuiz({
           </div>
         </div>
       ))}
-      <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-4">
+      <button
+        className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-4"
+        onClick={() => {
+          handleSubmit()
+        }}
+      >
         Submit
       </button>
+      {score !== null && (
+        <div className="mt-4">
+          <p className="font-bold">
+            Your score: {score}/{questions.length}
+          </p>
+        </div>
+      )}
     </div>
   )
 }

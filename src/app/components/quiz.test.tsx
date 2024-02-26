@@ -116,6 +116,34 @@ describe('MultipleChoiceQuiz', () => {
 
     expect(getByText('404')).toBeInTheDocument()
   })
+
+  it('should display final score when submit button is clicked', async () => {
+    const { findByText, getByText, getByLabelText } = renderMultipleChoicePage({
+      questionSet: new QuestionSetBuilderForTest()
+        .appendQuestion({
+          mc: new MultipleChoiceBuilder()
+            .setCorrectChoiceIndex(0)
+            .appendNonFixedChoice('Question 1 Choice 1 (Correct)')
+            .appendNonFixedChoice('Question 1 Choice 2')
+            .build(),
+        })
+        .appendQuestion({
+          mc: new MultipleChoiceBuilder()
+            .setCorrectChoiceIndex(1)
+            .appendNonFixedChoice('Question 2 Choice 1')
+            .appendNonFixedChoice('Question 2 Choice 2 (Correct)')
+            .build(),
+        })
+        .build(),
+    })
+
+    fireEvent.click(getByLabelText('Question 1 Choice 1 (Correct)'))
+    fireEvent.click(getByLabelText('Question 2 Choice 1'))
+
+    fireEvent.click(getByText('Submit'))
+
+    expect(await findByText('Your score: 1/2')).toBeVisible()
+  })
 })
 
 function renderMultipleChoicePage({
