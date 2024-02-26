@@ -53,7 +53,6 @@ export class MultipleChoiceQuizUIService {
   }
 }
 
-// TODO: Noted that won't test the rendering of submit button by now. Test that part later in the feature of submitting the answer is more meaningful.
 export default function MultipleChoiceQuiz({
   getQuestionSet,
 }: {
