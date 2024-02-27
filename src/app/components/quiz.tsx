@@ -95,6 +95,8 @@ export default function MultipleChoiceQuiz({
     setScore(calculateScore())
   }
 
+  const isSubmitted = () => score !== null
+
   const calculateScore = () => {
     let score = 0
     questions.forEach((question, questionIndex) => {
@@ -137,7 +139,7 @@ export default function MultipleChoiceQuiz({
                   onChange={() =>
                     handleChoiceChange(questionIndex, choiceIndex)
                   }
-                  disabled={score !== null}
+                  disabled={isSubmitted()}
                 />
                 {choice.answer}
               </label>
@@ -150,11 +152,11 @@ export default function MultipleChoiceQuiz({
         onClick={() => {
           handleSubmit()
         }}
-        disabled={score !== null}
+        disabled={isSubmitted()}
       >
         Submit
       </button>
-      {score !== null && (
+      {isSubmitted() && (
         <div className="mt-4">
           <p className="font-bold">
             Your score: {score}/{questions.length}
