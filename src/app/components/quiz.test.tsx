@@ -164,6 +164,37 @@ describe('MultipleChoiceQuiz', () => {
     expect(getByLabelText('Question 1 Choice 1')).toBeDisabled()
     expect(getByLabelText('Question 1 Choice 2')).toBeDisabled()
   })
+
+  it('should indicate correct and wrong answers after submitting', async () => {
+    const { getByText, getByLabelText } = renderMultipleChoicePage({
+      questionSet: new QuestionSetBuilderForTest()
+        .appendQuestion({
+          mc: new MultipleChoiceBuilder()
+            .setCorrectChoiceIndex(0)
+            .appendNonFixedChoice('Question 1 Choice 1 (Correct)')
+            .appendNonFixedChoice('Question 1 Choice 2')
+            .build(),
+        })
+        .appendQuestion({
+          mc: new MultipleChoiceBuilder()
+            .setCorrectChoiceIndex(1)
+            .appendNonFixedChoice('Question 2 Choice 1')
+            .appendNonFixedChoice('Question 2 Choice 2 (Correct)')
+            .build(),
+        })
+        .build(),
+    })
+
+    fireEvent.click(getByLabelText('Question 1 Choice 1 (Correct)'))
+    fireEvent.click(getByLabelText('Question 2 Choice 1'))
+
+    fireEvent.click(getByText('Submit'))
+
+    expect(
+      getByLabelText('Question 1 Choice 1 (Correct) is correct'),
+    ).toBeVisible()
+    expect(getByLabelText('Question 2 Choice 1 is wrong')).toBeVisible()
+  })
 })
 
 function renderMultipleChoicePage({
