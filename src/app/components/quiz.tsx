@@ -85,7 +85,7 @@ export default function MultipleChoiceQuiz({
     Map<number, number>
   >(new Map<number, number>())
 
-  const handleChoiceChange = (questionIndex: number, choiceIndex: number) => {
+  const updateCheckedChoice = (questionIndex: number, choiceIndex: number) => {
     const newMap = new Map<number, number>(questionToCheckedChoiceMap)
     newMap.set(questionIndex, choiceIndex)
     setCheckedChoice(newMap)
@@ -122,53 +122,15 @@ export default function MultipleChoiceQuiz({
     <div className="p-4">
       <h1 className="text-xl font-semibold mb-6">{questionSetName}</h1>
       {questions.map((question, questionIndex) => (
-        <div key={questionIndex} className="mb-4">
-          <p className="font-bold whitespace-pre-line">
-            {question.description}
-          </p>
-          <div className="ml-4">
-            {question.mc.choices.map((choice, choiceIndex) => (
-              <span key={choiceIndex}>
-                <label className="flex items-center mb-2">
-                  <input
-                    type="radio"
-                    className="mr-2"
-                    checked={
-                      choiceIndex ===
-                      questionToCheckedChoiceMap.get(questionIndex)
-                    }
-                    onChange={() =>
-                      handleChoiceChange(questionIndex, choiceIndex)
-                    }
-                    disabled={isSubmitted()}
-                  />
-                  {choice.answer}
-                </label>
-                {isSubmitted() &&
-                  questionToCheckedChoiceMap.get(questionIndex) ===
-                    choiceIndex && (
-                    <span className="ml-2">
-                      {question.mc.correctChoiceIndex === choiceIndex ? (
-                        <span
-                          className="text-green-500"
-                          aria-label={`${choice.answer} is correct`}
-                        >
-                          ✓
-                        </span>
-                      ) : (
-                        <span
-                          className="text-red-500"
-                          aria-label={`${choice.answer} is wrong`}
-                        >
-                          ✕
-                        </span>
-                      )}
-                    </span>
-                  )}
-              </span>
-            ))}
-          </div>
-        </div>
+        <QuestionForm
+          key={questionIndex}
+          question={question}
+          checkedChoiceIndex={questionToCheckedChoiceMap.get(questionIndex)}
+          handleChoiceChange={(newCheckedChoiceIndex) =>
+            updateCheckedChoice(questionIndex, newCheckedChoiceIndex)
+          }
+          isSubmitted={isSubmitted()}
+        />
       ))}
       <button
         className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-4"
@@ -186,6 +148,59 @@ export default function MultipleChoiceQuiz({
           </p>
         </div>
       )}
+    </div>
+  )
+}
+
+function QuestionForm({
+  question,
+  checkedChoiceIndex,
+  handleChoiceChange,
+  isSubmitted,
+}: {
+  question: Question
+  checkedChoiceIndex: number | undefined
+  handleChoiceChange: (newCheckedChoiceIndex: number) => void
+  isSubmitted: boolean
+}) {
+  return (
+    <div className="mb-4">
+      <p className="font-bold whitespace-pre-line">{question.description}</p>
+      <div className="ml-4">
+        {question.mc.choices.map((choice, choiceIndex) => (
+          <span key={choiceIndex}>
+            <label className="flex items-center mb-2">
+              <input
+                type="radio"
+                className="mr-2"
+                checked={choiceIndex === checkedChoiceIndex}
+                onChange={() => handleChoiceChange(choiceIndex)}
+                disabled={isSubmitted}
+              />
+              {choice.answer}
+            </label>
+            {isSubmitted && checkedChoiceIndex === choiceIndex && (
+              <span className="ml-2">
+                {question.mc.correctChoiceIndex === choiceIndex ? (
+                  <span
+                    className="text-green-500"
+                    aria-label={`${choice.answer} is correct`}
+                  >
+                    ✓
+                  </span>
+                ) : (
+                  <span
+                    className="text-red-500"
+                    aria-label={`${choice.answer} is wrong`}
+                  >
+                    ✕
+                  </span>
+                )}
+              </span>
+            )}
+          </span>
+        ))}
+      </div>
     </div>
   )
 }
