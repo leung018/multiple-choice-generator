@@ -128,21 +128,44 @@ export default function MultipleChoiceQuiz({
           </p>
           <div className="ml-4">
             {question.mc.choices.map((choice, choiceIndex) => (
-              <label key={choiceIndex} className="flex items-center mb-2">
-                <input
-                  type="radio"
-                  className="mr-2"
-                  checked={
-                    choiceIndex ===
-                    questionToCheckedChoiceMap.get(questionIndex)
-                  }
-                  onChange={() =>
-                    handleChoiceChange(questionIndex, choiceIndex)
-                  }
-                  disabled={isSubmitted()}
-                />
-                {choice.answer}
-              </label>
+              <span key={choiceIndex}>
+                <label className="flex items-center mb-2">
+                  <input
+                    type="radio"
+                    className="mr-2"
+                    checked={
+                      choiceIndex ===
+                      questionToCheckedChoiceMap.get(questionIndex)
+                    }
+                    onChange={() =>
+                      handleChoiceChange(questionIndex, choiceIndex)
+                    }
+                    disabled={isSubmitted()}
+                  />
+                  {choice.answer}
+                </label>
+                {isSubmitted() &&
+                  questionToCheckedChoiceMap.get(questionIndex) ===
+                    choiceIndex && (
+                    <span className="ml-2">
+                      {question.mc.correctChoiceIndex === choiceIndex ? (
+                        <span
+                          className="text-green-500"
+                          aria-label={`${choice.answer} is correct`}
+                        >
+                          ✓
+                        </span>
+                      ) : (
+                        <span
+                          className="text-red-500"
+                          aria-label={`${choice.answer} is wrong`}
+                        >
+                          ✕
+                        </span>
+                      )}
+                    </span>
+                  )}
+              </span>
             ))}
           </div>
         </div>
