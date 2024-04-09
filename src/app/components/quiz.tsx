@@ -168,39 +168,62 @@ function QuestionForm({
       <p className="font-bold whitespace-pre-line">{question.description}</p>
       <div className="ml-4">
         {question.mc.choices.map((choice, choiceIndex) => (
-          <span key={choiceIndex}>
-            <label className="flex items-center mb-2">
-              <input
-                type="radio"
-                className="mr-2"
-                checked={choiceIndex === checkedChoiceIndex}
-                onChange={() => handleChoiceChange(choiceIndex)}
-                disabled={isSubmitted}
-              />
-              {choice.answer}
-            </label>
-            {isSubmitted && checkedChoiceIndex === choiceIndex && (
-              <span className="ml-2">
-                {question.mc.correctChoiceIndex === choiceIndex ? (
-                  <span
-                    className="text-green-500"
-                    aria-label={`${choice.answer} is correct`}
-                  >
-                    ✓
-                  </span>
-                ) : (
-                  <span
-                    className="text-red-500"
-                    aria-label={`${choice.answer} is wrong`}
-                  >
-                    ✕
-                  </span>
-                )}
-              </span>
-            )}
-          </span>
+          <ChoiceForm
+            key={choiceIndex}
+            answer={choice.answer}
+            onSelect={() => handleChoiceChange(choiceIndex)}
+            isChecked={checkedChoiceIndex === choiceIndex}
+            isSubmitted={isSubmitted}
+            isCorrectAnswer={question.mc.correctChoiceIndex === choiceIndex}
+          />
         ))}
       </div>
     </div>
+  )
+}
+
+function ChoiceForm({
+  answer,
+  onSelect,
+  isChecked,
+  isSubmitted,
+  isCorrectAnswer,
+}: {
+  answer: string
+  onSelect: () => void
+  isChecked: boolean
+  isSubmitted: boolean
+  isCorrectAnswer: boolean
+}) {
+  return (
+    <span>
+      <label className="flex items-center mb-2">
+        <input
+          type="radio"
+          className="mr-2"
+          checked={isChecked}
+          onChange={() => onSelect()}
+          disabled={isSubmitted}
+        />
+        {answer}
+      </label>
+
+      {isSubmitted && isChecked && (
+        <span className="ml-2">
+          {isCorrectAnswer ? (
+            <span
+              className="text-green-500"
+              aria-label={`${answer} is correct`}
+            >
+              ✓
+            </span>
+          ) : (
+            <span className="text-red-500" aria-label={`${answer} is wrong`}>
+              ✕
+            </span>
+          )}
+        </span>
+      )}
+    </span>
   )
 }
