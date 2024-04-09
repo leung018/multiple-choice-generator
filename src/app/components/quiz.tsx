@@ -196,8 +196,8 @@ function ChoiceForm({
   isCorrectAnswer: boolean
 }) {
   return (
-    <span>
-      <label className="flex items-center mb-2">
+    <span className="flex items-center">
+      <label className="flex mb-2">
         <input
           type="radio"
           className="mr-2"
