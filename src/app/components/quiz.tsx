@@ -53,7 +53,7 @@ export class MultipleChoiceQuizUIService {
   }
 }
 
-export default function MultipleChoiceQuiz({
+function MultipleChoiceQuiz({
   getQuestionSet,
 }: {
   getQuestionSet: () => QuestionSet
