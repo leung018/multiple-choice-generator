@@ -53,7 +53,6 @@ export class MultipleChoiceQuizUIService {
   }
 }
 
-// TODO: Noted that won't test the rendering of submit button by now. Test that part later in the feature of submitting the answer is more meaningful.
 function MultipleChoiceQuiz({
   getQuestionSet,
 }: {
@@ -64,6 +63,7 @@ function MultipleChoiceQuiz({
 
   const [questions, setQuestions] = useState<readonly Question[]>([])
   const [questionSetName, setQuestionSetName] = useState('')
+  const [score, setScore] = useState<number | null>(null)
 
   useEffect(() => {
     try {
@@ -85,10 +85,29 @@ function MultipleChoiceQuiz({
     Map<number, number>
   >(new Map<number, number>())
 
-  const handleChoiceChange = (questionIndex: number, choiceIndex: number) => {
+  const updateCheckedChoice = (questionIndex: number, choiceIndex: number) => {
     const newMap = new Map<number, number>(questionToCheckedChoiceMap)
     newMap.set(questionIndex, choiceIndex)
     setCheckedChoice(newMap)
+  }
+
+  const handleSubmit = () => {
+    setScore(calculateScore())
+  }
+
+  const isSubmitted = () => score !== null
+
+  const calculateScore = () => {
+    let score = 0
+    questions.forEach((question, questionIndex) => {
+      if (
+        question.mc.correctChoiceIndex ===
+        questionToCheckedChoiceMap.get(questionIndex)
+      ) {
+        score++
+      }
+    })
+    return score
   }
 
   if (isNotFound) {
@@ -103,33 +122,108 @@ function MultipleChoiceQuiz({
     <div className="p-4">
       <h1 className="text-xl font-semibold mb-6">{questionSetName}</h1>
       {questions.map((question, questionIndex) => (
-        <div key={questionIndex} className="mb-4">
-          <p className="font-bold whitespace-pre-line">
-            {question.description}
-          </p>
-          <div className="ml-4">
-            {question.mc.choices.map((choice, choiceIndex) => (
-              <label key={choiceIndex} className="flex items-center mb-2">
-                <input
-                  type="radio"
-                  className="mr-2"
-                  checked={
-                    choiceIndex ===
-                    questionToCheckedChoiceMap.get(questionIndex)
-                  }
-                  onChange={() =>
-                    handleChoiceChange(questionIndex, choiceIndex)
-                  }
-                />
-                {choice.answer}
-              </label>
-            ))}
-          </div>
-        </div>
+        <QuestionForm
+          key={questionIndex}
+          question={question}
+          checkedChoiceIndex={questionToCheckedChoiceMap.get(questionIndex)}
+          handleChoiceChange={(newCheckedChoiceIndex) =>
+            updateCheckedChoice(questionIndex, newCheckedChoiceIndex)
+          }
+          isSubmitted={isSubmitted()}
+        />
       ))}
-      <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-4">
+      <button
+        className="bg-blue-500 enabled:hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-4 disabled:opacity-75"
+        onClick={() => {
+          handleSubmit()
+        }}
+        disabled={isSubmitted()}
+      >
         Submit
       </button>
+      {isSubmitted() && (
+        <div className="mt-4">
+          <p className="font-bold">
+            Your score: {score}/{questions.length}
+          </p>
+        </div>
+      )}
     </div>
+  )
+}
+
+function QuestionForm({
+  question,
+  checkedChoiceIndex,
+  handleChoiceChange,
+  isSubmitted,
+}: {
+  question: Question
+  checkedChoiceIndex: number | undefined
+  handleChoiceChange: (newCheckedChoiceIndex: number) => void
+  isSubmitted: boolean
+}) {
+  return (
+    <div className="mb-4">
+      <p className="font-bold whitespace-pre-line">{question.description}</p>
+      <div className="ml-4">
+        {question.mc.choices.map((choice, choiceIndex) => (
+          <ChoiceForm
+            key={choiceIndex}
+            answer={choice.answer}
+            onSelect={() => handleChoiceChange(choiceIndex)}
+            isChecked={checkedChoiceIndex === choiceIndex}
+            isSubmitted={isSubmitted}
+            isCorrectAnswer={question.mc.correctChoiceIndex === choiceIndex}
+          />
+        ))}
+      </div>
+    </div>
+  )
+}
+
+function ChoiceForm({
+  answer,
+  onSelect,
+  isChecked,
+  isSubmitted,
+  isCorrectAnswer,
+}: {
+  answer: string
+  onSelect: () => void
+  isChecked: boolean
+  isSubmitted: boolean
+  isCorrectAnswer: boolean
+}) {
+  return (
+    <span className="flex items-center">
+      <label className="flex mb-2">
+        <input
+          type="radio"
+          className="mr-2"
+          checked={isChecked}
+          onChange={() => onSelect()}
+          disabled={isSubmitted}
+        />
+        {answer}
+      </label>
+
+      {isSubmitted && isChecked && (
+        <span className="ml-2">
+          {isCorrectAnswer ? (
+            <span
+              className="text-green-500"
+              aria-label={`${answer} is correct`}
+            >
+              ✓
+            </span>
+          ) : (
+            <span className="text-red-500" aria-label={`${answer} is wrong`}>
+              ✕
+            </span>
+          )}
+        </span>
+      )}
+    </span>
   )
 }
