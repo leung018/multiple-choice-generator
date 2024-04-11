@@ -14,7 +14,9 @@ describe('MultipleChoiceQuiz', () => {
   }
 
   it('should render name of question set', () => {
-    const { getByText } = renderMultipleChoicePage({
+    const {
+      renderResult: { getByText },
+    } = renderMultipleChoicePage({
       questionSet: new QuestionSetBuilderForTest()
         .setName('My Question Set')
         .build(),
@@ -23,7 +25,9 @@ describe('MultipleChoiceQuiz', () => {
   })
 
   it('should render attributes of a question', () => {
-    const { getByText, getByLabelText } = renderMultipleChoicePage({
+    const {
+      renderResult: { getByText, getByLabelText },
+    } = renderMultipleChoicePage({
       questionSet: new QuestionSetBuilderForTest()
         .appendQuestion({
           description: 'Sample Question?',
@@ -40,7 +44,9 @@ describe('MultipleChoiceQuiz', () => {
   })
 
   it('should render multiple questions', () => {
-    const { getByText } = renderMultipleChoicePage({
+    const {
+      renderResult: { getByText },
+    } = renderMultipleChoicePage({
       questionSet: new QuestionSetBuilderForTest()
         .appendQuestion({
           description: 'Question 1',
@@ -55,7 +61,9 @@ describe('MultipleChoiceQuiz', () => {
   })
 
   it('should select one choice in a question will check it and uncheck other previously selected', () => {
-    const { getByLabelText } = renderMultipleChoicePage({
+    const {
+      renderResult: { getByLabelText },
+    } = renderMultipleChoicePage({
       questionSet: new QuestionSetBuilderForTest()
         .appendQuestion({
           mc: presetCorrectChoiceMcBuilder()
@@ -80,7 +88,9 @@ describe('MultipleChoiceQuiz', () => {
   })
 
   it("should select one choice in a question won't affect other questions", () => {
-    const { getByLabelText } = renderMultipleChoicePage({
+    const {
+      renderResult: { getByLabelText },
+    } = renderMultipleChoicePage({
       questionSet: new QuestionSetBuilderForTest()
         .appendQuestion({
           mc: presetCorrectChoiceMcBuilder()
@@ -118,7 +128,9 @@ describe('MultipleChoiceQuiz', () => {
   })
 
   it('should display final score when submit button is clicked', async () => {
-    const { findByText, getByText, getByLabelText } = renderMultipleChoicePage({
+    const {
+      renderResult: { findByText, getByText, getByLabelText },
+    } = renderMultipleChoicePage({
       questionSet: new QuestionSetBuilderForTest()
         .appendQuestion({
           mc: new MultipleChoiceBuilder()
@@ -146,7 +158,9 @@ describe('MultipleChoiceQuiz', () => {
   })
 
   it('should submit button and choices are disabled after submitting', async () => {
-    const { getByText, getByLabelText } = renderMultipleChoicePage({
+    const {
+      renderResult: { getByText, getByLabelText },
+    } = renderMultipleChoicePage({
       questionSet: new QuestionSetBuilderForTest()
         .appendQuestion({
           mc: presetCorrectChoiceMcBuilder()
@@ -166,7 +180,9 @@ describe('MultipleChoiceQuiz', () => {
   })
 
   it('should indicate correct and wrong answers after submitting', async () => {
-    const { getByText, getByLabelText } = renderMultipleChoicePage({
+    const {
+      renderResult: { getByText, getByLabelText },
+    } = renderMultipleChoicePage({
       questionSet: new QuestionSetBuilderForTest()
         .appendQuestion({
           mc: new MultipleChoiceBuilder()
@@ -204,10 +220,12 @@ function renderMultipleChoicePage({
 }) {
   const questionSetRepo = LocalStorageQuestionSetRepo.createNull()
   questionSetRepo.addQuestionSet(questionSet)
-  return render(
-    MultipleChoiceQuizUIService.createNull({
-      questionSetRepo,
-      questionSetId: questionSet.id,
-    }).getElement(),
-  )
+  return {
+    renderResult: render(
+      MultipleChoiceQuizUIService.createNull({
+        questionSetRepo,
+        questionSetId: questionSet.id,
+      }).getElement(),
+    ),
+  }
 }
