@@ -211,6 +211,23 @@ describe('MultipleChoiceQuiz', () => {
     ).toBeVisible()
     expect(getByLabelText('Question 2 Choice 1 is wrong')).toBeVisible()
   })
+
+  it('should questionSet being saved to lastSubmittedQuestionSetRepo after submitting', async () => {
+    const questionSet = new QuestionSetBuilderForTest().build()
+
+    const {
+      renderResult: { getByText },
+      lastSubmittedQuestionSetRepo,
+    } = renderMultipleChoicePage({
+      questionSet,
+    })
+
+    fireEvent.click(getByText('Submit'))
+
+    expect(
+      lastSubmittedQuestionSetRepo.getQuestionSetById(questionSet.id),
+    ).toEqual(questionSet)
+  })
 })
 
 function renderMultipleChoicePage({
@@ -220,6 +237,9 @@ function renderMultipleChoicePage({
 }) {
   const questionSetRepo = LocalStorageQuestionSetRepo.createNull()
   questionSetRepo.addQuestionSet(questionSet)
+
+  const lastSubmittedQuestionSetRepo = LocalStorageQuestionSetRepo.createNull()
+
   return {
     renderResult: render(
       MultipleChoiceQuizUIService.createNull({
@@ -227,5 +247,6 @@ function renderMultipleChoicePage({
         questionSetId: questionSet.id,
       }).getElement(),
     ),
+    lastSubmittedQuestionSetRepo,
   }
 }

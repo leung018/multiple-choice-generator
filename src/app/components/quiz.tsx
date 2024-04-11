@@ -14,31 +14,42 @@ export class MultipleChoiceQuizUIService {
   static create({ questionSetId }: { questionSetId: string }) {
     return new MultipleChoiceQuizUIService({
       questionSetRepo: LocalStorageQuestionSetRepo.create(),
+      lastSubmittedQuestionSetRepo: LocalStorageQuestionSetRepo.createNull(), // FIXME: Use real repo but have way to distinguish between two different type of questionSetRepo
       questionSetId,
     })
   }
 
   static createNull({
     questionSetRepo = LocalStorageQuestionSetRepo.createNull(),
+    lastSubmittedQuestionSetRepo = LocalStorageQuestionSetRepo.createNull(),
     questionSetId,
   }: {
     questionSetRepo?: QuestionSetRepo
+    lastSubmittedQuestionSetRepo?: QuestionSetRepo
     questionSetId: string
   }) {
-    return new MultipleChoiceQuizUIService({ questionSetRepo, questionSetId })
+    return new MultipleChoiceQuizUIService({
+      questionSetRepo,
+      lastSubmittedQuestionSetRepo,
+      questionSetId,
+    })
   }
 
   private readonly questionSetRepo: QuestionSetRepo
+  private readonly lastSubmittedQuestionSetRepo: QuestionSetRepo
   private readonly questionSetId: string
 
   private constructor({
     questionSetRepo,
+    lastSubmittedQuestionSetRepo,
     questionSetId,
   }: {
     questionSetRepo: QuestionSetRepo
+    lastSubmittedQuestionSetRepo: QuestionSetRepo
     questionSetId: string
   }) {
     this.questionSetRepo = questionSetRepo
+    this.lastSubmittedQuestionSetRepo = lastSubmittedQuestionSetRepo
     this.questionSetId = questionSetId
   }
 
