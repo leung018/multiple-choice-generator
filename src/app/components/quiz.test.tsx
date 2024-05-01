@@ -235,15 +235,15 @@ function renderMultipleChoicePage({
 }: {
   questionSet: QuestionSet
 }) {
-  const questionSetRepo = LocalStorageQuestionSetRepo.createNull()
-  questionSetRepo.addQuestionSet(questionSet)
+  const originalQuestionSetRepo = LocalStorageQuestionSetRepo.createNull()
+  originalQuestionSetRepo.addQuestionSet(questionSet)
 
   const lastSubmittedQuestionSetRepo = LocalStorageQuestionSetRepo.createNull()
 
   return {
     renderResult: render(
       MultipleChoiceQuizUIService.createNull({
-        questionSetRepo,
+        originalQuestionSetRepo,
         lastSubmittedQuestionSetRepo,
         questionSetId: questionSet.id,
       }).getElement(),

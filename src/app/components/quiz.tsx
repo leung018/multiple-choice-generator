@@ -13,42 +13,42 @@ import Error from 'next/error'
 export class MultipleChoiceQuizUIService {
   static create({ questionSetId }: { questionSetId: string }) {
     return new MultipleChoiceQuizUIService({
-      questionSetRepo: LocalStorageQuestionSetRepo.create(),
+      originalQuestionSetRepo: LocalStorageQuestionSetRepo.create(),
       lastSubmittedQuestionSetRepo: LocalStorageQuestionSetRepo.createNull(), // FIXME: Use real repo but have way to distinguish between two different type of questionSetRepo
       questionSetId,
     })
   }
 
   static createNull({
-    questionSetRepo = LocalStorageQuestionSetRepo.createNull(),
+    originalQuestionSetRepo = LocalStorageQuestionSetRepo.createNull(),
     lastSubmittedQuestionSetRepo = LocalStorageQuestionSetRepo.createNull(),
     questionSetId,
   }: {
-    questionSetRepo?: QuestionSetRepo
+    originalQuestionSetRepo?: QuestionSetRepo
     lastSubmittedQuestionSetRepo?: QuestionSetRepo
     questionSetId: string
   }) {
     return new MultipleChoiceQuizUIService({
-      questionSetRepo,
+      originalQuestionSetRepo: originalQuestionSetRepo,
       lastSubmittedQuestionSetRepo,
       questionSetId,
     })
   }
 
-  private readonly questionSetRepo: QuestionSetRepo
+  private readonly originalQuestionSetRepo: QuestionSetRepo
   private readonly lastSubmittedQuestionSetRepo: QuestionSetRepo
   private readonly questionSetId: string
 
   private constructor({
-    questionSetRepo,
+    originalQuestionSetRepo,
     lastSubmittedQuestionSetRepo,
     questionSetId,
   }: {
-    questionSetRepo: QuestionSetRepo
+    originalQuestionSetRepo: QuestionSetRepo
     lastSubmittedQuestionSetRepo: QuestionSetRepo
     questionSetId: string
   }) {
-    this.questionSetRepo = questionSetRepo
+    this.originalQuestionSetRepo = originalQuestionSetRepo
     this.lastSubmittedQuestionSetRepo = lastSubmittedQuestionSetRepo
     this.questionSetId = questionSetId
   }
@@ -57,7 +57,7 @@ export class MultipleChoiceQuizUIService {
     return (
       <MultipleChoiceQuiz
         fetchQuestionSet={() =>
-          this.questionSetRepo.getQuestionSetById(this.questionSetId)
+          this.originalQuestionSetRepo.getQuestionSetById(this.questionSetId)
         }
         recordSubmittedQuestionSet={(questionSet) =>
           this.lastSubmittedQuestionSetRepo.addQuestionSet(questionSet)
