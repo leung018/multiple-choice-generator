@@ -228,6 +228,24 @@ describe('MultipleChoiceQuiz', () => {
       lastSubmittedQuestionSetRepo.getQuestionSetById(questionSet.id),
     ).toEqual(questionSet)
   })
+
+  it('should use originalQuestionSet if there is no lastSubmittedQuestionSet', async () => {
+    const originalQuestionSet = new QuestionSetBuilderForTest().build()
+
+    const {
+      renderResult: { getByText },
+      lastSubmittedQuestionSetRepo,
+    } = renderMultipleChoicePage({
+      originalQuestionSet,
+      lastSubmittedQuestionSet: null,
+    })
+
+    fireEvent.click(getByText('Submit'))
+
+    expect(
+      lastSubmittedQuestionSetRepo.getQuestionSetById(originalQuestionSet.id),
+    ).toEqual(originalQuestionSet)
+  })
 })
 
 function renderMultipleChoicePage({
