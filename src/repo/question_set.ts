@@ -64,17 +64,26 @@ export class LocalStorageQuestionSetRepo implements QuestionSetRepo {
   private localStorageOperator: LocalStorageOperator<QuestionSet>
 
   upsertQuestionSet(questionSet: QuestionSet): void {
+    const questionSets = this.localStorageOperator.getAll()
     if (
-      this.localStorageOperator.findOneByFilter(
+      questionSets.filter(
         (q) => q.name === questionSet.name && q.id !== questionSet.id,
-      )
+      ).length > 0
     ) {
       throw new UpsertQuestionSetError(
         'DUPLICATE_QUESTION_SET_NAME',
         `QuestionSet with name ${questionSet.name} already exists`,
       )
     }
-    this.localStorageOperator.add(questionSet)
+
+    if (questionSets.filter((q) => q.id === questionSet.id).length < 1) {
+      questionSets.push(questionSet)
+    } else {
+      const index = questionSets.findIndex((q) => q.id === questionSet.id)
+      questionSets[index] = questionSet
+    }
+
+    this.localStorageOperator.setAll(questionSets)
   }
 
   getQuestionSetByName(questionSetName: string): QuestionSet {

@@ -41,9 +41,7 @@ export class LocalStorageOperator<T> {
     private readonly storagePath: string,
   ) {}
 
-  add(value: T): void {
-    const values = this.getAll()
-    values.push(value)
+  setAll(values: T[]): void {
     this.localStorageOperator.setItem(this.storagePath, JSON.stringify(values))
   }
 
