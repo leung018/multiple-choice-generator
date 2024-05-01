@@ -72,15 +72,17 @@ function MultipleChoiceQuiz({
   const [isLoading, setLoading] = useState(true)
   const [isNotFound, setNotFound] = useState(false)
 
-  const [questions, setQuestions] = useState<readonly Question[]>([])
-  const [questionSetName, setQuestionSetName] = useState('')
+  const [questionSet, setQuestionSet] = useState<QuestionSet>({
+    id: '',
+    name: '',
+    questions: [],
+  })
   const [score, setScore] = useState<number | null>(null)
 
   useEffect(() => {
     try {
       const questionSet = getQuestionSet()
-      setQuestions(questionSet.questions)
-      setQuestionSetName(questionSet.name)
+      setQuestionSet(questionSet)
       setLoading(false)
     } catch (e) {
       if (
@@ -110,7 +112,7 @@ function MultipleChoiceQuiz({
 
   const calculateScore = () => {
     let score = 0
-    questions.forEach((question, questionIndex) => {
+    questionSet.questions.forEach((question, questionIndex) => {
       if (
         question.mc.correctChoiceIndex ===
         questionToCheckedChoiceMap.get(questionIndex)
@@ -131,8 +133,8 @@ function MultipleChoiceQuiz({
 
   return (
     <div className="p-4">
-      <h1 className="text-xl font-semibold mb-6">{questionSetName}</h1>
-      {questions.map((question, questionIndex) => (
+      <h1 className="text-xl font-semibold mb-6">{questionSet.name}</h1>
+      {questionSet.questions.map((question, questionIndex) => (
         <QuestionForm
           key={questionIndex}
           question={question}
@@ -155,7 +157,7 @@ function MultipleChoiceQuiz({
       {isSubmitted() && (
         <div className="mt-4">
           <p className="font-bold">
-            Your score: {score}/{questions.length}
+            Your score: {score}/{questionSet.questions.length}
           </p>
         </div>
       )}
