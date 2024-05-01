@@ -75,4 +75,18 @@ describe('LocalStorageQuestionSetRepo', () => {
   it('should get empty list for getQuestionSets when no question set added', () => {
     expect(repo.getQuestionSets()).toEqual([])
   })
+
+  it('should update questionSet', () => {
+    repo.upsertQuestionSet(questionSet)
+
+    const updatedQuestionSet = {
+      ...questionSet,
+      name: 'Updated name',
+    }
+    repo.upsertQuestionSet(updatedQuestionSet)
+
+    expect(repo.getQuestionSetById(questionSet.id).name).toEqual(
+      updatedQuestionSet.name,
+    )
+  })
 })

@@ -38,6 +38,10 @@ export class GetQuestionSetError extends CustomBaseError<GetQuestionSetErrorCode
   }
 }
 
+type QuestionSetMap = {
+  [id: string]: QuestionSet
+}
+
 export class LocalStorageQuestionSetRepo implements QuestionSetRepo {
   static createNull(): LocalStorageQuestionSetRepo {
     return new LocalStorageQuestionSetRepo(
@@ -57,15 +61,27 @@ export class LocalStorageQuestionSetRepo implements QuestionSetRepo {
     )
   }
 
-  private constructor(localStorageOperator: LocalStorageOperator<QuestionSet>) {
+  private constructor(
+    localStorageOperator: LocalStorageOperator<QuestionSetMap>,
+  ) {
     this.localStorageOperator = localStorageOperator
   }
 
-  private localStorageOperator: LocalStorageOperator<QuestionSet>
+  private localStorageOperator: LocalStorageOperator<QuestionSetMap>
+
+  private getQuestionSetMap(): QuestionSetMap {
+    return this.localStorageOperator.getItem() ?? {}
+  }
+
+  private setQuestionSetMap(questionSetMap: QuestionSetMap): void {
+    this.localStorageOperator.setItem(questionSetMap)
+  }
 
   upsertQuestionSet(questionSet: QuestionSet): void {
+    const questionSetMap = this.getQuestionSetMap()
+
     if (
-      this.localStorageOperator.findOneByFilter(
+      this.findOneQuestionSetByFilter(
         (q) => q.name === questionSet.name && q.id !== questionSet.id,
       )
     ) {
@@ -74,11 +90,20 @@ export class LocalStorageQuestionSetRepo implements QuestionSetRepo {
         `QuestionSet with name ${questionSet.name} already exists`,
       )
     }
-    this.localStorageOperator.add(questionSet)
+
+    questionSetMap[questionSet.id] = questionSet
+    this.setQuestionSetMap(questionSetMap)
+  }
+
+  private findOneQuestionSetByFilter(
+    filter: (questionSet: QuestionSet) => boolean,
+  ): QuestionSet | null {
+    const questionSets = this.getQuestionSets()
+    return questionSets.find(filter) ?? null
   }
 
   getQuestionSetByName(questionSetName: string): QuestionSet {
-    const questionSet = this.localStorageOperator.findOneByFilter(
+    const questionSet = this.findOneQuestionSetByFilter(
       (questionSet) => questionSet.name === questionSetName,
     )
     if (!questionSet) {
@@ -91,19 +116,19 @@ export class LocalStorageQuestionSetRepo implements QuestionSetRepo {
   }
 
   getQuestionSetById(questionSetId: string): QuestionSet {
-    const questionSet = this.localStorageOperator.findOneByFilter(
-      (questionSet) => questionSet.id === questionSetId,
-    )
-    if (!questionSet) {
+    const questionSetMap = this.getQuestionSetMap()
+    if (!questionSetMap[questionSetId]) {
       throw new GetQuestionSetError(
         'QUESTION_SET_NOT_FOUND',
         `QuestionSet with id ${questionSetId} not found`,
       )
     }
-    return questionSet
+    return questionSetMap[questionSetId]
   }
 
   getQuestionSets(): readonly QuestionSet[] {
-    return this.localStorageOperator.getAll()
+    const questionSetMap = this.getQuestionSetMap()
+    const questionSets: QuestionSet[] = Object.values(questionSetMap)
+    return questionSets
   }
 }
