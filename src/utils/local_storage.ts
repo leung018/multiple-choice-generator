@@ -37,29 +37,19 @@ export class LocalStorageOperator<T> {
   }
 
   private constructor(
-    private readonly localStorageOperator: LocalStorageWrapper,
+    private readonly localStorageWrapper: LocalStorageWrapper,
     private readonly storagePath: string,
   ) {}
 
-  setAll(values: T[]): void {
-    this.localStorageOperator.setItem(this.storagePath, JSON.stringify(values))
+  setItem: (value: T) => void = (value) => {
+    this.localStorageWrapper.setItem(this.storagePath, JSON.stringify(value))
   }
 
-  getAll(): T[] {
-    const values = this.localStorageOperator.getItem(this.storagePath)
-    if (!values) {
-      return []
+  getItem: () => T | null = () => {
+    const value = this.localStorageWrapper.getItem(this.storagePath)
+    if (!value) {
+      return null
     }
-    return JSON.parse(values)
-  }
-
-  findOneByFilter(filter: (value: T) => boolean): T | null {
-    const values = this.getAll()
-    for (const value of values) {
-      if (filter(value)) {
-        return value
-      }
-    }
-    return null
+    return JSON.parse(value)
   }
 }
