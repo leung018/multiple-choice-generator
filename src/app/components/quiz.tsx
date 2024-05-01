@@ -59,6 +59,9 @@ export class MultipleChoiceQuizUIService {
         fetchQuestionSet={() =>
           this.questionSetRepo.getQuestionSetById(this.questionSetId)
         }
+        recordSubmittedQuestionSet={(questionSet) =>
+          this.lastSubmittedQuestionSetRepo.addQuestionSet(questionSet)
+        }
       ></MultipleChoiceQuiz>
     )
   }
@@ -66,8 +69,10 @@ export class MultipleChoiceQuizUIService {
 
 function MultipleChoiceQuiz({
   fetchQuestionSet,
+  recordSubmittedQuestionSet,
 }: {
   fetchQuestionSet: () => QuestionSet
+  recordSubmittedQuestionSet: (questionSet: QuestionSet) => void
 }) {
   const [isLoading, setLoading] = useState(true)
   const [isNotFound, setNotFound] = useState(false)
@@ -106,6 +111,7 @@ function MultipleChoiceQuiz({
 
   const handleSubmit = () => {
     setScore(calculateScore())
+    recordSubmittedQuestionSet(questionSet)
   }
 
   const isSubmitted = () => score !== null

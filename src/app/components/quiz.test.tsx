@@ -244,6 +244,7 @@ function renderMultipleChoicePage({
     renderResult: render(
       MultipleChoiceQuizUIService.createNull({
         questionSetRepo,
+        lastSubmittedQuestionSetRepo,
         questionSetId: questionSet.id,
       }).getElement(),
     ),
