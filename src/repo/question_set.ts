@@ -39,17 +39,21 @@ export class GetQuestionSetError extends CustomBaseError<GetQuestionSetErrorCode
 }
 
 export class LocalStorageQuestionSetRepo implements QuestionSetRepo {
-  static readonly STORAGE_PATH = 'questionSets'
-
   static createNull(): LocalStorageQuestionSetRepo {
     return new LocalStorageQuestionSetRepo(
-      LocalStorageOperator.createNull(this.STORAGE_PATH),
+      LocalStorageOperator.createNull('IN_MEMORY'),
     )
   }
 
-  static create(): LocalStorageQuestionSetRepo {
+  static createOriginalQuestionSetRepo(): LocalStorageQuestionSetRepo {
     return new LocalStorageQuestionSetRepo(
-      LocalStorageOperator.create(this.STORAGE_PATH),
+      LocalStorageOperator.create('ORIGINAL_QUESTION_SET'),
+    )
+  }
+
+  static createLastSubmittedQuestionSetRepo(): LocalStorageQuestionSetRepo {
+    return new LocalStorageQuestionSetRepo(
+      LocalStorageOperator.create('LAST_SUBMITTED_QUESTION_SET'),
     )
   }
 

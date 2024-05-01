@@ -12,7 +12,8 @@ import LoadingSpinner from './loading'
 export class HomePageUIService {
   static create() {
     return new HomePageUIService({
-      questionSetRepo: LocalStorageQuestionSetRepo.create(),
+      questionSetRepo:
+        LocalStorageQuestionSetRepo.createOriginalQuestionSetRepo(),
     })
   }
 

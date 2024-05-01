@@ -13,40 +13,56 @@ import Error from 'next/error'
 export class MultipleChoiceQuizUIService {
   static create({ questionSetId }: { questionSetId: string }) {
     return new MultipleChoiceQuizUIService({
-      questionSetRepo: LocalStorageQuestionSetRepo.create(),
+      originalQuestionSetRepo:
+        LocalStorageQuestionSetRepo.createOriginalQuestionSetRepo(),
+      lastSubmittedQuestionSetRepo:
+        LocalStorageQuestionSetRepo.createLastSubmittedQuestionSetRepo(),
       questionSetId,
     })
   }
 
   static createNull({
-    questionSetRepo = LocalStorageQuestionSetRepo.createNull(),
+    originalQuestionSetRepo = LocalStorageQuestionSetRepo.createNull(),
+    lastSubmittedQuestionSetRepo = LocalStorageQuestionSetRepo.createNull(),
     questionSetId,
   }: {
-    questionSetRepo?: QuestionSetRepo
+    originalQuestionSetRepo?: QuestionSetRepo
+    lastSubmittedQuestionSetRepo?: QuestionSetRepo
     questionSetId: string
   }) {
-    return new MultipleChoiceQuizUIService({ questionSetRepo, questionSetId })
+    return new MultipleChoiceQuizUIService({
+      originalQuestionSetRepo: originalQuestionSetRepo,
+      lastSubmittedQuestionSetRepo,
+      questionSetId,
+    })
   }
 
-  private readonly questionSetRepo: QuestionSetRepo
+  private readonly originalQuestionSetRepo: QuestionSetRepo
+  private readonly lastSubmittedQuestionSetRepo: QuestionSetRepo
   private readonly questionSetId: string
 
   private constructor({
-    questionSetRepo,
+    originalQuestionSetRepo,
+    lastSubmittedQuestionSetRepo,
     questionSetId,
   }: {
-    questionSetRepo: QuestionSetRepo
+    originalQuestionSetRepo: QuestionSetRepo
+    lastSubmittedQuestionSetRepo: QuestionSetRepo
     questionSetId: string
   }) {
-    this.questionSetRepo = questionSetRepo
+    this.originalQuestionSetRepo = originalQuestionSetRepo
+    this.lastSubmittedQuestionSetRepo = lastSubmittedQuestionSetRepo
     this.questionSetId = questionSetId
   }
 
   getElement() {
     return (
       <MultipleChoiceQuiz
-        getQuestionSet={() =>
-          this.questionSetRepo.getQuestionSetById(this.questionSetId)
+        fetchQuestionSet={() =>
+          this.originalQuestionSetRepo.getQuestionSetById(this.questionSetId)
+        }
+        recordSubmittedQuestionSet={(questionSet) =>
+          this.lastSubmittedQuestionSetRepo.addQuestionSet(questionSet)
         }
       ></MultipleChoiceQuiz>
     )
@@ -54,22 +70,26 @@ export class MultipleChoiceQuizUIService {
 }
 
 function MultipleChoiceQuiz({
-  getQuestionSet,
+  fetchQuestionSet,
+  recordSubmittedQuestionSet,
 }: {
-  getQuestionSet: () => QuestionSet
+  fetchQuestionSet: () => QuestionSet
+  recordSubmittedQuestionSet: (questionSet: QuestionSet) => void
 }) {
   const [isLoading, setLoading] = useState(true)
   const [isNotFound, setNotFound] = useState(false)
 
-  const [questions, setQuestions] = useState<readonly Question[]>([])
-  const [questionSetName, setQuestionSetName] = useState('')
+  const [questionSet, setQuestionSet] = useState<QuestionSet>({
+    id: '',
+    name: '',
+    questions: [],
+  })
   const [score, setScore] = useState<number | null>(null)
 
   useEffect(() => {
     try {
-      const questionSet = getQuestionSet()
-      setQuestions(questionSet.questions)
-      setQuestionSetName(questionSet.name)
+      const questionSet = fetchQuestionSet()
+      setQuestionSet(questionSet)
       setLoading(false)
     } catch (e) {
       if (
@@ -79,7 +99,7 @@ function MultipleChoiceQuiz({
         setNotFound(true)
       }
     }
-  }, [getQuestionSet])
+  }, [fetchQuestionSet])
 
   const [questionToCheckedChoiceMap, setCheckedChoice] = useState<
     Map<number, number>
@@ -93,13 +113,14 @@ function MultipleChoiceQuiz({
 
   const handleSubmit = () => {
     setScore(calculateScore())
+    recordSubmittedQuestionSet(questionSet)
   }
 
   const isSubmitted = () => score !== null
 
   const calculateScore = () => {
     let score = 0
-    questions.forEach((question, questionIndex) => {
+    questionSet.questions.forEach((question, questionIndex) => {
       if (
         question.mc.correctChoiceIndex ===
         questionToCheckedChoiceMap.get(questionIndex)
@@ -120,8 +141,8 @@ function MultipleChoiceQuiz({
 
   return (
     <div className="p-4">
-      <h1 className="text-xl font-semibold mb-6">{questionSetName}</h1>
-      {questions.map((question, questionIndex) => (
+      <h1 className="text-xl font-semibold mb-6">{questionSet.name}</h1>
+      {questionSet.questions.map((question, questionIndex) => (
         <QuestionForm
           key={questionIndex}
           question={question}
@@ -144,7 +165,7 @@ function MultipleChoiceQuiz({
       {isSubmitted() && (
         <div className="mt-4">
           <p className="font-bold">
-            Your score: {score}/{questions.length}
+            Your score: {score}/{questionSet.questions.length}
           </p>
         </div>
       )}

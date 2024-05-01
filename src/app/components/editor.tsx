@@ -49,7 +49,8 @@ export class QuestionSetEditorAriaLabel {
 export class QuestionSetEditorUIService {
   static create() {
     return new QuestionSetEditorUIService({
-      questionSetRepo: LocalStorageQuestionSetRepo.create(),
+      questionSetRepo:
+        LocalStorageQuestionSetRepo.createOriginalQuestionSetRepo(),
     })
   }
 
