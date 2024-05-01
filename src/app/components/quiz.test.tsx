@@ -236,7 +236,7 @@ function renderMultipleChoicePage({
   questionSet: QuestionSet
 }) {
   const originalQuestionSetRepo = LocalStorageQuestionSetRepo.createNull()
-  originalQuestionSetRepo.addQuestionSet(questionSet)
+  originalQuestionSetRepo.upsertQuestionSet(questionSet)
 
   const lastSubmittedQuestionSetRepo = LocalStorageQuestionSetRepo.createNull()
 

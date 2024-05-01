@@ -2,7 +2,7 @@ import { MultipleChoiceBuilder } from '../model/mc'
 import { QuestionSet, QuestionSetBuilderForTest } from '../model/question_set'
 import {
   LocalStorageQuestionSetRepo,
-  AddQuestionSetError,
+  UpsertQuestionSetError,
   GetQuestionSetError,
   QuestionSetRepo,
 } from './question_set'
@@ -27,7 +27,7 @@ describe('LocalStorageQuestionSetRepo', () => {
   })
 
   it('should add question set and get question set by name', () => {
-    repo.addQuestionSet(questionSet)
+    repo.upsertQuestionSet(questionSet)
     expect(repo.getQuestionSetByName(questionSet.name)).toEqual(questionSet)
   })
 
@@ -38,16 +38,23 @@ describe('LocalStorageQuestionSetRepo', () => {
     )
   })
 
-  it('should throw error when question set name is taken', () => {
-    repo.addQuestionSet(questionSet)
-    expect(() => repo.addQuestionSet(questionSet)).toThrowCustomError(
-      AddQuestionSetError,
+  it('should throw error when question set name is taken by other questionSet', () => {
+    repo.upsertQuestionSet(questionSet)
+
+    const anotherQuestionSet = new QuestionSetBuilderForTest()
+      .setName(questionSet.name)
+      .build()
+    expect(() => repo.upsertQuestionSet(anotherQuestionSet)).toThrowCustomError(
+      UpsertQuestionSetError,
       'DUPLICATE_QUESTION_SET_NAME',
     )
+
+    // should not throw error when just updating the same question set
+    repo.upsertQuestionSet(questionSet)
   })
 
   it('should add question set and get question set by id', () => {
-    repo.addQuestionSet(questionSet)
+    repo.upsertQuestionSet(questionSet)
     expect(repo.getQuestionSetById(questionSet.id)).toEqual(questionSet)
   })
 
@@ -60,8 +67,8 @@ describe('LocalStorageQuestionSetRepo', () => {
 
   it('should get all question sets for added', () => {
     const questionSet2 = new QuestionSetBuilderForTest().setName('2').build()
-    repo.addQuestionSet(questionSet)
-    repo.addQuestionSet(questionSet2)
+    repo.upsertQuestionSet(questionSet)
+    repo.upsertQuestionSet(questionSet2)
     expect(repo.getQuestionSets()).toEqual([questionSet, questionSet2])
   })
 

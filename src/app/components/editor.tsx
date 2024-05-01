@@ -4,7 +4,7 @@ import { useState } from 'react'
 import {
   QuestionSetRepo,
   LocalStorageQuestionSetRepo,
-  AddQuestionSetError,
+  UpsertQuestionSetError,
 } from '../../repo/question_set'
 import { Question, QuestionSet } from '../../model/question_set'
 import { MultipleChoiceBuilder, MultipleChoiceError } from '../../model/mc'
@@ -162,9 +162,9 @@ function QuestionSetEditor({
     })
 
     try {
-      questionSetRepo.addQuestionSet(questionSet)
+      questionSetRepo.upsertQuestionSet(questionSet)
     } catch (e) {
-      if (e instanceof AddQuestionSetError) {
+      if (e instanceof UpsertQuestionSetError) {
         if (e.cause.code === 'DUPLICATE_QUESTION_SET_NAME') {
           setErrorMessage('Question set with same name already exists')
           return

@@ -52,6 +52,6 @@ function renderHomePage({
   questionSets: readonly QuestionSet[]
 }) {
   const questionSetRepo = LocalStorageQuestionSetRepo.createNull()
-  questionSets.forEach((set) => questionSetRepo.addQuestionSet(set))
+  questionSets.forEach((set) => questionSetRepo.upsertQuestionSet(set))
   return render(HomePageUIService.createNull({ questionSetRepo }).getElement())
 }

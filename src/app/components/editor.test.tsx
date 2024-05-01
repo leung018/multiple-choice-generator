@@ -470,7 +470,7 @@ describe('QuestionSetEditor', () => {
       .setName('Test name')
       .appendQuestion()
       .build()
-    questionSetRepo.addQuestionSet(questionSet)
+    questionSetRepo.upsertQuestionSet(questionSet)
 
     const interactor = new UIServiceInteractor({
       questionSetName: 'Test name',
