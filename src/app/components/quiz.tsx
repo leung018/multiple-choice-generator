@@ -56,7 +56,7 @@ export class MultipleChoiceQuizUIService {
   getElement() {
     return (
       <MultipleChoiceQuiz
-        getQuestionSet={() =>
+        fetchQuestionSet={() =>
           this.questionSetRepo.getQuestionSetById(this.questionSetId)
         }
       ></MultipleChoiceQuiz>
@@ -65,9 +65,9 @@ export class MultipleChoiceQuizUIService {
 }
 
 function MultipleChoiceQuiz({
-  getQuestionSet,
+  fetchQuestionSet,
 }: {
-  getQuestionSet: () => QuestionSet
+  fetchQuestionSet: () => QuestionSet
 }) {
   const [isLoading, setLoading] = useState(true)
   const [isNotFound, setNotFound] = useState(false)
@@ -81,7 +81,7 @@ function MultipleChoiceQuiz({
 
   useEffect(() => {
     try {
-      const questionSet = getQuestionSet()
+      const questionSet = fetchQuestionSet()
       setQuestionSet(questionSet)
       setLoading(false)
     } catch (e) {
@@ -92,7 +92,7 @@ function MultipleChoiceQuiz({
         setNotFound(true)
       }
     }
-  }, [getQuestionSet])
+  }, [fetchQuestionSet])
 
   const [questionToCheckedChoiceMap, setCheckedChoice] = useState<
     Map<number, number>
