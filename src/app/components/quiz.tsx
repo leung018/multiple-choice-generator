@@ -62,7 +62,7 @@ export class MultipleChoiceQuizUIService {
           this.originalQuestionSetRepo.getQuestionSetById(this.questionSetId)
         }
         recordSubmittedQuestionSet={(questionSet) =>
-          this.lastSubmittedQuestionSetRepo.addQuestionSet(questionSet)
+          this.lastSubmittedQuestionSetRepo.upsertQuestionSet(questionSet)
         }
       ></MultipleChoiceQuiz>
     )

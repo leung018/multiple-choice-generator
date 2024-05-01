@@ -4,9 +4,9 @@ import { LocalStorageOperator } from '../utils/local_storage'
 
 export interface QuestionSetRepo {
   /**
-   * @throws {AddQuestionSetError}
+   * @throws {UpsertQuestionSetError}
    */
-  addQuestionSet(questionSet: QuestionSet): void
+  upsertQuestionSet(questionSet: QuestionSet): void
 
   /**
    * @throws {GetQuestionSetError}
@@ -24,9 +24,9 @@ export interface QuestionSetRepo {
   getQuestionSets(): ReadonlyArray<QuestionSet>
 }
 
-type AddQuestionSetErrorCode = 'DUPLICATE_QUESTION_SET_NAME'
-export class AddQuestionSetError extends CustomBaseError<AddQuestionSetErrorCode> {
-  constructor(code: AddQuestionSetErrorCode, message?: string) {
+type UpsertQuestionSetErrorCode = 'DUPLICATE_QUESTION_SET_NAME'
+export class UpsertQuestionSetError extends CustomBaseError<UpsertQuestionSetErrorCode> {
+  constructor(code: UpsertQuestionSetErrorCode, message?: string) {
     super(code, message)
   }
 }
@@ -63,13 +63,13 @@ export class LocalStorageQuestionSetRepo implements QuestionSetRepo {
 
   private localStorageOperator: LocalStorageOperator<QuestionSet>
 
-  addQuestionSet(questionSet: QuestionSet): void {
+  upsertQuestionSet(questionSet: QuestionSet): void {
     if (
       this.localStorageOperator.findOneByFilter(
-        (q) => q.name === questionSet.name,
+        (q) => q.name === questionSet.name && q.id !== questionSet.id,
       )
     ) {
-      throw new AddQuestionSetError(
+      throw new UpsertQuestionSetError(
         'DUPLICATE_QUESTION_SET_NAME',
         `QuestionSet with name ${questionSet.name} already exists`,
       )
