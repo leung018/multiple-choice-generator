@@ -15,7 +15,8 @@ export class MultipleChoiceQuizUIService {
     return new MultipleChoiceQuizUIService({
       originalQuestionSetRepo:
         LocalStorageQuestionSetRepo.createOriginalQuestionSetRepo(),
-      lastSubmittedQuestionSetRepo: LocalStorageQuestionSetRepo.createNull(), // FIXME: Use real repo but have way to distinguish between two different type of questionSetRepo
+      lastSubmittedQuestionSetRepo:
+        LocalStorageQuestionSetRepo.createLastSubmittedQuestionSetRepo(),
       questionSetId,
     })
   }

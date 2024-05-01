@@ -51,6 +51,12 @@ export class LocalStorageQuestionSetRepo implements QuestionSetRepo {
     )
   }
 
+  static createLastSubmittedQuestionSetRepo(): LocalStorageQuestionSetRepo {
+    return new LocalStorageQuestionSetRepo(
+      LocalStorageOperator.create('LAST_SUBMITTED_QUESTION_SET'),
+    )
+  }
+
   private constructor(localStorageOperator: LocalStorageOperator<QuestionSet>) {
     this.localStorageOperator = localStorageOperator
   }
