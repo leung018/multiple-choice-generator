@@ -246,6 +246,43 @@ describe('MultipleChoiceQuiz', () => {
       lastSubmittedQuestionSetRepo.getQuestionSetById(originalQuestionSet.id),
     ).toEqual(originalQuestionSet)
   })
+
+  it('should swap multiple choices of lastSubmittedQuestionSet if possible', async () => {
+    const originalQuestionSet = new QuestionSetBuilderForTest()
+      .appendQuestion({
+        mc: new MultipleChoiceBuilder()
+          .setCorrectChoiceIndex(0)
+          .appendNonFixedChoice('Question 1 Choice 1 (Correct)')
+          .appendNonFixedChoice('Question 1 Choice 2')
+          .build(),
+      })
+      .build()
+
+    const {
+      renderResult: { getByText, getByLabelText },
+      lastSubmittedQuestionSetRepo,
+    } = renderMultipleChoicePage({
+      originalQuestionSet,
+      lastSubmittedQuestionSet: originalQuestionSet,
+    })
+
+    // Choices are swapped in the page
+    const choice1 = getByLabelText('Question 1 Choice 1 (Correct)')
+    const choice2 = getByLabelText('Question 1 Choice 2')
+    expect(choice2.compareDocumentPosition(choice1)).toBe(
+      Node.DOCUMENT_POSITION_FOLLOWING,
+    )
+
+    fireEvent.click(getByText('Submit'))
+
+    // Should save the swapped choices to lastSubmittedQuestionSetRepo
+    const lastSubmittedQuestionSet =
+      lastSubmittedQuestionSetRepo.getQuestionSetById(originalQuestionSet.id)
+    const question = lastSubmittedQuestionSet.questions[0]
+    const choices = question.mc.choices
+    expect(choices[0].answer).toBe('Question 1 Choice 2')
+    expect(choices[1].answer).toBe('Question 1 Choice 1 (Correct)')
+  })
 })
 
 function renderMultipleChoicePage({
