@@ -13,7 +13,8 @@ import Error from 'next/error'
 export class MultipleChoiceQuizUIService {
   static create({ questionSetId }: { questionSetId: string }) {
     return new MultipleChoiceQuizUIService({
-      originalQuestionSetRepo: LocalStorageQuestionSetRepo.create(),
+      originalQuestionSetRepo:
+        LocalStorageQuestionSetRepo.createOriginalQuestionSetRepo(),
       lastSubmittedQuestionSetRepo: LocalStorageQuestionSetRepo.createNull(), // FIXME: Use real repo but have way to distinguish between two different type of questionSetRepo
       questionSetId,
     })
