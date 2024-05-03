@@ -10,6 +10,7 @@ import {
 import LoadingSpinner from './loading'
 import Error from 'next/error'
 import { MultipleChoiceSwapper } from '../../model/swap'
+import { SetRandomDrawer } from '../../utils/random_draw'
 
 export class MultipleChoiceQuizUIService {
   static create({ questionSetId }: { questionSetId: string }) {
@@ -84,15 +85,15 @@ export class MultipleChoiceQuizUIService {
   }
 
   private swappedChoicesQuestionSet(questionSet: QuestionSet): QuestionSet {
+    const drawer = SetRandomDrawer.create()
+
     const questions = questionSet.questions.map((question) => {
       const possibleMcs = MultipleChoiceSwapper.getSignificantlySwapped(
         question.mc,
       )
       return {
         ...question,
-        mc: Array.from(possibleMcs)[
-          Math.floor(Math.random() * possibleMcs.size)
-        ],
+        mc: drawer.draw(possibleMcs),
       }
     })
     return {
