@@ -18,6 +18,10 @@ export class SetRandomDrawer {
   }
 
   draw<E>(inputSet: Set<E>): E {
+    if (inputSet.size === 0) {
+      throw new Error('SetRandomDrawer cannot draw from an empty set')
+    }
+
     const randomIndex = Math.floor(this.random() * inputSet.size)
     return Array.from(inputSet)[randomIndex]
   }
