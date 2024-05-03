@@ -9,7 +9,7 @@ export class SetRandomDrawer {
    * @param random - a function that returns a number n that n >= 0 and n < 1
    * @returns
    */
-  static createNull({ random = Math.random }: { random: () => number }) {
+  static createNull({ random = Math.random }: { random?: () => number }) {
     return new SetRandomDrawer(random)
   }
 
