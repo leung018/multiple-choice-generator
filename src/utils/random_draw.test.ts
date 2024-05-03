@@ -2,7 +2,7 @@ import { SetRandomDrawer } from './random_draw'
 
 describe('SetRandomDraw', () => {
   it('should raise error if empty set is passed', () => {
-    const setRandomDrawer = SetRandomDrawer.createNull({})
+    const setRandomDrawer = SetRandomDrawer.createNull()
     expect(() => setRandomDrawer.draw(new Set())).toThrow()
   })
 
