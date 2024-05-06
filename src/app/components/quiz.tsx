@@ -9,6 +9,8 @@ import {
 } from '../../repo/question_set'
 import LoadingSpinner from './loading'
 import Error from 'next/error'
+import { MultipleChoiceSwapper } from '../../model/swap'
+import { SetRandomDrawer } from '../../utils/random_draw'
 
 export class MultipleChoiceQuizUIService {
   static create({ questionSetId }: { questionSetId: string }) {
@@ -58,14 +60,46 @@ export class MultipleChoiceQuizUIService {
   getElement() {
     return (
       <MultipleChoiceQuiz
-        fetchQuestionSet={() =>
-          this.originalQuestionSetRepo.getQuestionSetById(this.questionSetId)
-        }
-        recordSubmittedQuestionSet={(questionSet) =>
+        fetchQuestionSet={() => this.fetchQuestionSet()}
+        recordSubmittedQuestionSet={(questionSet) => {
           this.lastSubmittedQuestionSetRepo.upsertQuestionSet(questionSet)
-        }
+        }}
       ></MultipleChoiceQuiz>
     )
+  }
+
+  private fetchQuestionSet(): QuestionSet {
+    try {
+      this.lastSubmittedQuestionSetRepo.getQuestionSetById(this.questionSetId)
+    } catch (e) {
+      if (e instanceof GetQuestionSetError)
+        return this.originalQuestionSetRepo.getQuestionSetById(
+          this.questionSetId,
+        )
+      throw e
+    }
+
+    return this.swappedChoicesQuestionSet(
+      this.lastSubmittedQuestionSetRepo.getQuestionSetById(this.questionSetId),
+    )
+  }
+
+  private swappedChoicesQuestionSet(questionSet: QuestionSet): QuestionSet {
+    const drawer = SetRandomDrawer.create()
+
+    const questions = questionSet.questions.map((question) => {
+      const possibleMcs = MultipleChoiceSwapper.getSignificantlySwapped(
+        question.mc,
+      )
+      return {
+        ...question,
+        mc: drawer.draw(possibleMcs),
+      }
+    })
+    return {
+      ...questionSet,
+      questions,
+    }
   }
 }
 

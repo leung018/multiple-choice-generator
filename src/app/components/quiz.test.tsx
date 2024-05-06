@@ -17,7 +17,7 @@ describe('MultipleChoiceQuiz', () => {
     const {
       renderResult: { getByText },
     } = renderMultipleChoicePage({
-      questionSet: new QuestionSetBuilderForTest()
+      originalQuestionSet: new QuestionSetBuilderForTest()
         .setName('My Question Set')
         .build(),
     })
@@ -28,7 +28,7 @@ describe('MultipleChoiceQuiz', () => {
     const {
       renderResult: { getByText, getByLabelText },
     } = renderMultipleChoicePage({
-      questionSet: new QuestionSetBuilderForTest()
+      originalQuestionSet: new QuestionSetBuilderForTest()
         .appendQuestion({
           description: 'Sample Question?',
           mc: presetCorrectChoiceMcBuilder()
@@ -47,7 +47,7 @@ describe('MultipleChoiceQuiz', () => {
     const {
       renderResult: { getByText },
     } = renderMultipleChoicePage({
-      questionSet: new QuestionSetBuilderForTest()
+      originalQuestionSet: new QuestionSetBuilderForTest()
         .appendQuestion({
           description: 'Question 1',
         })
@@ -64,7 +64,7 @@ describe('MultipleChoiceQuiz', () => {
     const {
       renderResult: { getByLabelText },
     } = renderMultipleChoicePage({
-      questionSet: new QuestionSetBuilderForTest()
+      originalQuestionSet: new QuestionSetBuilderForTest()
         .appendQuestion({
           mc: presetCorrectChoiceMcBuilder()
             .appendNonFixedChoice('Choice 1')
@@ -91,7 +91,7 @@ describe('MultipleChoiceQuiz', () => {
     const {
       renderResult: { getByLabelText },
     } = renderMultipleChoicePage({
-      questionSet: new QuestionSetBuilderForTest()
+      originalQuestionSet: new QuestionSetBuilderForTest()
         .appendQuestion({
           mc: presetCorrectChoiceMcBuilder()
             .appendNonFixedChoice('Question 1 Choice A')
@@ -131,7 +131,7 @@ describe('MultipleChoiceQuiz', () => {
     const {
       renderResult: { findByText, getByText, getByLabelText },
     } = renderMultipleChoicePage({
-      questionSet: new QuestionSetBuilderForTest()
+      originalQuestionSet: new QuestionSetBuilderForTest()
         .appendQuestion({
           mc: new MultipleChoiceBuilder()
             .setCorrectChoiceIndex(0)
@@ -161,7 +161,7 @@ describe('MultipleChoiceQuiz', () => {
     const {
       renderResult: { getByText, getByLabelText },
     } = renderMultipleChoicePage({
-      questionSet: new QuestionSetBuilderForTest()
+      originalQuestionSet: new QuestionSetBuilderForTest()
         .appendQuestion({
           mc: presetCorrectChoiceMcBuilder()
             .appendNonFixedChoice('Question 1 Choice 1')
@@ -183,7 +183,7 @@ describe('MultipleChoiceQuiz', () => {
     const {
       renderResult: { getByText, getByLabelText },
     } = renderMultipleChoicePage({
-      questionSet: new QuestionSetBuilderForTest()
+      originalQuestionSet: new QuestionSetBuilderForTest()
         .appendQuestion({
           mc: new MultipleChoiceBuilder()
             .setCorrectChoiceIndex(0)
@@ -219,7 +219,7 @@ describe('MultipleChoiceQuiz', () => {
       renderResult: { getByText },
       lastSubmittedQuestionSetRepo,
     } = renderMultipleChoicePage({
-      questionSet,
+      originalQuestionSet: questionSet,
     })
 
     fireEvent.click(getByText('Submit'))
@@ -228,24 +228,84 @@ describe('MultipleChoiceQuiz', () => {
       lastSubmittedQuestionSetRepo.getQuestionSetById(questionSet.id),
     ).toEqual(questionSet)
   })
+
+  it('should use originalQuestionSet if there is no lastSubmittedQuestionSet', async () => {
+    const originalQuestionSet = new QuestionSetBuilderForTest().build()
+
+    const {
+      renderResult: { getByText },
+      lastSubmittedQuestionSetRepo,
+    } = renderMultipleChoicePage({
+      originalQuestionSet,
+      lastSubmittedQuestionSet: null,
+    })
+
+    fireEvent.click(getByText('Submit'))
+
+    expect(
+      lastSubmittedQuestionSetRepo.getQuestionSetById(originalQuestionSet.id),
+    ).toEqual(originalQuestionSet)
+  })
+
+  it('should swap multiple choices of lastSubmittedQuestionSet if possible', async () => {
+    const originalQuestionSet = new QuestionSetBuilderForTest()
+      .appendQuestion({
+        mc: new MultipleChoiceBuilder()
+          .setCorrectChoiceIndex(0)
+          .appendNonFixedChoice('Question 1 Choice 1 (Correct)')
+          .appendNonFixedChoice('Question 1 Choice 2')
+          .build(),
+      })
+      .build()
+
+    const {
+      renderResult: { getByText, getByLabelText },
+      lastSubmittedQuestionSetRepo,
+    } = renderMultipleChoicePage({
+      originalQuestionSet,
+      lastSubmittedQuestionSet: originalQuestionSet,
+    })
+
+    // Choices are swapped in the page
+    const choice1 = getByLabelText('Question 1 Choice 1 (Correct)')
+    const choice2 = getByLabelText('Question 1 Choice 2')
+    expect(choice2.compareDocumentPosition(choice1)).toBe(
+      Node.DOCUMENT_POSITION_FOLLOWING,
+    )
+
+    fireEvent.click(getByText('Submit'))
+
+    // Should save the swapped choices to lastSubmittedQuestionSetRepo
+    const lastSubmittedQuestionSet =
+      lastSubmittedQuestionSetRepo.getQuestionSetById(originalQuestionSet.id)
+    const question = lastSubmittedQuestionSet.questions[0]
+    const choices = question.mc.choices
+    expect(choices[0].answer).toBe('Question 1 Choice 2')
+    expect(choices[1].answer).toBe('Question 1 Choice 1 (Correct)')
+  })
 })
 
 function renderMultipleChoicePage({
-  questionSet,
+  originalQuestionSet,
+  lastSubmittedQuestionSet = null,
 }: {
-  questionSet: QuestionSet
+  originalQuestionSet: QuestionSet
+  lastSubmittedQuestionSet?: QuestionSet | null
 }) {
   const originalQuestionSetRepo = LocalStorageQuestionSetRepo.createNull()
-  originalQuestionSetRepo.upsertQuestionSet(questionSet)
+  originalQuestionSetRepo.upsertQuestionSet(originalQuestionSet)
 
   const lastSubmittedQuestionSetRepo = LocalStorageQuestionSetRepo.createNull()
+  if (lastSubmittedQuestionSet) {
+    lastSubmittedQuestionSetRepo.upsertQuestionSet(lastSubmittedQuestionSet)
+  }
 
   return {
     renderResult: render(
       MultipleChoiceQuizUIService.createNull({
         originalQuestionSetRepo,
         lastSubmittedQuestionSetRepo,
-        questionSetId: questionSet.id,
+        questionSetId: originalQuestionSet.id,
       }).getElement(),
     ),
     lastSubmittedQuestionSetRepo,
