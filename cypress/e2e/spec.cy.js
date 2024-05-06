@@ -1,24 +1,20 @@
 describe('End to end tests', () => {
   it('should save question set and navigate to quiz of that question set', () => {
-    cy.visit('/')
-    cy.contains('Add New Question Set').click()
-
-    // Adding question set
-
-    cy.contains('Question Set Name').type('Test Question Set')
-    cy.contains('Question 1').type('Test Question 1')
-
-    // choice 1
-    cy.findByLabelText('answer of question 1 choice 1').type('Answer 1')
-    cy.findByLabelText('question 1 choice 1 is correct answer').click()
-
-    // choice 2
-    cy.findByLabelText('answer of question 1 choice 2').type('Answer 2')
-
-    cy.contains('Save').click()
+    createQuestionSet({
+      cy,
+      questionSetName: 'Test Question Set',
+      questions: [
+        {
+          description: 'Test Question 1',
+          choices: [
+            { answer: 'Answer 1', markAsCorrect: true },
+            { answer: 'Answer 2' },
+          ],
+        },
+      ],
+    })
 
     // Navigate to quiz of that question set and check the contents
-
     cy.visit('/')
     cy.contains('Take Quiz').click()
 
@@ -27,4 +23,78 @@ describe('End to end tests', () => {
     cy.contains('Answer 1')
     cy.contains('Answer 2')
   })
+
+  it('should swap the choices of question set after submit', () => {
+    createQuestionSet({
+      cy,
+      questions: [
+        {
+          description: 'Test Question 1',
+          choices: [
+            { answer: 'Answer 1', markAsCorrect: true },
+            { answer: 'Answer 2' },
+          ],
+        },
+      ],
+    })
+
+    cy.visit('/')
+    cy.contains('Take Quiz').click()
+    cy.contains('Submit').click()
+
+    // Check if the choices are swapped after previous submit
+    cy.visit('/')
+    cy.contains('Take Quiz').click()
+
+    cy.findByText('Answer 1').then(($el1) => {
+      cy.findByText('Answer 2').then(($el2) => {
+        expect($el2[0].compareDocumentPosition($el1[0])).to.eq(
+          Node.DOCUMENT_POSITION_FOLLOWING,
+        )
+      })
+    })
+  })
 })
+
+/**
+ * TODO: Currently not support more than 2 choices or more than 1 question. But no need for e2e testing currently
+ */
+function createQuestionSet({
+  cy,
+  questionSetName = 'Dummy Question Set',
+  questions = [
+    {
+      description: 'Dummy Question 1',
+      choices: [
+        { answer: 'Dummy Answer 1', markAsCorrect: true },
+        { answer: 'Dummy Answer 2' },
+      ],
+    },
+  ],
+}) {
+  // TODO: Perhaps can move to command.ts after typescript configuration of cypress, jest is configured properly
+  // TODO: Perhaps can reuse QuestionSetBuilderForTest from the main codebase, but can't figure out how to import it here
+
+  cy.visit('/')
+  cy.contains('Add New Question Set').click()
+
+  cy.contains('Question Set Name').type(questionSetName)
+
+  questions.forEach((question, index) => {
+    cy.contains(`Question ${index + 1}`).type(question.description)
+
+    question.choices.forEach((choice, choiceIndex) => {
+      cy.findByLabelText(
+        `answer of question ${index + 1} choice ${choiceIndex + 1}`,
+      ).type(choice.answer)
+
+      if (choice.markAsCorrect) {
+        cy.findByLabelText(
+          `question ${index + 1} choice ${choiceIndex + 1} is correct answer`,
+        ).click()
+      }
+    })
+  })
+
+  cy.contains('Save').click()
+}
