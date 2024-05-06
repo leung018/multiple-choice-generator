@@ -42,6 +42,7 @@ describe('End to end tests', () => {
     cy.contains('Take Quiz').click()
     cy.contains('Submit').click()
 
+    // Check if the choices are swapped after previous submit
     cy.visit('/')
     cy.contains('Take Quiz').click()
 
