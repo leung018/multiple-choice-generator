@@ -54,6 +54,18 @@ describe('End to end tests', () => {
       })
     })
   })
+
+  it('should only go back to home page when create question set successfully', () => {
+    createQuestionSet({ cy, questionSetName: '' }) // Do not allow empty question set name
+
+    // Should stay in the edit page
+    cy.contains('Question Set Name').type('Valid Question Set Name')
+    cy.contains('Save').click()
+
+    // Should go back to home page after successfully creating question set
+    cy.contains('Take Quiz')
+    cy.contains('Valid Question Set Name')
+  })
 })
 
 /**
@@ -78,7 +90,7 @@ function createQuestionSet({
   cy.visit('/')
   cy.contains('Add New Question Set').click()
 
-  cy.contains('Question Set Name').type(questionSetName)
+  if (questionSetName) cy.contains('Question Set Name').type(questionSetName)
 
   questions.forEach((question, index) => {
     cy.contains(`Question ${index + 1}`).type(question.description)
