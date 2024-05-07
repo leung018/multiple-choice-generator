@@ -172,6 +172,8 @@ function QuestionSetEditor({
       }
       throw e
     }
+
+    router.push('/')
   }
 
   const createQuestion = (
@@ -323,7 +325,6 @@ function QuestionSetEditor({
             className="bg-green-500 text-white px-4 py-2 rounded"
             onClick={() => {
               handleSaveClick()
-              router.push('/')
             }}
           >
             Save
