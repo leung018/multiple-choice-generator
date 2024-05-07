@@ -131,7 +131,9 @@ function MultipleChoiceQuiz({
         e.cause.code === 'QUESTION_SET_NOT_FOUND'
       ) {
         setNotFound(true)
+        return
       }
+      throw e
     }
   }, [fetchQuestionSet])
 
