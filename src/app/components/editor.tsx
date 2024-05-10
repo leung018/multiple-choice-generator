@@ -230,7 +230,7 @@ function QuestionSetEditor({
   return (
     <div className="container mx-auto p-4">
       <form>
-        <div className="form-group">
+        <div className="form-group mb-8">
           <label>
             <h1 className="text-lg font-bold mb-2">Question Set Name:</h1>
             <input
@@ -248,7 +248,10 @@ function QuestionSetEditor({
 
         {questionSetInput.questions.map((question, questionIndex) => {
           return (
-            <div key={questionIndex} className="mb-8">
+            <div
+              key={questionIndex}
+              className="mb-8 border border-2 border-gray-300 p-4"
+            >
               <label>
                 <h2 className="text-lg font-bold mb-2">
                   Question {questionIndex + 1}:
