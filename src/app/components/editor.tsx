@@ -250,8 +250,14 @@ function QuestionSetEditor({
           return (
             <div
               key={questionIndex}
-              className="mb-8 border border-2 border-gray-300 p-4"
+              className="mb-8 border border-2 border-gray-300 p-4 relative"
             >
+              <button
+                className="absolute top-2 right-2"
+                aria-label="Remove question"
+              >
+                ×
+              </button>
               <label>
                 <h2 className="text-lg font-bold mb-2">
                   Question {questionIndex + 1}:
