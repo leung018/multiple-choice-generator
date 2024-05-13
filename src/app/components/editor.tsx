@@ -15,6 +15,10 @@ export class QuestionSetEditorAriaLabel {
 
   static readonly ERROR_PROMPT = 'error prompt'
 
+  static removeQuestionButton(questionNumber: number) {
+    return `button of removing question ${questionNumber}`
+  }
+
   static answerInput({
     choiceNumber,
     questionNumber,
@@ -254,7 +258,9 @@ function QuestionSetEditor({
             >
               <button
                 className="absolute top-2 right-2 bg-transparent text-2xl text-red-500 hover:text-red-700"
-                aria-label="Remove question"
+                aria-label={QuestionSetEditorAriaLabel.removeQuestionButton(
+                  questionIndex + 1,
+                )}
               >
                 ×
               </button>
