@@ -253,7 +253,7 @@ function QuestionSetEditor({
               className="mb-8 border border-2 border-gray-300 p-4 relative"
             >
               <button
-                className="absolute top-2 right-2"
+                className="absolute top-2 right-2 bg-transparent text-2xl text-red-500 hover:text-red-700"
                 aria-label="Remove question"
               >
                 ×
