@@ -124,6 +124,12 @@ class UIServiceInteractor {
   errorPrompt() {
     return screen.queryByLabelText(QuestionSetEditorAriaLabel.ERROR_PROMPT)
   }
+
+  removeQuestionButton() {
+    return screen.queryByLabelText(
+      QuestionSetEditorAriaLabel.removeQuestionButton(this.questionNumberFocus),
+    )
+  }
 }
 
 describe('QuestionSetEditor', () => {
@@ -487,6 +493,25 @@ describe('QuestionSetEditor', () => {
     interactor.setQuestionSetName('Test name 2').clickSave()
 
     expect(interactor.getSavedQuestionSet()['name']).toBe('Test name 2')
+  })
+
+  it('should show remove question button when question input box is more than one', () => {
+    const interactor = new UIServiceInteractor({})
+
+    interactor.clickAddQuestion()
+
+    interactor.setQuestionNumberFocus(1)
+    expect(interactor.removeQuestionButton()).not.toBeNull()
+
+    interactor.setQuestionNumberFocus(2)
+    expect(interactor.removeQuestionButton()).not.toBeNull()
+  })
+
+  it('should hide remove question button when question input is only one', () => {
+    const interactor = new UIServiceInteractor({})
+
+    interactor.setQuestionNumberFocus(1)
+    expect(interactor.removeQuestionButton()).toBeNull()
   })
 })
 

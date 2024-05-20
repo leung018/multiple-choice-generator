@@ -256,14 +256,16 @@ function QuestionSetEditor({
               key={questionIndex}
               className="mb-8 border border-2 border-gray-300 p-4 relative"
             >
-              <button
-                className="absolute top-2 right-2 bg-transparent text-2xl text-red-500 hover:text-red-700"
-                aria-label={QuestionSetEditorAriaLabel.removeQuestionButton(
-                  questionIndex + 1,
-                )}
-              >
-                ×
-              </button>
+              {questionSetInput.questions.length > 1 && (
+                <button
+                  className="absolute top-2 right-2 bg-transparent text-2xl text-red-500 hover:text-red-700"
+                  aria-label={QuestionSetEditorAriaLabel.removeQuestionButton(
+                    questionIndex + 1,
+                  )}
+                >
+                  ×
+                </button>
+              )}
               <label>
                 <h2 className="text-lg font-bold mb-2">
                   Question {questionIndex + 1}:
