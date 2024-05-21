@@ -111,6 +111,11 @@ class UIServiceInteractor {
     return this
   }
 
+  clickRemoveQuestion() {
+    fireEvent.click(this.removeQuestionButton()!)
+    return this
+  }
+
   clickAddQuestion() {
     fireEvent.click(screen.getByText('Add Question'))
     return this
@@ -512,6 +517,24 @@ describe('QuestionSetEditor', () => {
 
     interactor.setQuestionNumberFocus(1)
     expect(interactor.removeQuestionButton()).toBeNull()
+  })
+
+  it('should remove targeted question by clicking remove question button', () => {
+    const interactor = new UIServiceInteractor({})
+
+    interactor
+      .setQuestionNumberFocus(1)
+      .inputQuestionDescription({ description: 'I will be removed' })
+
+    interactor
+      .clickAddQuestion()
+      .setQuestionNumberFocus(2)
+      .inputQuestionDescription({ description: 'I will be kept' })
+
+    interactor.setQuestionNumberFocus(1).clickRemoveQuestion()
+
+    expect(screen.queryByDisplayValue('I will be kept')).not.toBeNull()
+    expect(screen.queryByDisplayValue('I will be removed')).toBeNull()
   })
 })
 

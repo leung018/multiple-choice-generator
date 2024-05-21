@@ -87,6 +87,7 @@ interface QuestionSetInput {
 }
 
 interface QuestionInput {
+  readonly id: number
   description: string
   choices: ChoiceInput[]
 }
@@ -103,7 +104,10 @@ const newChoice = (): ChoiceInput => ({
   isCorrect: false,
 })
 
+let questionCounter = 0
+
 const newQuestion = (): QuestionInput => ({
+  id: questionCounter++,
   description: '',
   choices: [newChoice(), newChoice()],
 })
@@ -133,6 +137,15 @@ function QuestionSetEditor({
         }
         return oldQuestion
       }),
+    })
+  }
+
+  const handleQuestionRemove = (questionId: number) => {
+    setQuestionSetInput({
+      ...questionSetInput,
+      questions: questionSetInput.questions.filter(
+        (question) => question.id !== questionId,
+      ),
     })
   }
 
@@ -253,7 +266,7 @@ function QuestionSetEditor({
         {questionSetInput.questions.map((question, questionIndex) => {
           return (
             <div
-              key={questionIndex}
+              key={question.id}
               className="mb-8 border border-2 border-gray-300 p-4 relative"
             >
               {questionSetInput.questions.length > 1 && (
@@ -262,6 +275,9 @@ function QuestionSetEditor({
                   aria-label={QuestionSetEditorAriaLabel.removeQuestionButton(
                     questionIndex + 1,
                   )}
+                  onClick={() => {
+                    handleQuestionRemove(question.id)
+                  }}
                 >
                   ×
                 </button>
