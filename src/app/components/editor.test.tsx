@@ -517,6 +517,11 @@ describe('QuestionSetEditor', () => {
 
     interactor.setQuestionNumberFocus(1)
     expect(interactor.removeQuestionButton()).toBeNull()
+
+    interactor.clickAddQuestion()
+    interactor.clickRemoveQuestion()
+
+    expect(interactor.removeQuestionButton()).toBeNull()
   })
 
   it('should remove targeted question by clicking remove question button', () => {
