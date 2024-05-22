@@ -126,13 +126,13 @@ function QuestionSetEditor({
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
 
   const handleQuestionUpdate = (
-    questionIndex: number,
+    questionId: number,
     questionUpdater: (oldQuestion: QuestionInput) => QuestionInput,
   ) => {
     setQuestionSetInput({
       ...questionSetInput,
-      questions: questionSetInput.questions.map((oldQuestion, index) => {
-        if (index === questionIndex) {
+      questions: questionSetInput.questions.map((oldQuestion) => {
+        if (oldQuestion.id === questionId) {
           return questionUpdater(oldQuestion)
         }
         return oldQuestion
@@ -290,7 +290,7 @@ function QuestionSetEditor({
                   type="text"
                   className="border border-gray-300 px-2 py-1 w-full"
                   onChange={(e) => {
-                    handleQuestionUpdate(questionIndex, (oldQuestion) => ({
+                    handleQuestionUpdate(question.id, (oldQuestion) => ({
                       ...oldQuestion,
                       description: e.target.value,
                     }))
@@ -314,7 +314,7 @@ function QuestionSetEditor({
                       questionIndex={questionIndex}
                       choices={question.choices}
                       onChoicesUpdate={(choices) => {
-                        handleQuestionUpdate(questionIndex, (oldQuestion) => ({
+                        handleQuestionUpdate(question.id, (oldQuestion) => ({
                           ...oldQuestion,
                           choices,
                         }))
@@ -327,7 +327,7 @@ function QuestionSetEditor({
                   type="button"
                   className="bg-blue-500 text-white px-4 py-2 rounded"
                   onClick={() => {
-                    handleQuestionUpdate(questionIndex, (oldQuestion) => ({
+                    handleQuestionUpdate(question.id, (oldQuestion) => ({
                       ...oldQuestion,
                       choices: [...oldQuestion.choices, newChoice()],
                     }))
