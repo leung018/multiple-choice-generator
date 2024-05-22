@@ -411,6 +411,7 @@ function ChoicesEditor(props: {
   const choiceEditors = []
   for (let choiceIndex = 0; choiceIndex < choices.length; choiceIndex++) {
     const choiceNumber = choiceIndex + 1
+    // TODO: Not to use choiceIndex for key and param of handleInternalChoiceUpdate. Especially, if wanna add remove choices in future
     choiceEditors.push(
       <tr key={choiceIndex}>
         <td className="border border-slate-300">
