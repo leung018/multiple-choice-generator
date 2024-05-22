@@ -15,6 +15,10 @@ export class QuestionSetEditorAriaLabel {
 
   static readonly ERROR_PROMPT = 'error prompt'
 
+  static removeQuestionButton(questionNumber: number) {
+    return `button of removing question ${questionNumber}`
+  }
+
   static answerInput({
     choiceNumber,
     questionNumber,
@@ -83,6 +87,7 @@ interface QuestionSetInput {
 }
 
 interface QuestionInput {
+  readonly id: number
   description: string
   choices: ChoiceInput[]
 }
@@ -99,7 +104,10 @@ const newChoice = (): ChoiceInput => ({
   isCorrect: false,
 })
 
+let questionCounter = 0
+
 const newQuestion = (): QuestionInput => ({
+  id: questionCounter++,
   description: '',
   choices: [newChoice(), newChoice()],
 })
@@ -118,17 +126,26 @@ function QuestionSetEditor({
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
 
   const handleQuestionUpdate = (
-    questionIndex: number,
+    questionId: number,
     questionUpdater: (oldQuestion: QuestionInput) => QuestionInput,
   ) => {
     setQuestionSetInput({
       ...questionSetInput,
-      questions: questionSetInput.questions.map((oldQuestion, index) => {
-        if (index === questionIndex) {
+      questions: questionSetInput.questions.map((oldQuestion) => {
+        if (oldQuestion.id === questionId) {
           return questionUpdater(oldQuestion)
         }
         return oldQuestion
       }),
+    })
+  }
+
+  const handleQuestionRemove = (questionId: number) => {
+    setQuestionSetInput({
+      ...questionSetInput,
+      questions: questionSetInput.questions.filter(
+        (question) => question.id !== questionId,
+      ),
     })
   }
 
@@ -230,7 +247,7 @@ function QuestionSetEditor({
   return (
     <div className="container mx-auto p-4">
       <form>
-        <div className="form-group">
+        <div className="form-group mb-8">
           <label>
             <h1 className="text-lg font-bold mb-2">Question Set Name:</h1>
             <input
@@ -247,17 +264,35 @@ function QuestionSetEditor({
         </div>
 
         {questionSetInput.questions.map((question, questionIndex) => {
+          const questionNumber = questionIndex + 1
           return (
-            <div key={questionIndex} className="mb-8">
+            <div
+              key={question.id}
+              className="mb-8 border border-2 border-gray-300 p-4 relative"
+            >
+              {questionSetInput.questions.length > 1 && (
+                <button
+                  type="button"
+                  className="absolute top-2 right-2 bg-transparent text-2xl text-red-500 hover:text-red-700"
+                  aria-label={QuestionSetEditorAriaLabel.removeQuestionButton(
+                    questionNumber,
+                  )}
+                  onClick={() => {
+                    handleQuestionRemove(question.id)
+                  }}
+                >
+                  ×
+                </button>
+              )}
               <label>
                 <h2 className="text-lg font-bold mb-2">
-                  Question {questionIndex + 1}:
+                  Question {questionNumber}:
                 </h2>
                 <input
                   type="text"
                   className="border border-gray-300 px-2 py-1 w-full"
                   onChange={(e) => {
-                    handleQuestionUpdate(questionIndex, (oldQuestion) => ({
+                    handleQuestionUpdate(question.id, (oldQuestion) => ({
                       ...oldQuestion,
                       description: e.target.value,
                     }))
@@ -278,10 +313,10 @@ function QuestionSetEditor({
                   </thead>
                   <tbody>
                     <ChoicesEditor
-                      questionIndex={questionIndex}
+                      questionNumber={questionNumber}
                       choices={question.choices}
                       onChoicesUpdate={(choices) => {
-                        handleQuestionUpdate(questionIndex, (oldQuestion) => ({
+                        handleQuestionUpdate(question.id, (oldQuestion) => ({
                           ...oldQuestion,
                           choices,
                         }))
@@ -294,7 +329,7 @@ function QuestionSetEditor({
                   type="button"
                   className="bg-blue-500 text-white px-4 py-2 rounded"
                   onClick={() => {
-                    handleQuestionUpdate(questionIndex, (oldQuestion) => ({
+                    handleQuestionUpdate(question.id, (oldQuestion) => ({
                       ...oldQuestion,
                       choices: [...oldQuestion.choices, newChoice()],
                     }))
@@ -345,11 +380,11 @@ function QuestionSetEditor({
 }
 
 function ChoicesEditor(props: {
-  questionIndex: number
+  questionNumber: number
   choices: ChoiceInput[]
   onChoicesUpdate: (choices: ChoiceInput[]) => void
 }) {
-  const { choices, questionIndex, onChoicesUpdate } = props
+  const { choices, questionNumber, onChoicesUpdate } = props
 
   const handleInternalChoiceUpdate = (
     choiceIndex: number,
@@ -376,6 +411,8 @@ function ChoicesEditor(props: {
 
   const choiceEditors = []
   for (let choiceIndex = 0; choiceIndex < choices.length; choiceIndex++) {
+    const choiceNumber = choiceIndex + 1
+    // TODO: Not to use choiceIndex for key and param of handleInternalChoiceUpdate. Especially, if wanna add remove choices in future
     choiceEditors.push(
       <tr key={choiceIndex}>
         <td className="border border-slate-300">
@@ -388,8 +425,8 @@ function ChoicesEditor(props: {
               })
             }}
             aria-label={QuestionSetEditorAriaLabel.answerInput({
-              choiceNumber: choiceIndex + 1,
-              questionNumber: questionIndex + 1,
+              choiceNumber,
+              questionNumber,
             })}
           />
         </td>
@@ -404,8 +441,8 @@ function ChoicesEditor(props: {
               })
             }}
             aria-label={QuestionSetEditorAriaLabel.isCorrectAnswerCheckbox({
-              choiceNumber: choiceIndex + 1,
-              questionNumber: questionIndex + 1,
+              choiceNumber,
+              questionNumber,
             })}
           />
         </td>
@@ -414,8 +451,8 @@ function ChoicesEditor(props: {
             type="checkbox"
             className="mr-1"
             aria-label={QuestionSetEditorAriaLabel.isFixedPositionCheckbox({
-              choiceNumber: choiceIndex + 1,
-              questionNumber: questionIndex + 1,
+              choiceNumber,
+              questionNumber,
             })}
             onChange={(e) => {
               handleInternalChoiceUpdate(choiceIndex, {
