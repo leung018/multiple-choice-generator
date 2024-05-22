@@ -500,7 +500,7 @@ describe('QuestionSetEditor', () => {
     expect(interactor.getSavedQuestionSet()['name']).toBe('Test name 2')
   })
 
-  it('should show remove question button when question input box is more than one', () => {
+  it('should show remove question button when questions are more than one', () => {
     const interactor = new UIServiceInteractor({})
 
     interactor.clickAddQuestion()
@@ -512,7 +512,7 @@ describe('QuestionSetEditor', () => {
     expect(interactor.removeQuestionButton()).not.toBeNull()
   })
 
-  it('should hide remove question button when question input is only one', () => {
+  it('should hide remove question button when there is only one question', () => {
     const interactor = new UIServiceInteractor({})
 
     interactor.setQuestionNumberFocus(1)
