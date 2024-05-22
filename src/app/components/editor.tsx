@@ -410,6 +410,7 @@ function ChoicesEditor(props: {
 
   const choiceEditors = []
   for (let choiceIndex = 0; choiceIndex < choices.length; choiceIndex++) {
+    const choiceNumber = choiceIndex + 1
     choiceEditors.push(
       <tr key={choiceIndex}>
         <td className="border border-slate-300">
@@ -422,7 +423,7 @@ function ChoicesEditor(props: {
               })
             }}
             aria-label={QuestionSetEditorAriaLabel.answerInput({
-              choiceNumber: choiceIndex + 1,
+              choiceNumber,
               questionNumber,
             })}
           />
@@ -438,7 +439,7 @@ function ChoicesEditor(props: {
               })
             }}
             aria-label={QuestionSetEditorAriaLabel.isCorrectAnswerCheckbox({
-              choiceNumber: choiceIndex + 1,
+              choiceNumber,
               questionNumber,
             })}
           />
@@ -448,7 +449,7 @@ function ChoicesEditor(props: {
             type="checkbox"
             className="mr-1"
             aria-label={QuestionSetEditorAriaLabel.isFixedPositionCheckbox({
-              choiceNumber: choiceIndex + 1,
+              choiceNumber,
               questionNumber,
             })}
             onChange={(e) => {
