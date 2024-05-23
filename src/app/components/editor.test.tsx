@@ -92,11 +92,11 @@ class UIServiceInteractor {
   }
 
   clickCorrectAnswer({ choiceNumber }: { choiceNumber: number }) {
-    fireEvent.click(this.correctAnswerCheckbox({ choiceNumber }))
+    fireEvent.click(this.getCorrectAnswerCheckbox({ choiceNumber }))
     return this
   }
 
-  correctAnswerCheckbox({ choiceNumber }: { choiceNumber: number }) {
+  getCorrectAnswerCheckbox({ choiceNumber }: { choiceNumber: number }) {
     return screen.getByLabelText(
       QuestionSetEditorAriaLabel.isCorrectAnswerCheckbox({
         questionNumber: this.questionNumberFocus,
@@ -112,7 +112,7 @@ class UIServiceInteractor {
   }
 
   clickRemoveQuestion() {
-    fireEvent.click(this.removeQuestionButton()!)
+    fireEvent.click(this.queryRemoveQuestionButton()!)
     return this
   }
 
@@ -126,7 +126,7 @@ class UIServiceInteractor {
     return this
   }
 
-  removeQuestionButton() {
+  queryRemoveQuestionButton() {
     return screen.queryByLabelText(
       QuestionSetEditorAriaLabel.removeQuestionButton(this.questionNumberFocus),
     )
@@ -323,12 +323,14 @@ describe('QuestionSetEditor', () => {
     expect(actualQuestionSet.questions[0].mc.correctChoiceIndex).toBe(1)
 
     // also check that the UI is updated correctly
-    expect(interactor.correctAnswerCheckbox({ choiceNumber: 2 })).toBeChecked()
     expect(
-      interactor.correctAnswerCheckbox({ choiceNumber: 1 }),
+      interactor.getCorrectAnswerCheckbox({ choiceNumber: 2 }),
+    ).toBeChecked()
+    expect(
+      interactor.getCorrectAnswerCheckbox({ choiceNumber: 1 }),
     ).not.toBeChecked()
     expect(
-      interactor.correctAnswerCheckbox({ choiceNumber: 3 }),
+      interactor.getCorrectAnswerCheckbox({ choiceNumber: 3 }),
     ).not.toBeChecked()
   })
 
@@ -506,22 +508,22 @@ describe('QuestionSetEditor', () => {
     interactor.clickAddQuestion()
 
     interactor.setQuestionNumberFocus(1)
-    expect(interactor.removeQuestionButton()).not.toBeNull()
+    expect(interactor.queryRemoveQuestionButton()).not.toBeNull()
 
     interactor.setQuestionNumberFocus(2)
-    expect(interactor.removeQuestionButton()).not.toBeNull()
+    expect(interactor.queryRemoveQuestionButton()).not.toBeNull()
   })
 
   it('should hide remove question button when there is only one question', () => {
     const interactor = new UIServiceInteractor({})
 
     interactor.setQuestionNumberFocus(1)
-    expect(interactor.removeQuestionButton()).toBeNull()
+    expect(interactor.queryRemoveQuestionButton()).toBeNull()
 
     interactor.clickAddQuestion()
     interactor.clickRemoveQuestion()
 
-    expect(interactor.removeQuestionButton()).toBeNull()
+    expect(interactor.queryRemoveQuestionButton()).toBeNull()
   })
 
   it('should remove targeted question by clicking remove question button', () => {
