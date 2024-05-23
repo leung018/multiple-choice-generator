@@ -126,10 +126,6 @@ class UIServiceInteractor {
     return this
   }
 
-  errorPrompt() {
-    return screen.queryByLabelText(QuestionSetEditorAriaLabel.ERROR_PROMPT)
-  }
-
   removeQuestionButton() {
     return screen.queryByLabelText(
       QuestionSetEditorAriaLabel.removeQuestionButton(this.questionNumberFocus),
@@ -374,7 +370,9 @@ describe('QuestionSetEditor', () => {
     setFirstValidQuestion(interactor)
     interactor.clickSave()
 
-    expect(interactor.errorPrompt()).toBeNull()
+    expect(
+      screen.queryByLabelText(QuestionSetEditorAriaLabel.ERROR_PROMPT),
+    ).toBeNull()
   })
 
   it('should reject saving question set when question set name is empty', () => {
@@ -471,7 +469,9 @@ describe('QuestionSetEditor', () => {
       .clickCorrectAnswer({ choiceNumber: 1 })
       .clickSave()
 
-    expect(interactor.errorPrompt()).toBeNull()
+    expect(
+      screen.queryByLabelText(QuestionSetEditorAriaLabel.ERROR_PROMPT),
+    ).toBeNull()
     interactor.getSavedQuestionSet() // should not throw
   })
 
@@ -490,9 +490,9 @@ describe('QuestionSetEditor', () => {
     setFirstValidQuestion(interactor)
     interactor.clickSave()
 
-    expect(interactor.errorPrompt()).toHaveTextContent(
-      'Question set with same name already exists',
-    )
+    expect(
+      screen.getByLabelText(QuestionSetEditorAriaLabel.ERROR_PROMPT),
+    ).toHaveTextContent('Question set with same name already exists')
 
     // change name and save again
     interactor.setQuestionSetName('Test name 2').clickSave()
@@ -550,7 +550,9 @@ function expectCannotSaveQuestionSet({
   interactor: UIServiceInteractor
   errorMessage: string
 }) {
-  expect(interactor.errorPrompt()).toHaveTextContent(errorMessage)
+  expect(
+    screen.getByLabelText(QuestionSetEditorAriaLabel.ERROR_PROMPT),
+  ).toHaveTextContent(errorMessage)
   expect(() => {
     interactor.getSavedQuestionSet()
   }).toThrow()
