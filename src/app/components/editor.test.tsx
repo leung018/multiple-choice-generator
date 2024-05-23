@@ -16,6 +16,12 @@ class UIServiceInteractor {
   private questionSetName: string
   private questionNumberFocus = 1
 
+  /**
+   * Initializes a new instance of UIServiceInteractor, rendering the associated UI using `testing-library/react` and providing methods to interact with the UI
+   *
+   * @param questionSetName The initial name of the question set to be inputted once the UI is rendered.
+   * @param questionSetRepo Repository for storing the submitted question set after it is submitted through this page.
+   */
   constructor({
     questionSetName = 'Dummy name',
     questionSetRepo = LocalStorageQuestionSetRepo.createNull(),
