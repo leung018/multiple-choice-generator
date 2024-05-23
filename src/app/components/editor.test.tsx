@@ -16,6 +16,12 @@ class UIServiceInteractor {
   private questionSetName: string
   private questionNumberFocus = 1
 
+  /**
+   * Initializes a new instance of UIServiceInteractor, rendering the associated UI using `testing-library/react` and providing methods to interact with the UI
+   *
+   * @param questionSetName The initial name of the question set to be inputted once the UI is rendered.
+   * @param questionSetRepo Repository for storing the submitted question set after it is submitted through this page.
+   */
   constructor({
     questionSetName = 'Dummy name',
     questionSetRepo = LocalStorageQuestionSetRepo.createNull(),
@@ -92,11 +98,11 @@ class UIServiceInteractor {
   }
 
   clickCorrectAnswer({ choiceNumber }: { choiceNumber: number }) {
-    fireEvent.click(this.correctAnswerCheckbox({ choiceNumber }))
+    fireEvent.click(this.getCorrectAnswerCheckbox({ choiceNumber }))
     return this
   }
 
-  correctAnswerCheckbox({ choiceNumber }: { choiceNumber: number }) {
+  getCorrectAnswerCheckbox({ choiceNumber }: { choiceNumber: number }) {
     return screen.getByLabelText(
       QuestionSetEditorAriaLabel.isCorrectAnswerCheckbox({
         questionNumber: this.questionNumberFocus,
@@ -112,7 +118,7 @@ class UIServiceInteractor {
   }
 
   clickRemoveQuestion() {
-    fireEvent.click(this.removeQuestionButton()!)
+    fireEvent.click(this.queryRemoveQuestionButton()!)
     return this
   }
 
@@ -126,11 +132,7 @@ class UIServiceInteractor {
     return this
   }
 
-  errorPrompt() {
-    return screen.queryByLabelText(QuestionSetEditorAriaLabel.ERROR_PROMPT)
-  }
-
-  removeQuestionButton() {
+  queryRemoveQuestionButton() {
     return screen.queryByLabelText(
       QuestionSetEditorAriaLabel.removeQuestionButton(this.questionNumberFocus),
     )
@@ -327,12 +329,14 @@ describe('QuestionSetEditor', () => {
     expect(actualQuestionSet.questions[0].mc.correctChoiceIndex).toBe(1)
 
     // also check that the UI is updated correctly
-    expect(interactor.correctAnswerCheckbox({ choiceNumber: 2 })).toBeChecked()
     expect(
-      interactor.correctAnswerCheckbox({ choiceNumber: 1 }),
+      interactor.getCorrectAnswerCheckbox({ choiceNumber: 2 }),
+    ).toBeChecked()
+    expect(
+      interactor.getCorrectAnswerCheckbox({ choiceNumber: 1 }),
     ).not.toBeChecked()
     expect(
-      interactor.correctAnswerCheckbox({ choiceNumber: 3 }),
+      interactor.getCorrectAnswerCheckbox({ choiceNumber: 3 }),
     ).not.toBeChecked()
   })
 
@@ -374,7 +378,9 @@ describe('QuestionSetEditor', () => {
     setFirstValidQuestion(interactor)
     interactor.clickSave()
 
-    expect(interactor.errorPrompt()).toBeNull()
+    expect(
+      screen.queryByLabelText(QuestionSetEditorAriaLabel.ERROR_PROMPT),
+    ).toBeNull()
   })
 
   it('should reject saving question set when question set name is empty', () => {
@@ -382,7 +388,7 @@ describe('QuestionSetEditor', () => {
     setFirstValidQuestion(interactor)
     interactor.clickSave()
 
-    expectCannotSaveQuestionSet({
+    expectCannotCreateQuestionSet({
       interactor,
       errorMessage: "Question set name can't be empty",
     })
@@ -396,7 +402,7 @@ describe('QuestionSetEditor', () => {
       .inputQuestionDescription({ description: '' })
       .clickSave()
 
-    expectCannotSaveQuestionSet({
+    expectCannotCreateQuestionSet({
       interactor,
       errorMessage: "Question 1: description can't be empty",
     })
@@ -413,7 +419,7 @@ describe('QuestionSetEditor', () => {
       .clickCorrectAnswer({ choiceNumber: 1 })
       .clickSave()
 
-    expectCannotSaveQuestionSet({
+    expectCannotCreateQuestionSet({
       interactor,
       errorMessage: "Question 1: answer can't be empty",
     })
@@ -429,7 +435,7 @@ describe('QuestionSetEditor', () => {
       .inputAnswer({ choiceNumber: 2, answer: '0' })
       .clickSave()
 
-    expectCannotSaveQuestionSet({
+    expectCannotCreateQuestionSet({
       interactor,
       errorMessage: 'Question 1: please select one correct choice',
     })
@@ -446,7 +452,7 @@ describe('QuestionSetEditor', () => {
       .clickCorrectAnswer({ choiceNumber: 1 })
       .clickSave()
 
-    expectCannotSaveQuestionSet({
+    expectCannotCreateQuestionSet({
       interactor,
       errorMessage: 'Question 1: duplicate answer',
     })
@@ -471,7 +477,9 @@ describe('QuestionSetEditor', () => {
       .clickCorrectAnswer({ choiceNumber: 1 })
       .clickSave()
 
-    expect(interactor.errorPrompt()).toBeNull()
+    expect(
+      screen.queryByLabelText(QuestionSetEditorAriaLabel.ERROR_PROMPT),
+    ).toBeNull()
     interactor.getSavedQuestionSet() // should not throw
   })
 
@@ -490,9 +498,9 @@ describe('QuestionSetEditor', () => {
     setFirstValidQuestion(interactor)
     interactor.clickSave()
 
-    expect(interactor.errorPrompt()).toHaveTextContent(
-      'Question set with same name already exists',
-    )
+    expect(
+      screen.getByLabelText(QuestionSetEditorAriaLabel.ERROR_PROMPT),
+    ).toHaveTextContent('Question set with same name already exists')
 
     // change name and save again
     interactor.setQuestionSetName('Test name 2').clickSave()
@@ -506,22 +514,22 @@ describe('QuestionSetEditor', () => {
     interactor.clickAddQuestion()
 
     interactor.setQuestionNumberFocus(1)
-    expect(interactor.removeQuestionButton()).not.toBeNull()
+    expect(interactor.queryRemoveQuestionButton()).not.toBeNull()
 
     interactor.setQuestionNumberFocus(2)
-    expect(interactor.removeQuestionButton()).not.toBeNull()
+    expect(interactor.queryRemoveQuestionButton()).not.toBeNull()
   })
 
   it('should hide remove question button when there is only one question', () => {
     const interactor = new UIServiceInteractor({})
 
     interactor.setQuestionNumberFocus(1)
-    expect(interactor.removeQuestionButton()).toBeNull()
+    expect(interactor.queryRemoveQuestionButton()).toBeNull()
 
     interactor.clickAddQuestion()
     interactor.clickRemoveQuestion()
 
-    expect(interactor.removeQuestionButton()).toBeNull()
+    expect(interactor.queryRemoveQuestionButton()).toBeNull()
   })
 
   it('should remove targeted question by clicking remove question button', () => {
@@ -543,14 +551,16 @@ describe('QuestionSetEditor', () => {
   })
 })
 
-function expectCannotSaveQuestionSet({
+function expectCannotCreateQuestionSet({
   interactor,
   errorMessage,
 }: {
   interactor: UIServiceInteractor
   errorMessage: string
 }) {
-  expect(interactor.errorPrompt()).toHaveTextContent(errorMessage)
+  expect(
+    screen.getByLabelText(QuestionSetEditorAriaLabel.ERROR_PROMPT),
+  ).toHaveTextContent(errorMessage)
   expect(() => {
     interactor.getSavedQuestionSet()
   }).toThrow()
