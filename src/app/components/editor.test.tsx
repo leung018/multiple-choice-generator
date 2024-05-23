@@ -382,7 +382,7 @@ describe('QuestionSetEditor', () => {
     setFirstValidQuestion(interactor)
     interactor.clickSave()
 
-    expectCannotSaveQuestionSet({
+    expectCannotCreateQuestionSet({
       interactor,
       errorMessage: "Question set name can't be empty",
     })
@@ -396,7 +396,7 @@ describe('QuestionSetEditor', () => {
       .inputQuestionDescription({ description: '' })
       .clickSave()
 
-    expectCannotSaveQuestionSet({
+    expectCannotCreateQuestionSet({
       interactor,
       errorMessage: "Question 1: description can't be empty",
     })
@@ -413,7 +413,7 @@ describe('QuestionSetEditor', () => {
       .clickCorrectAnswer({ choiceNumber: 1 })
       .clickSave()
 
-    expectCannotSaveQuestionSet({
+    expectCannotCreateQuestionSet({
       interactor,
       errorMessage: "Question 1: answer can't be empty",
     })
@@ -429,7 +429,7 @@ describe('QuestionSetEditor', () => {
       .inputAnswer({ choiceNumber: 2, answer: '0' })
       .clickSave()
 
-    expectCannotSaveQuestionSet({
+    expectCannotCreateQuestionSet({
       interactor,
       errorMessage: 'Question 1: please select one correct choice',
     })
@@ -446,7 +446,7 @@ describe('QuestionSetEditor', () => {
       .clickCorrectAnswer({ choiceNumber: 1 })
       .clickSave()
 
-    expectCannotSaveQuestionSet({
+    expectCannotCreateQuestionSet({
       interactor,
       errorMessage: 'Question 1: duplicate answer',
     })
@@ -545,7 +545,7 @@ describe('QuestionSetEditor', () => {
   })
 })
 
-function expectCannotSaveQuestionSet({
+function expectCannotCreateQuestionSet({
   interactor,
   errorMessage,
 }: {
