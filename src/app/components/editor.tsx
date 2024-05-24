@@ -93,12 +93,16 @@ interface QuestionInput {
 }
 
 interface ChoiceInput {
+  readonly id: number
   answer: string
   isFixedPosition: boolean
   isCorrect: boolean
 }
 
+let choiceCounter = 0
+
 const newChoice = (): ChoiceInput => ({
+  id: choiceCounter++,
   answer: '',
   isFixedPosition: false,
   isCorrect: false,
@@ -387,11 +391,11 @@ function ChoicesEditor(props: {
   const { choices, questionNumber, onChoicesUpdate } = props
 
   const handleInternalChoiceUpdate = (
-    choiceIndex: number,
+    choiceId: number,
     choiceUpdate: Partial<ChoiceInput>,
   ) => {
-    const newChoices = choices.map((oldChoice, index) => {
-      if (index === choiceIndex) {
+    const newChoices = choices.map((oldChoice) => {
+      if (oldChoice.id === choiceId) {
         return {
           ...oldChoice,
           ...choiceUpdate,
@@ -400,8 +404,8 @@ function ChoicesEditor(props: {
       return oldChoice
     })
     if (choiceUpdate.isCorrect) {
-      newChoices.forEach((choice, index) => {
-        if (index !== choiceIndex) {
+      newChoices.forEach((choice) => {
+        if (choice.id !== choiceId) {
           choice.isCorrect = false
         }
       })
@@ -412,15 +416,15 @@ function ChoicesEditor(props: {
   const choiceEditors = []
   for (let choiceIndex = 0; choiceIndex < choices.length; choiceIndex++) {
     const choiceNumber = choiceIndex + 1
-    // TODO: Not to use choiceIndex for key and param of handleInternalChoiceUpdate. Especially, if wanna add remove choices in future
+    const choice = choices[choiceIndex]
     choiceEditors.push(
-      <tr key={choiceIndex}>
+      <tr key={choice.id}>
         <td className="border border-slate-300">
           <input
             type="text"
             className="border border-gray-300 px-2 py-1"
             onChange={(e) => {
-              handleInternalChoiceUpdate(choiceIndex, {
+              handleInternalChoiceUpdate(choice.id, {
                 answer: e.target.value,
               })
             }}
@@ -434,9 +438,9 @@ function ChoicesEditor(props: {
           <input
             type="checkbox"
             className="mr-1"
-            checked={choices[choiceIndex].isCorrect}
+            checked={choice.isCorrect}
             onChange={(e) => {
-              handleInternalChoiceUpdate(choiceIndex, {
+              handleInternalChoiceUpdate(choice.id, {
                 isCorrect: e.target.checked,
               })
             }}
@@ -455,7 +459,7 @@ function ChoicesEditor(props: {
               questionNumber,
             })}
             onChange={(e) => {
-              handleInternalChoiceUpdate(choiceIndex, {
+              handleInternalChoiceUpdate(choice.id, {
                 isFixedPosition: e.target.checked,
               })
             }}
