@@ -93,12 +93,16 @@ interface QuestionInput {
 }
 
 interface ChoiceInput {
+  readonly id: number
   answer: string
   isFixedPosition: boolean
   isCorrect: boolean
 }
 
+let choiceCounter = 0
+
 const newChoice = (): ChoiceInput => ({
+  id: choiceCounter++,
   answer: '',
   isFixedPosition: false,
   isCorrect: false,
@@ -299,45 +303,16 @@ function QuestionSetEditor({
                   }}
                 />
               </label>
-              <div className="form-group">
-                <h3 className="text-lg font-bold mb-2">Choices:</h3>
-                <table className="border-collapse border border-slate-400">
-                  <thead>
-                    <tr>
-                      <th className="border border-slate-300">Answer</th>
-                      <th className="border border-slate-300">Correct</th>
-                      <th className="border border-slate-300">
-                        Fixed Position
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <ChoicesEditor
-                      questionNumber={questionNumber}
-                      choices={question.choices}
-                      onChoicesUpdate={(choices) => {
-                        handleQuestionUpdate(question.id, (oldQuestion) => ({
-                          ...oldQuestion,
-                          choices,
-                        }))
-                      }}
-                    />
-                  </tbody>
-                </table>
-
-                <button
-                  type="button"
-                  className="bg-blue-500 text-white px-4 py-2 rounded"
-                  onClick={() => {
-                    handleQuestionUpdate(question.id, (oldQuestion) => ({
-                      ...oldQuestion,
-                      choices: [...oldQuestion.choices, newChoice()],
-                    }))
-                  }}
-                >
-                  Add Choice
-                </button>
-              </div>
+              <ChoicesEditor
+                questionNumber={questionNumber}
+                choices={question.choices}
+                onChoicesUpdate={(choices) => {
+                  handleQuestionUpdate(question.id, (oldQuestion) => ({
+                    ...oldQuestion,
+                    choices,
+                  }))
+                }}
+              />
             </div>
           )
         })}
@@ -387,11 +362,11 @@ function ChoicesEditor(props: {
   const { choices, questionNumber, onChoicesUpdate } = props
 
   const handleInternalChoiceUpdate = (
-    choiceIndex: number,
+    choiceId: number,
     choiceUpdate: Partial<ChoiceInput>,
   ) => {
-    const newChoices = choices.map((oldChoice, index) => {
-      if (index === choiceIndex) {
+    const newChoices = choices.map((oldChoice) => {
+      if (oldChoice.id === choiceId) {
         return {
           ...oldChoice,
           ...choiceUpdate,
@@ -400,8 +375,8 @@ function ChoicesEditor(props: {
       return oldChoice
     })
     if (choiceUpdate.isCorrect) {
-      newChoices.forEach((choice, index) => {
-        if (index !== choiceIndex) {
+      newChoices.forEach((choice) => {
+        if (choice.id !== choiceId) {
           choice.isCorrect = false
         }
       })
@@ -409,60 +384,87 @@ function ChoicesEditor(props: {
     onChoicesUpdate(newChoices)
   }
 
-  const choiceEditors = []
-  for (let choiceIndex = 0; choiceIndex < choices.length; choiceIndex++) {
-    const choiceNumber = choiceIndex + 1
-    // TODO: Not to use choiceIndex for key and param of handleInternalChoiceUpdate. Especially, if wanna add remove choices in future
-    choiceEditors.push(
-      <tr key={choiceIndex}>
-        <td className="border border-slate-300">
-          <input
-            type="text"
-            className="border border-gray-300 px-2 py-1"
-            onChange={(e) => {
-              handleInternalChoiceUpdate(choiceIndex, {
-                answer: e.target.value,
-              })
-            }}
-            aria-label={QuestionSetEditorAriaLabel.answerInput({
-              choiceNumber,
-              questionNumber,
-            })}
-          />
-        </td>
-        <td className="border border-slate-300">
-          <input
-            type="checkbox"
-            className="mr-1"
-            checked={choices[choiceIndex].isCorrect}
-            onChange={(e) => {
-              handleInternalChoiceUpdate(choiceIndex, {
-                isCorrect: e.target.checked,
-              })
-            }}
-            aria-label={QuestionSetEditorAriaLabel.isCorrectAnswerCheckbox({
-              choiceNumber,
-              questionNumber,
-            })}
-          />
-        </td>
-        <td className="border border-slate-300">
-          <input
-            type="checkbox"
-            className="mr-1"
-            aria-label={QuestionSetEditorAriaLabel.isFixedPositionCheckbox({
-              choiceNumber,
-              questionNumber,
-            })}
-            onChange={(e) => {
-              handleInternalChoiceUpdate(choiceIndex, {
-                isFixedPosition: e.target.checked,
-              })
-            }}
-          />
-        </td>
-      </tr>,
-    )
-  }
-  return choiceEditors
+  return (
+    <div className="form-group">
+      <h3 className="text-lg font-bold mb-2">Choices:</h3>
+      <table className="border-collapse border border-slate-400">
+        <thead>
+          <tr>
+            <th className="border border-slate-300">Answer</th>
+            <th className="border border-slate-300">Correct</th>
+            <th className="border border-slate-300">Fixed Position</th>
+          </tr>
+        </thead>
+        <tbody>
+          {choices.map((choice, choiceIndex) => {
+            const choiceNumber = choiceIndex + 1
+            return (
+              <tr key={choice.id}>
+                <td className="border border-slate-300">
+                  <input
+                    type="text"
+                    className="border border-gray-300 px-2 py-1"
+                    onChange={(e) => {
+                      handleInternalChoiceUpdate(choice.id, {
+                        answer: e.target.value,
+                      })
+                    }}
+                    aria-label={QuestionSetEditorAriaLabel.answerInput({
+                      choiceNumber,
+                      questionNumber,
+                    })}
+                  />
+                </td>
+                <td className="border border-slate-300">
+                  <input
+                    type="checkbox"
+                    className="mr-1"
+                    checked={choice.isCorrect}
+                    onChange={(e) => {
+                      handleInternalChoiceUpdate(choice.id, {
+                        isCorrect: e.target.checked,
+                      })
+                    }}
+                    aria-label={QuestionSetEditorAriaLabel.isCorrectAnswerCheckbox(
+                      {
+                        choiceNumber,
+                        questionNumber,
+                      },
+                    )}
+                  />
+                </td>
+                <td className="border border-slate-300">
+                  <input
+                    type="checkbox"
+                    className="mr-1"
+                    aria-label={QuestionSetEditorAriaLabel.isFixedPositionCheckbox(
+                      {
+                        choiceNumber,
+                        questionNumber,
+                      },
+                    )}
+                    onChange={(e) => {
+                      handleInternalChoiceUpdate(choice.id, {
+                        isFixedPosition: e.target.checked,
+                      })
+                    }}
+                  />
+                </td>
+              </tr>
+            )
+          })}
+        </tbody>
+      </table>
+
+      <button
+        type="button"
+        className="bg-blue-500 text-white px-4 py-2 rounded"
+        onClick={() => {
+          onChoicesUpdate([...choices, newChoice()])
+        }}
+      >
+        Add Choice
+      </button>
+    </div>
+  )
 }
