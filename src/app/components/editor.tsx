@@ -450,6 +450,14 @@ function ChoicesEditor(props: {
                     }}
                   />
                 </td>
+                <td className="border border-slate-300">
+                  <button
+                    type="button"
+                    className="bg-transparent text-2xl text-red-500 hover:text-red-700"
+                  >
+                    ×
+                  </button>
+                </td>
               </tr>
             )
           })}
