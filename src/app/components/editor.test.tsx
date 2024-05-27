@@ -137,6 +137,15 @@ class UIServiceInteractor {
       QuestionSetEditorAriaLabel.removeQuestionButton(this.questionNumberFocus),
     )
   }
+
+  queryRemoveChoiceButton({ choiceNumber }: { choiceNumber: number }) {
+    return screen.queryByLabelText(
+      QuestionSetEditorAriaLabel.removeChoiceButton({
+        questionNumber: this.questionNumberFocus,
+        choiceNumber,
+      }),
+    )
+  }
 }
 
 describe('QuestionSetEditor', () => {
@@ -548,6 +557,22 @@ describe('QuestionSetEditor', () => {
 
     expect(screen.queryByDisplayValue('I will be kept')).not.toBeNull()
     expect(screen.queryByDisplayValue('I will be removed')).toBeNull()
+  })
+
+  it('should show remove choice button when there are more than two choices', () => {
+    const interactor = new UIServiceInteractor({})
+
+    interactor.setQuestionNumberFocus(1).clickAddChoice()
+
+    expect(
+      interactor.queryRemoveChoiceButton({ choiceNumber: 1 }),
+    ).not.toBeNull()
+    expect(
+      interactor.queryRemoveChoiceButton({ choiceNumber: 2 }),
+    ).not.toBeNull()
+    expect(
+      interactor.queryRemoveChoiceButton({ choiceNumber: 3 }),
+    ).not.toBeNull()
   })
 })
 

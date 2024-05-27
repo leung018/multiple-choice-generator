@@ -19,6 +19,16 @@ export class QuestionSetEditorAriaLabel {
     return `button of removing question ${questionNumber}`
   }
 
+  static removeChoiceButton({
+    questionNumber,
+    choiceNumber,
+  }: {
+    choiceNumber: number
+    questionNumber: number
+  }) {
+    return `button of removing question ${questionNumber} choice ${choiceNumber}`
+  }
+
   static answerInput({
     choiceNumber,
     questionNumber,
@@ -454,6 +464,10 @@ function ChoicesEditor(props: {
                   <button
                     type="button"
                     className="bg-transparent text-2xl text-red-500 hover:text-red-700"
+                    aria-label={QuestionSetEditorAriaLabel.removeChoiceButton({
+                      questionNumber,
+                      choiceNumber,
+                    })}
                   >
                     ×
                   </button>
