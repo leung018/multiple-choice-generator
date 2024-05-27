@@ -111,6 +111,11 @@ class UIServiceInteractor {
     )
   }
 
+  clickRemoveChoice({ choiceNumber }: { choiceNumber: number }) {
+    fireEvent.click(this.queryRemoveChoiceButton({ choiceNumber })!)
+    return this
+  }
+
   clickAddChoice() {
     const addChoiceButtons = screen.getAllByText('Add Choice')
     fireEvent.click(addChoiceButtons[this.questionNumberFocus - 1])
@@ -581,6 +586,14 @@ describe('QuestionSetEditor', () => {
     interactor.setQuestionNumberFocus(1)
     expect(interactor.queryRemoveChoiceButton({ choiceNumber: 1 })).toBeNull()
     expect(interactor.queryRemoveChoiceButton({ choiceNumber: 2 })).toBeNull()
+
+    interactor.clickAddChoice()
+    interactor.clickRemoveChoice({ choiceNumber: 1 })
+
+    //: TODO: Uncomment below when action that is triggered by remove choice button is implemented
+    // expect(interactor.queryRemoveChoiceButton({ choiceNumber: 1 })).toBeNull()
+    // expect(interactor.queryRemoveChoiceButton({ choiceNumber: 2 })).toBeNull()
+    // expect(interactor.queryRemoveChoiceButton({ choiceNumber: 3 })).toBeNull()
   })
 })
 
