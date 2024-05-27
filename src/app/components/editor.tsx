@@ -460,18 +460,22 @@ function ChoicesEditor(props: {
                     }}
                   />
                 </td>
-                <td className="border border-slate-300">
-                  <button
-                    type="button"
-                    className="bg-transparent text-2xl text-red-500 hover:text-red-700"
-                    aria-label={QuestionSetEditorAriaLabel.removeChoiceButton({
-                      questionNumber,
-                      choiceNumber,
-                    })}
-                  >
-                    ×
-                  </button>
-                </td>
+                {choices.length > 2 && (
+                  <td className="border border-slate-300">
+                    <button
+                      type="button"
+                      className="bg-transparent text-2xl text-red-500 hover:text-red-700"
+                      aria-label={QuestionSetEditorAriaLabel.removeChoiceButton(
+                        {
+                          questionNumber,
+                          choiceNumber,
+                        },
+                      )}
+                    >
+                      ×
+                    </button>
+                  </td>
+                )}
               </tr>
             )
           })}

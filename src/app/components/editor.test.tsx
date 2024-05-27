@@ -574,6 +574,14 @@ describe('QuestionSetEditor', () => {
       interactor.queryRemoveChoiceButton({ choiceNumber: 3 }),
     ).not.toBeNull()
   })
+
+  it('should hide remove choice button when there are only two choices', () => {
+    const interactor = new UIServiceInteractor({})
+
+    interactor.setQuestionNumberFocus(1)
+    expect(interactor.queryRemoveChoiceButton({ choiceNumber: 1 })).toBeNull()
+    expect(interactor.queryRemoveChoiceButton({ choiceNumber: 2 })).toBeNull()
+  })
 })
 
 function expectCannotCreateQuestionSet({
