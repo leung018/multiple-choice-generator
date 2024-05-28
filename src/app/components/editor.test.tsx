@@ -590,10 +590,9 @@ describe('QuestionSetEditor', () => {
     interactor.clickAddChoice()
     interactor.clickRemoveChoice({ choiceNumber: 1 })
 
-    //: TODO: Uncomment below when action that is triggered by remove choice button is implemented
-    // expect(interactor.queryRemoveChoiceButton({ choiceNumber: 1 })).toBeNull()
-    // expect(interactor.queryRemoveChoiceButton({ choiceNumber: 2 })).toBeNull()
-    // expect(interactor.queryRemoveChoiceButton({ choiceNumber: 3 })).toBeNull()
+    expect(interactor.queryRemoveChoiceButton({ choiceNumber: 1 })).toBeNull()
+    expect(interactor.queryRemoveChoiceButton({ choiceNumber: 2 })).toBeNull()
+    expect(interactor.queryRemoveChoiceButton({ choiceNumber: 3 })).toBeNull()
   })
 
   it('should remove targeted choice by clicking nearby remove choice button', () => {
