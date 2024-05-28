@@ -111,6 +111,11 @@ class UIServiceInteractor {
     )
   }
 
+  clickRemoveChoice({ choiceNumber }: { choiceNumber: number }) {
+    fireEvent.click(this.queryRemoveChoiceButton({ choiceNumber })!)
+    return this
+  }
+
   clickAddChoice() {
     const addChoiceButtons = screen.getAllByText('Add Choice')
     fireEvent.click(addChoiceButtons[this.questionNumberFocus - 1])
@@ -135,6 +140,15 @@ class UIServiceInteractor {
   queryRemoveQuestionButton() {
     return screen.queryByLabelText(
       QuestionSetEditorAriaLabel.removeQuestionButton(this.questionNumberFocus),
+    )
+  }
+
+  queryRemoveChoiceButton({ choiceNumber }: { choiceNumber: number }) {
+    return screen.queryByLabelText(
+      QuestionSetEditorAriaLabel.removeChoiceButton({
+        questionNumber: this.questionNumberFocus,
+        choiceNumber,
+      }),
     )
   }
 }
@@ -547,6 +561,54 @@ describe('QuestionSetEditor', () => {
     interactor.setQuestionNumberFocus(1).clickRemoveQuestion()
 
     expect(screen.queryByDisplayValue('I will be kept')).not.toBeNull()
+    expect(screen.queryByDisplayValue('I will be removed')).toBeNull()
+  })
+
+  it('should show remove choice button when there are more than two choices', () => {
+    const interactor = new UIServiceInteractor({})
+
+    interactor.setQuestionNumberFocus(1).clickAddChoice()
+
+    expect(
+      interactor.queryRemoveChoiceButton({ choiceNumber: 1 }),
+    ).not.toBeNull()
+    expect(
+      interactor.queryRemoveChoiceButton({ choiceNumber: 2 }),
+    ).not.toBeNull()
+    expect(
+      interactor.queryRemoveChoiceButton({ choiceNumber: 3 }),
+    ).not.toBeNull()
+  })
+
+  it('should hide remove choice button when there are only two choices', () => {
+    const interactor = new UIServiceInteractor({})
+
+    interactor.setQuestionNumberFocus(1)
+    expect(interactor.queryRemoveChoiceButton({ choiceNumber: 1 })).toBeNull()
+    expect(interactor.queryRemoveChoiceButton({ choiceNumber: 2 })).toBeNull()
+
+    interactor.clickAddChoice()
+    interactor.clickRemoveChoice({ choiceNumber: 1 })
+
+    expect(interactor.queryRemoveChoiceButton({ choiceNumber: 1 })).toBeNull()
+    expect(interactor.queryRemoveChoiceButton({ choiceNumber: 2 })).toBeNull()
+    expect(interactor.queryRemoveChoiceButton({ choiceNumber: 3 })).toBeNull()
+  })
+
+  it('should remove targeted choice by clicking nearby remove choice button', () => {
+    const interactor = new UIServiceInteractor({})
+
+    interactor
+      .setQuestionNumberFocus(1)
+      .clickAddChoice()
+      .inputAnswer({ choiceNumber: 1, answer: 'I will be removed' })
+      .inputAnswer({ choiceNumber: 2, answer: 'I will be kept' })
+      .inputAnswer({ choiceNumber: 3, answer: 'I will be kept too' })
+
+    interactor.clickRemoveChoice({ choiceNumber: 1 })
+
+    expect(screen.queryByDisplayValue('I will be kept')).not.toBeNull()
+    expect(screen.queryByDisplayValue('I will be kept too')).not.toBeNull()
     expect(screen.queryByDisplayValue('I will be removed')).toBeNull()
   })
 })
