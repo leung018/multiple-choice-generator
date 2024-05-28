@@ -394,6 +394,11 @@ function ChoicesEditor(props: {
     onChoicesUpdate(newChoices)
   }
 
+  const handleInternalChoiceRemove = (choiceId: number) => {
+    const newChoices = choices.filter((choice) => choice.id !== choiceId)
+    onChoicesUpdate(newChoices)
+  }
+
   return (
     <div className="form-group">
       <h3 className="text-lg font-bold mb-2">Choices:</h3>
@@ -471,6 +476,9 @@ function ChoicesEditor(props: {
                           choiceNumber,
                         },
                       )}
+                      onClick={() => {
+                        handleInternalChoiceRemove(choice.id)
+                      }}
                     >
                       ×
                     </button>

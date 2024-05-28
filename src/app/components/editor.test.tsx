@@ -595,6 +595,23 @@ describe('QuestionSetEditor', () => {
     // expect(interactor.queryRemoveChoiceButton({ choiceNumber: 2 })).toBeNull()
     // expect(interactor.queryRemoveChoiceButton({ choiceNumber: 3 })).toBeNull()
   })
+
+  it('should remove targeted choice by clicking nearby remove choice button', () => {
+    const interactor = new UIServiceInteractor({})
+
+    interactor
+      .setQuestionNumberFocus(1)
+      .clickAddChoice()
+      .inputAnswer({ choiceNumber: 1, answer: 'I will be removed' })
+      .inputAnswer({ choiceNumber: 2, answer: 'I will be kept' })
+      .inputAnswer({ choiceNumber: 3, answer: 'I will be kept too' })
+
+    interactor.clickRemoveChoice({ choiceNumber: 1 })
+
+    expect(screen.queryByDisplayValue('I will be kept')).not.toBeNull()
+    expect(screen.queryByDisplayValue('I will be kept too')).not.toBeNull()
+    expect(screen.queryByDisplayValue('I will be removed')).toBeNull()
+  })
 })
 
 function expectCannotCreateQuestionSet({
