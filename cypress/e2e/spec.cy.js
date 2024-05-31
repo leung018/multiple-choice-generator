@@ -66,6 +66,20 @@ describe('End to end tests', () => {
     cy.contains('Take Quiz')
     cy.contains('Valid Question Set Name')
   })
+
+  it('should allow navigate to home page after submitted quiz', () => {
+    createQuestionSet({ cy })
+
+    cy.visit('/')
+    cy.contains('Take Quiz').click()
+
+    // Do the quiz
+    cy.contains('Submit').click()
+    cy.contains('Back').click()
+
+    // Should go back to home page successfully
+    cy.contains('Take Quiz')
+  })
 })
 
 /**
