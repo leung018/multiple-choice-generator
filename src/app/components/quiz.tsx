@@ -203,6 +203,9 @@ function MultipleChoiceQuiz({
           <p className="font-bold">
             Your score: {score}/{questionSet.questions.length}
           </p>
+          <button className="bg-green-500 text-white font-bold py-2 px-4 rounded mt-4">
+            Back
+          </button>
         </div>
       )}
     </div>
