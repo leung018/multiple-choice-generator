@@ -56,9 +56,9 @@ describe('End to end tests', () => {
   })
 
   it('should only go back to home page when create question set successfully', () => {
-    createQuestionSet({ cy, questionSetName: '' }) // Do not allow empty question set name
+    createQuestionSet({ cy, questionSetName: '' }) // Do not allow empty question set name. Expect staying in the edit page
 
-    // Should stay in the edit page
+    // Should stay in the edit page and able to continue to edit
     cy.contains('Question Set Name').type('Valid Question Set Name')
     cy.contains('Save').click()
 
@@ -102,7 +102,6 @@ function createQuestionSet({
     },
   ],
 }) {
-  // TODO: Perhaps can move to command.ts after typescript configuration of cypress, jest is configured properly
   // TODO: Perhaps can reuse QuestionSetBuilderForTest from the main codebase, but can't figure out how to import it here
 
   cy.visit('/')
