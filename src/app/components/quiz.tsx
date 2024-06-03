@@ -11,6 +11,7 @@ import LoadingSpinner from './loading'
 import Error from 'next/error'
 import { MultipleChoiceSwapper } from '../../model/swap'
 import { SetRandomDrawer } from '../../utils/random_draw'
+import { useRouter } from 'next/navigation'
 
 export class MultipleChoiceQuizUIService {
   static create({ questionSetId }: { questionSetId: string }) {
@@ -110,6 +111,7 @@ function MultipleChoiceQuiz({
   fetchQuestionSet: () => QuestionSet
   recordSubmittedQuestionSet: (questionSet: QuestionSet) => void
 }) {
+  const router = useRouter()
   const [isLoading, setLoading] = useState(true)
   const [isNotFound, setNotFound] = useState(false)
 
@@ -203,6 +205,14 @@ function MultipleChoiceQuiz({
           <p className="font-bold">
             Your score: {score}/{questionSet.questions.length}
           </p>
+          <button
+            className="bg-green-500 text-white font-bold py-2 px-4 rounded mt-4"
+            onClick={() => {
+              router.push('/')
+            }}
+          >
+            Back
+          </button>
         </div>
       )}
     </div>
