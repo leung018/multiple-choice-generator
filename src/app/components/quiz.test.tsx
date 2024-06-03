@@ -160,9 +160,7 @@ describe('MultipleChoiceQuiz', () => {
   it('should display back to home page button only after submit button is clicked', async () => {
     const {
       renderResult: { queryByRole, getByText, findByRole },
-    } = renderMultipleChoicePage({
-      originalQuestionSet: new QuestionSetBuilderForTest().build(),
-    })
+    } = renderMultipleChoicePage()
 
     expect(queryByRole('button', { name: 'Back' })).toBeNull()
     fireEvent.click(getByText('Submit'))
@@ -299,12 +297,12 @@ describe('MultipleChoiceQuiz', () => {
 })
 
 function renderMultipleChoicePage({
-  originalQuestionSet,
+  originalQuestionSet = new QuestionSetBuilderForTest().build(),
   lastSubmittedQuestionSet = null,
 }: {
-  originalQuestionSet: QuestionSet
+  originalQuestionSet?: QuestionSet
   lastSubmittedQuestionSet?: QuestionSet | null
-}) {
+} = {}) {
   const originalQuestionSetRepo = LocalStorageQuestionSetRepo.createNull()
   originalQuestionSetRepo.upsertQuestionSet(originalQuestionSet)
 
