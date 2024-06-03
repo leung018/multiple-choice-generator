@@ -62,8 +62,7 @@ describe('End to end tests', () => {
     cy.contains('Question Set Name').type('Valid Question Set Name')
     cy.contains('Save').click()
 
-    // Should go back to home page after successfully creating question set
-    cy.contains('Take Quiz')
+    assertIsInHomePage(cy)
     cy.contains('Valid Question Set Name')
   })
 
@@ -77,10 +76,15 @@ describe('End to end tests', () => {
     cy.contains('Submit').click()
     cy.contains('Back').click()
 
-    // Should go back to home page successfully
-    cy.contains('Take Quiz')
+    assertIsInHomePage(cy)
   })
 })
+
+// TODO: Perhaps can move to command.ts after typescript configuration of cypress, jest is configured properly
+
+function assertIsInHomePage(cy) {
+  cy.contains('Take Quiz')
+}
 
 /**
  * TODO: Currently not support more than 2 choices or more than 1 question. But no need for e2e testing currently
