@@ -87,7 +87,23 @@ export class QuestionSetEditorUIService {
   }
 
   getElement() {
-    return <QuestionSetEditor questionSetRepo={this.questionSetRepo} />
+    return <QuestionSetEditor saveQuestionSet={this.saveQuestionSet} />
+  }
+
+  private saveQuestionSet = (questionSet: QuestionSet): { error?: string } => {
+    try {
+      this.questionSetRepo.upsertQuestionSet(questionSet)
+    } catch (e) {
+      if (e instanceof UpsertQuestionSetError) {
+        if (e.cause.code === 'DUPLICATE_QUESTION_SET_NAME') {
+          return {
+            error: 'Question set with same name already exists',
+          }
+        }
+      }
+      throw e
+    }
+    return {}
   }
 }
 
@@ -127,9 +143,9 @@ const newQuestion = (): QuestionInput => ({
 })
 
 function QuestionSetEditor({
-  questionSetRepo,
+  saveQuestionSet,
 }: {
-  questionSetRepo: QuestionSetRepo
+  saveQuestionSet: (questionSet: QuestionSet) => { error?: string }
 }) {
   const router = useRouter()
 
@@ -192,18 +208,11 @@ function QuestionSetEditor({
       questions,
     })
 
-    try {
-      questionSetRepo.upsertQuestionSet(questionSet)
-    } catch (e) {
-      if (e instanceof UpsertQuestionSetError) {
-        if (e.cause.code === 'DUPLICATE_QUESTION_SET_NAME') {
-          setErrorMessage('Question set with same name already exists')
-          return
-        }
-      }
-      throw e
+    const { error } = saveQuestionSet(questionSet)
+    if (error) {
+      setErrorMessage(error)
+      return
     }
-
     router.push('/')
   }
 
