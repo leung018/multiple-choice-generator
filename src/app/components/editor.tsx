@@ -60,6 +60,10 @@ export class QuestionSetEditorAriaLabel {
   }
 }
 
+interface OperationResult {
+  error?: string
+}
+
 export class QuestionSetEditorUIService {
   static create() {
     return new QuestionSetEditorUIService({
@@ -90,7 +94,7 @@ export class QuestionSetEditorUIService {
     return <QuestionSetEditor saveQuestionSet={this.saveQuestionSet} />
   }
 
-  private saveQuestionSet = (questionSet: QuestionSet): { error?: string } => {
+  private saveQuestionSet = (questionSet: QuestionSet): OperationResult => {
     try {
       this.questionSetRepo.upsertQuestionSet(questionSet)
     } catch (e) {
@@ -145,7 +149,7 @@ const newQuestion = (): QuestionInput => ({
 function QuestionSetEditor({
   saveQuestionSet,
 }: {
-  saveQuestionSet: (questionSet: QuestionSet) => { error?: string }
+  saveQuestionSet: (questionSet: QuestionSet) => OperationResult
 }) {
   const router = useRouter()
 
@@ -180,9 +184,18 @@ function QuestionSetEditor({
   }
 
   const handleSaveClick = () => {
-    if (questionSetInput.name === '') {
-      setErrorMessage("Question set name can't be empty")
+    const { error } = saveChanges()
+    if (error) {
+      setErrorMessage(error)
       return
+    }
+
+    router.push('/')
+  }
+
+  const saveChanges = (): OperationResult => {
+    if (questionSetInput.name === '') {
+      return { error: "Question set name can't be empty" }
     }
 
     const questions: Question[] = []
@@ -191,16 +204,15 @@ function QuestionSetEditor({
       const questionInput = questionSetInput.questions[i]
       const questionNumber = i + 1
 
-      const { error, question } = createQuestion(questionInput, questionNumber)
+      const { error, question } = mapQuestionInputToQuestion(
+        questionInput,
+        questionNumber,
+      )
       if (error) {
-        setErrorMessage(error)
-        return
+        return { error }
       }
-      if (!question) {
-        setErrorMessage('Unexpected error')
-        return
-      }
-      questions.push(question)
+
+      questions.push(question!)
     }
 
     const questionSet = new QuestionSet({
@@ -208,19 +220,13 @@ function QuestionSetEditor({
       questions,
     })
 
-    const { error } = saveQuestionSet(questionSet)
-    if (error) {
-      setErrorMessage(error)
-      return
-    }
-    router.push('/')
+    return saveQuestionSet(questionSet)
   }
 
-  const createQuestion = (
+  const mapQuestionInputToQuestion = (
     input: QuestionInput,
     questionNumber: number,
-  ): {
-    error?: string
+  ): OperationResult & {
     question?: Question
   } => {
     if (input.description === '') {
