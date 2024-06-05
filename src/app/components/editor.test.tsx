@@ -30,7 +30,7 @@ class UIServiceInteractor {
     render(
       QuestionSetEditorUIService.createNull({
         questionSetRepo: this.questionSetRepo,
-      }).getElement(),
+      }).getCreationPageElement(),
     )
 
     this.questionSetName = questionSetName

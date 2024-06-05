@@ -90,7 +90,13 @@ export class QuestionSetEditorUIService {
     this.questionSetRepo = questionSetRepo
   }
 
-  getElement() {
+  getCreationPageElement() {
+    return <QuestionSetEditor saveQuestionSet={this.saveQuestionSet} />
+  }
+
+  // eslint-disable-next-line unused-imports/no-unused-vars
+  getModifyingPageElement(questionSetId: string) {
+    // TODO: Able to load questionSet from questionSetId and modify it in the editor
     return <QuestionSetEditor saveQuestionSet={this.saveQuestionSet} />
   }
 
