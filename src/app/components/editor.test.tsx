@@ -28,7 +28,7 @@ class UIServiceInteractor {
   }
 
   /**
-   * @param @param questionSetName The initial name of the question set to be inputted once the UI is rendered.
+   * @param @questionSetName The initial name of the question set to be inputted once the UI is rendered.
    */
   renderCreationPage({ questionSetName = 'Dummy name' } = {}) {
     render(
