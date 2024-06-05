@@ -215,7 +215,7 @@ function QuestionSetEditor({
       questions.push(question!)
     }
 
-    const questionSet = new QuestionSet({
+    const questionSet = QuestionSet.create({
       name: questionSetInput.name,
       questions,
     })
