@@ -7,9 +7,12 @@ import {
   QuestionSetEditorAriaLabel,
   QuestionSetEditorUIService,
 } from './editor'
-import { MultipleChoice } from '../../model/mc'
+import { MultipleChoiceBuilder, MultipleChoice } from '../../model/mc'
 import '@testing-library/jest-dom'
-import { QuestionSetBuilderForTest } from '../../model/question_set'
+import {
+  QuestionSet,
+  QuestionSetBuilderForTest,
+} from '../../model/question_set'
 
 class UIServiceInteractor {
   private readonly questionSetRepo: QuestionSetRepo
@@ -39,6 +42,16 @@ class UIServiceInteractor {
 
     this.questionSetName = questionSetName
     this.setQuestionSetName(questionSetName)
+    return this
+  }
+
+  renderModifyingPage(questionSetId: string) {
+    render(
+      QuestionSetEditorUIService.createNull({
+        questionSetRepo: this.questionSetRepo,
+      }).getModifyingPageElement(questionSetId),
+    )
+
     return this
   }
 
@@ -91,15 +104,17 @@ class UIServiceInteractor {
   }
 
   clickFixedPosition({ choiceNumber }: { choiceNumber: number }) {
-    fireEvent.click(
-      screen.getByLabelText(
-        QuestionSetEditorAriaLabel.isFixedPositionCheckbox({
-          questionNumber: this.questionNumberFocus,
-          choiceNumber,
-        }),
-      ),
-    )
+    fireEvent.click(this.getIsFixedPositionCheckbox({ choiceNumber }))
     return this
+  }
+
+  getIsFixedPositionCheckbox({ choiceNumber }: { choiceNumber: number }) {
+    return screen.getByLabelText(
+      QuestionSetEditorAriaLabel.isFixedPositionCheckbox({
+        questionNumber: this.questionNumberFocus,
+        choiceNumber,
+      }),
+    )
   }
 
   clickCorrectAnswer({ choiceNumber }: { choiceNumber: number }) {
@@ -635,6 +650,65 @@ describe('QuestionSetEditor', () => {
     expect(screen.queryByDisplayValue('I will be kept')).not.toBeNull()
     expect(screen.queryByDisplayValue('I will be kept too')).not.toBeNull()
     expect(screen.queryByDisplayValue('I will be removed')).toBeNull()
+  })
+
+  it('should modifying page load the contents in original question set', () => {
+    const questionSetRepo = LocalStorageQuestionSetRepo.createNull()
+    const questionSet = QuestionSet.create({
+      name: 'Hello World',
+      questions: [
+        {
+          description: 'Which one is larger than 1.1?',
+          mc: new MultipleChoiceBuilder()
+            .appendNonFixedChoice('1')
+            .appendNonFixedChoice('2')
+            .appendFixedChoice('All of the above')
+            .setCorrectChoiceIndex(1)
+            .build(),
+        },
+      ],
+    })
+    questionSetRepo.upsertQuestionSet(questionSet)
+
+    const interactor = new UIServiceInteractor({
+      questionSetRepo,
+    })
+    interactor.renderModifyingPage(questionSet.id)
+
+    expect(screen.queryByDisplayValue('Hello World')).toBeInTheDocument()
+
+    expect(
+      screen.queryByDisplayValue('Which one is larger than 1.1?'),
+    ).toBeInTheDocument()
+
+    interactor.setQuestionNumberFocus(1)
+
+    // Choice 1
+    expect(screen.queryByDisplayValue('1')).toBeInTheDocument()
+    expect(
+      interactor.getCorrectAnswerCheckbox({ choiceNumber: 1 }),
+    ).not.toBeChecked()
+    expect(
+      interactor.getIsFixedPositionCheckbox({ choiceNumber: 1 }),
+    ).not.toBeChecked()
+
+    // Choice 2
+    expect(screen.queryByDisplayValue('2')).toBeInTheDocument()
+    expect(
+      interactor.getCorrectAnswerCheckbox({ choiceNumber: 2 }),
+    ).toBeChecked()
+    expect(
+      interactor.getIsFixedPositionCheckbox({ choiceNumber: 2 }),
+    ).not.toBeChecked()
+
+    // Choice 3
+    expect(screen.queryByDisplayValue('All of the above')).toBeInTheDocument()
+    expect(
+      interactor.getCorrectAnswerCheckbox({ choiceNumber: 3 }),
+    ).not.toBeChecked()
+    expect(
+      interactor.getIsFixedPositionCheckbox({ choiceNumber: 3 }),
+    ).toBeChecked()
   })
 })
 

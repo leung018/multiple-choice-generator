@@ -91,13 +91,22 @@ export class QuestionSetEditorUIService {
   }
 
   getCreationPageElement() {
-    return <QuestionSetEditor saveQuestionSet={this.saveQuestionSet} />
+    return (
+      <QuestionSetEditor
+        saveQuestionSet={this.saveQuestionSet}
+        questionSet={QuestionSet.create({ name: '', questions: [] })}
+      />
+    )
   }
 
-  // eslint-disable-next-line unused-imports/no-unused-vars
   getModifyingPageElement(questionSetId: string) {
-    // TODO: Able to load questionSet from questionSetId and modify it in the editor
-    return <QuestionSetEditor saveQuestionSet={this.saveQuestionSet} />
+    const questionSet = this.questionSetRepo.getQuestionSetById(questionSetId)
+    return (
+      <QuestionSetEditor
+        saveQuestionSet={this.saveQuestionSet}
+        questionSet={questionSet}
+      />
+    )
   }
 
   private saveQuestionSet = (questionSet: QuestionSet): OperationResult => {
@@ -152,17 +161,38 @@ const newQuestion = (): QuestionInput => ({
   choices: [newChoice(), newChoice()],
 })
 
+const mapQuestionSetToQuestionSetInput = (
+  questionSet: QuestionSet,
+): QuestionSetInput => {
+  const input = {
+    name: questionSet.name,
+    questions: questionSet.questions.map((question) => ({
+      id: questionCounter++,
+      description: question.description,
+      choices: question.mc.choices.map((choice, index) => ({
+        id: choiceCounter++,
+        answer: choice.answer,
+        isFixedPosition: choice.isFixedPosition,
+        isCorrect: index == question.mc.correctChoiceIndex,
+      })),
+    })),
+  }
+  input.questions.push(newQuestion())
+  return input
+}
+
 function QuestionSetEditor({
+  questionSet,
   saveQuestionSet,
 }: {
+  questionSet: QuestionSet
   saveQuestionSet: (questionSet: QuestionSet) => OperationResult
 }) {
   const router = useRouter()
 
-  const [questionSetInput, setQuestionSetInput] = useState<QuestionSetInput>({
-    name: '',
-    questions: [newQuestion()],
-  })
+  const [questionSetInput, setQuestionSetInput] = useState<QuestionSetInput>(
+    mapQuestionSetToQuestionSetInput(questionSet),
+  )
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
 
   const handleQuestionUpdate = (
@@ -288,6 +318,7 @@ function QuestionSetEditor({
             <input
               type="text"
               className="border border-gray-300 px-2 py-1 w-full"
+              value={questionSet.name}
               onChange={(e) => {
                 setQuestionSetInput({
                   ...questionSetInput,
@@ -326,6 +357,7 @@ function QuestionSetEditor({
                 <input
                   type="text"
                   className="border border-gray-300 px-2 py-1 w-full"
+                  value={question.description}
                   onChange={(e) => {
                     handleQuestionUpdate(question.id, (oldQuestion) => ({
                       ...oldQuestion,
@@ -440,6 +472,7 @@ function ChoicesEditor(props: {
                   <input
                     type="text"
                     className="border border-gray-300 px-2 py-1"
+                    value={choice.answer}
                     onChange={(e) => {
                       handleInternalChoiceUpdate(choice.id, {
                         answer: e.target.value,
@@ -473,6 +506,7 @@ function ChoicesEditor(props: {
                   <input
                     type="checkbox"
                     className="mr-1"
+                    checked={choice.isFixedPosition}
                     aria-label={QuestionSetEditorAriaLabel.isFixedPositionCheckbox(
                       {
                         choiceNumber,
