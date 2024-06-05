@@ -13,20 +13,24 @@ import { QuestionSetBuilderForTest } from '../../model/question_set'
 
 class UIServiceInteractor {
   private readonly questionSetRepo: QuestionSetRepo
-  private questionSetName: string
+  private questionSetName: string = ''
   private questionNumberFocus = 1
 
   /**
-   * Initializes a new instance of UIServiceInteractor, rendering the associated UI using `testing-library/react` and providing methods to interact with the UI
+   * Initializes a new instance of UIServiceInteractor, providing methods for rendering the associated UI using `testing-library/react` and interact with it
    *
-   * @param questionSetName The initial name of the question set to be inputted once the UI is rendered.
    * @param questionSetRepo Repository for storing the submitted question set after it is submitted through this page.
    */
   constructor({
-    questionSetName = 'Dummy name',
     questionSetRepo = LocalStorageQuestionSetRepo.createNull(),
-  }) {
+  } = {}) {
     this.questionSetRepo = questionSetRepo
+  }
+
+  /**
+   * @param @param questionSetName The initial name of the question set to be inputted once the UI is rendered.
+   */
+  renderCreationPage({ questionSetName = 'Dummy name' } = {}) {
     render(
       QuestionSetEditorUIService.createNull({
         questionSetRepo: this.questionSetRepo,
@@ -35,6 +39,7 @@ class UIServiceInteractor {
 
     this.questionSetName = questionSetName
     this.setQuestionSetName(questionSetName)
+    return this
   }
 
   setQuestionSetName(questionSetName: string) {
@@ -155,7 +160,8 @@ class UIServiceInteractor {
 
 describe('QuestionSetEditor', () => {
   it('should save question set successfully when no extra choice or question added', () => {
-    const interactor = new UIServiceInteractor({ questionSetName: 'Test name' })
+    const interactor = new UIServiceInteractor()
+    interactor.renderCreationPage({ questionSetName: 'Test name' })
     interactor
       .setQuestionNumberFocus(1)
       .inputQuestionDescription({ description: 'Am I handsome?' })
@@ -189,7 +195,8 @@ describe('QuestionSetEditor', () => {
   })
 
   it('should also save all input specified in extra option', () => {
-    const interactor = new UIServiceInteractor({})
+    const interactor = new UIServiceInteractor()
+    interactor.renderCreationPage()
     interactor
       .setQuestionNumberFocus(1)
       .inputQuestionDescription({ description: '1 + 1 = ?' })
@@ -227,7 +234,8 @@ describe('QuestionSetEditor', () => {
   })
 
   it('should save question set after multiple clicks of add choice and add question', () => {
-    const interactor = new UIServiceInteractor({})
+    const interactor = new UIServiceInteractor()
+    interactor.renderCreationPage()
 
     interactor
       .setQuestionNumberFocus(1)
@@ -323,7 +331,8 @@ describe('QuestionSetEditor', () => {
   })
 
   it('should only choose one correct answer no matter how many are clicked as correct', () => {
-    const interactor = new UIServiceInteractor({})
+    const interactor = new UIServiceInteractor()
+    interactor.renderCreationPage()
 
     interactor
       .setQuestionNumberFocus(1)
@@ -355,7 +364,8 @@ describe('QuestionSetEditor', () => {
   })
 
   it('should allow multiple choices to be fixed position', () => {
-    const interactor = new UIServiceInteractor({})
+    const interactor = new UIServiceInteractor()
+    interactor.renderCreationPage()
 
     interactor
       .setQuestionNumberFocus(1)
@@ -388,7 +398,9 @@ describe('QuestionSetEditor', () => {
   })
 
   it('should hide error prompt when successful save', () => {
-    const interactor = new UIServiceInteractor({})
+    const interactor = new UIServiceInteractor()
+    interactor.renderCreationPage()
+
     setFirstValidQuestion(interactor)
     interactor.clickSave()
 
@@ -398,7 +410,8 @@ describe('QuestionSetEditor', () => {
   })
 
   it('should reject saving question set when question set name is empty', () => {
-    const interactor = new UIServiceInteractor({ questionSetName: '' })
+    const interactor = new UIServiceInteractor()
+    interactor.renderCreationPage({ questionSetName: '' })
     setFirstValidQuestion(interactor)
     interactor.clickSave()
 
@@ -409,7 +422,9 @@ describe('QuestionSetEditor', () => {
   })
 
   it('should reject saving question set when empty question description', () => {
-    const interactor = new UIServiceInteractor({})
+    const interactor = new UIServiceInteractor()
+    interactor.renderCreationPage()
+
     setFirstValidQuestion(interactor)
     interactor
       .setQuestionNumberFocus(1)
@@ -423,7 +438,8 @@ describe('QuestionSetEditor', () => {
   })
 
   it('should reject saving question set when empty answer', () => {
-    const interactor = new UIServiceInteractor({})
+    const interactor = new UIServiceInteractor()
+    interactor.renderCreationPage()
 
     interactor
       .setQuestionNumberFocus(1)
@@ -440,7 +456,8 @@ describe('QuestionSetEditor', () => {
   })
 
   it('should reject saving question set when no correct answer is selected', () => {
-    const interactor = new UIServiceInteractor({})
+    const interactor = new UIServiceInteractor()
+    interactor.renderCreationPage()
 
     interactor
       .setQuestionNumberFocus(1)
@@ -456,7 +473,8 @@ describe('QuestionSetEditor', () => {
   })
 
   it('should reject saving question set when duplicate answer in a question', () => {
-    const interactor = new UIServiceInteractor({})
+    const interactor = new UIServiceInteractor()
+    interactor.renderCreationPage()
 
     interactor
       .setQuestionNumberFocus(1)
@@ -473,7 +491,8 @@ describe('QuestionSetEditor', () => {
   })
 
   it('should save if duplicate answer in different questions', () => {
-    const interactor = new UIServiceInteractor({})
+    const interactor = new UIServiceInteractor()
+    interactor.renderCreationPage()
 
     interactor
       .setQuestionNumberFocus(1)
@@ -506,9 +525,9 @@ describe('QuestionSetEditor', () => {
     questionSetRepo.upsertQuestionSet(questionSet)
 
     const interactor = new UIServiceInteractor({
-      questionSetName: 'Test name',
       questionSetRepo,
     })
+    interactor.renderCreationPage({ questionSetName: 'Test name' })
     setFirstValidQuestion(interactor)
     interactor.clickSave()
 
@@ -523,7 +542,8 @@ describe('QuestionSetEditor', () => {
   })
 
   it('should show remove question button when questions are more than one', () => {
-    const interactor = new UIServiceInteractor({})
+    const interactor = new UIServiceInteractor()
+    interactor.renderCreationPage()
 
     interactor.clickAddQuestion()
 
@@ -535,7 +555,8 @@ describe('QuestionSetEditor', () => {
   })
 
   it('should hide remove question button when there is only one question', () => {
-    const interactor = new UIServiceInteractor({})
+    const interactor = new UIServiceInteractor()
+    interactor.renderCreationPage()
 
     interactor.setQuestionNumberFocus(1)
     expect(interactor.queryRemoveQuestionButton()).toBeNull()
@@ -547,7 +568,8 @@ describe('QuestionSetEditor', () => {
   })
 
   it('should remove targeted question by clicking remove question button', () => {
-    const interactor = new UIServiceInteractor({})
+    const interactor = new UIServiceInteractor()
+    interactor.renderCreationPage()
 
     interactor
       .setQuestionNumberFocus(1)
@@ -565,7 +587,8 @@ describe('QuestionSetEditor', () => {
   })
 
   it('should show remove choice button when there are more than two choices', () => {
-    const interactor = new UIServiceInteractor({})
+    const interactor = new UIServiceInteractor()
+    interactor.renderCreationPage()
 
     interactor.setQuestionNumberFocus(1).clickAddChoice()
 
@@ -581,7 +604,8 @@ describe('QuestionSetEditor', () => {
   })
 
   it('should hide remove choice button when there are only two choices', () => {
-    const interactor = new UIServiceInteractor({})
+    const interactor = new UIServiceInteractor()
+    interactor.renderCreationPage()
 
     interactor.setQuestionNumberFocus(1)
     expect(interactor.queryRemoveChoiceButton({ choiceNumber: 1 })).toBeNull()
@@ -596,7 +620,8 @@ describe('QuestionSetEditor', () => {
   })
 
   it('should remove targeted choice by clicking nearby remove choice button', () => {
-    const interactor = new UIServiceInteractor({})
+    const interactor = new UIServiceInteractor()
+    interactor.renderCreationPage()
 
     interactor
       .setQuestionNumberFocus(1)
