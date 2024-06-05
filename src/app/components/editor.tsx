@@ -60,6 +60,10 @@ export class QuestionSetEditorAriaLabel {
   }
 }
 
+interface OperationResult {
+  error?: string
+}
+
 export class QuestionSetEditorUIService {
   static create() {
     return new QuestionSetEditorUIService({
@@ -86,8 +90,30 @@ export class QuestionSetEditorUIService {
     this.questionSetRepo = questionSetRepo
   }
 
-  getElement() {
-    return <QuestionSetEditor questionSetRepo={this.questionSetRepo} />
+  getCreationPageElement() {
+    return <QuestionSetEditor saveQuestionSet={this.saveQuestionSet} />
+  }
+
+  // eslint-disable-next-line unused-imports/no-unused-vars
+  getModifyingPageElement(questionSetId: string) {
+    // TODO: Able to load questionSet from questionSetId and modify it in the editor
+    return <QuestionSetEditor saveQuestionSet={this.saveQuestionSet} />
+  }
+
+  private saveQuestionSet = (questionSet: QuestionSet): OperationResult => {
+    try {
+      this.questionSetRepo.upsertQuestionSet(questionSet)
+    } catch (e) {
+      if (e instanceof UpsertQuestionSetError) {
+        if (e.cause.code === 'DUPLICATE_QUESTION_SET_NAME') {
+          return {
+            error: 'Question set with same name already exists',
+          }
+        }
+      }
+      throw e
+    }
+    return {}
   }
 }
 
@@ -127,9 +153,9 @@ const newQuestion = (): QuestionInput => ({
 })
 
 function QuestionSetEditor({
-  questionSetRepo,
+  saveQuestionSet,
 }: {
-  questionSetRepo: QuestionSetRepo
+  saveQuestionSet: (questionSet: QuestionSet) => OperationResult
 }) {
   const router = useRouter()
 
@@ -164,9 +190,18 @@ function QuestionSetEditor({
   }
 
   const handleSaveClick = () => {
-    if (questionSetInput.name === '') {
-      setErrorMessage("Question set name can't be empty")
+    const { error } = saveChanges()
+    if (error) {
+      setErrorMessage(error)
       return
+    }
+
+    router.push('/')
+  }
+
+  const saveChanges = (): OperationResult => {
+    if (questionSetInput.name === '') {
+      return { error: "Question set name can't be empty" }
     }
 
     const questions: Question[] = []
@@ -175,43 +210,29 @@ function QuestionSetEditor({
       const questionInput = questionSetInput.questions[i]
       const questionNumber = i + 1
 
-      const { error, question } = createQuestion(questionInput, questionNumber)
+      const { error, question } = mapQuestionInputToQuestion(
+        questionInput,
+        questionNumber,
+      )
       if (error) {
-        setErrorMessage(error)
-        return
+        return { error }
       }
-      if (!question) {
-        setErrorMessage('Unexpected error')
-        return
-      }
-      questions.push(question)
+
+      questions.push(question!)
     }
 
-    const questionSet = new QuestionSet({
+    const questionSet = QuestionSet.create({
       name: questionSetInput.name,
       questions,
     })
 
-    try {
-      questionSetRepo.upsertQuestionSet(questionSet)
-    } catch (e) {
-      if (e instanceof UpsertQuestionSetError) {
-        if (e.cause.code === 'DUPLICATE_QUESTION_SET_NAME') {
-          setErrorMessage('Question set with same name already exists')
-          return
-        }
-      }
-      throw e
-    }
-
-    router.push('/')
+    return saveQuestionSet(questionSet)
   }
 
-  const createQuestion = (
+  const mapQuestionInputToQuestion = (
     input: QuestionInput,
     questionNumber: number,
-  ): {
-    error?: string
+  ): OperationResult & {
     question?: Question
   } => {
     if (input.description === '') {

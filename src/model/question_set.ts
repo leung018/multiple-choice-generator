@@ -1,22 +1,29 @@
 import { MultipleChoiceBuilder, MultipleChoice } from './mc'
 import { v4 as uuidv4 } from 'uuid'
 export class QuestionSet {
-  readonly name: string
+  name: string
 
-  readonly questions: ReadonlyArray<Question>
+  questions: Question[]
 
   readonly id: string
 
+  static create({ name, questions }: { name: string; questions: Question[] }) {
+    const id = uuidv4()
+    return new QuestionSet({ id, name, questions })
+  }
+
   constructor({
+    id,
     name,
     questions,
   }: {
+    id: string
     name: string
-    questions: ReadonlyArray<Question>
+    questions: Question[]
   }) {
+    this.id = id
     this.name = name
     this.questions = questions
-    this.id = uuidv4()
   }
 }
 
@@ -53,7 +60,7 @@ export class QuestionSetBuilderForTest {
   }
 
   build(): QuestionSet {
-    return new QuestionSet({
+    return QuestionSet.create({
       name: this.name,
       questions: this.questions,
     })
