@@ -73,13 +73,14 @@ class UIServiceInteractor {
   }
 
   inputQuestionDescription({ description }: { description: string }) {
-    fireEvent.change(
-      screen.getByLabelText(`Question ${this.questionNumberFocus}:`),
-      {
-        target: { value: description },
-      },
-    )
+    fireEvent.change(this.getQuestionDescriptionInput(), {
+      target: { value: description },
+    })
     return this
+  }
+
+  getQuestionDescriptionInput() {
+    return screen.getByLabelText(`Question ${this.questionNumberFocus}:`)
   }
 
   inputAnswer({
@@ -89,18 +90,19 @@ class UIServiceInteractor {
     choiceNumber: number
     answer: string
   }) {
-    fireEvent.change(
-      screen.getByLabelText(
-        QuestionSetEditorAriaLabel.answerInput({
-          questionNumber: this.questionNumberFocus,
-          choiceNumber,
-        }),
-      ),
-      {
-        target: { value: answer },
-      },
-    )
+    fireEvent.change(this.getAnswerInput({ choiceNumber }), {
+      target: { value: answer },
+    })
     return this
+  }
+
+  getAnswerInput({ choiceNumber }: { choiceNumber: number }) {
+    return screen.getByLabelText(
+      QuestionSetEditorAriaLabel.answerInput({
+        questionNumber: this.questionNumberFocus,
+        choiceNumber,
+      }),
+    )
   }
 
   clickFixedPosition({ choiceNumber }: { choiceNumber: number }) {
@@ -675,16 +677,19 @@ describe('QuestionSetEditor', () => {
     })
     interactor.renderModifyingPage(questionSet.id)
 
-    expect(screen.queryByDisplayValue('Hello World')).toBeInTheDocument()
-
-    expect(
-      screen.queryByDisplayValue('Which one is larger than 1.1?'),
-    ).toBeInTheDocument()
+    expect(screen.getByLabelText('Question Set Name:')).toHaveDisplayValue(
+      'Hello World',
+    )
 
     interactor.setQuestionNumberFocus(1)
+    expect(interactor.getQuestionDescriptionInput()).toHaveDisplayValue(
+      'Which one is larger than 1.1?',
+    )
 
     // Choice 1
-    expect(screen.queryByDisplayValue('1')).toBeInTheDocument()
+    expect(interactor.getAnswerInput({ choiceNumber: 1 })).toHaveDisplayValue(
+      '1',
+    )
     expect(
       interactor.getCorrectAnswerCheckbox({ choiceNumber: 1 }),
     ).not.toBeChecked()
@@ -693,7 +698,9 @@ describe('QuestionSetEditor', () => {
     ).not.toBeChecked()
 
     // Choice 2
-    expect(screen.queryByDisplayValue('2')).toBeInTheDocument()
+    expect(interactor.getAnswerInput({ choiceNumber: 2 })).toHaveDisplayValue(
+      '2',
+    )
     expect(
       interactor.getCorrectAnswerCheckbox({ choiceNumber: 2 }),
     ).toBeChecked()
@@ -702,7 +709,9 @@ describe('QuestionSetEditor', () => {
     ).not.toBeChecked()
 
     // Choice 3
-    expect(screen.queryByDisplayValue('All of the above')).toBeInTheDocument()
+    expect(interactor.getAnswerInput({ choiceNumber: 3 })).toHaveDisplayValue(
+      'All of the above',
+    )
     expect(
       interactor.getCorrectAnswerCheckbox({ choiceNumber: 3 }),
     ).not.toBeChecked()
