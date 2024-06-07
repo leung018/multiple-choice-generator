@@ -39,8 +39,6 @@ class UIServiceInteractor {
         questionSetRepo: this.questionSetRepo,
       }).getCreationPageElement(),
     )
-
-    this.questionSetName = questionSetName
     this.setQuestionSetName(questionSetName)
     return this
   }
