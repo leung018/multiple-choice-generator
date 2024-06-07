@@ -7,23 +7,16 @@ export class QuestionSet {
 
   readonly id: string
 
-  static create({ name, questions }: { name: string; questions: Question[] }) {
-    const id = uuidv4()
-    return new QuestionSet({ id, name, questions })
-  }
-
   constructor({
-    id,
     name,
     questions,
   }: {
-    id: string
     name: string
     questions: Question[]
   }) {
-    this.id = id
     this.name = name
     this.questions = questions
+    this.id = uuidv4()
   }
 }
 
@@ -60,7 +53,7 @@ export class QuestionSetBuilderForTest {
   }
 
   build(): QuestionSet {
-    return QuestionSet.create({
+    return new QuestionSet({
       name: this.name,
       questions: this.questions,
     })
