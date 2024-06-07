@@ -7,7 +7,11 @@ import {
   UpsertQuestionSetError,
 } from '../../repo/question_set'
 import { Question, QuestionSet } from '../../model/question_set'
-import { MultipleChoiceBuilder, MultipleChoiceError } from '../../model/mc'
+import {
+  MultipleChoice,
+  MultipleChoiceBuilder,
+  MultipleChoiceError,
+} from '../../model/mc'
 import { useRouter } from 'next/navigation'
 
 export class QuestionSetEditorAriaLabel {
@@ -146,19 +150,26 @@ interface ChoiceInput {
 
 let choiceCounter = 0
 
-const newChoiceInput = (): ChoiceInput => ({
+const newChoiceInput = ({
+  answer = '',
+  isFixedPosition = false,
+  isCorrect = false,
+} = {}): ChoiceInput => ({
   id: choiceCounter++,
-  answer: '',
-  isFixedPosition: false,
-  isCorrect: false,
+  answer,
+  isFixedPosition,
+  isCorrect,
 })
 
 let questionCounter = 0
 
-const newQuestionInput = (): QuestionInput => ({
+const newQuestionInput = ({
+  description = '',
+  choices = [newChoiceInput(), newChoiceInput()],
+} = {}): QuestionInput => ({
   id: questionCounter++,
-  description: '',
-  choices: [newChoiceInput(), newChoiceInput()],
+  description,
+  choices,
 })
 
 const mapQuestionSetToQuestionSetInput = (
@@ -166,19 +177,25 @@ const mapQuestionSetToQuestionSetInput = (
 ): QuestionSetInput => {
   const input = {
     name: questionSet.name,
-    questions: questionSet.questions.map((question) => ({
-      id: questionCounter++,
-      description: question.description,
-      choices: question.mc.choices.map((choice, index) => ({
-        id: choiceCounter++,
-        answer: choice.answer,
-        isFixedPosition: choice.isFixedPosition,
-        isCorrect: index == question.mc.correctChoiceIndex,
-      })),
-    })),
+    questions: questionSet.questions.map((question) =>
+      newQuestionInput({
+        description: question.description,
+        choices: mapMultipleChoiceToChoiceInputs(question.mc),
+      }),
+    ),
   }
   if (input.questions.length == 0) input.questions.push(newQuestionInput())
   return input
+}
+
+const mapMultipleChoiceToChoiceInputs = (mc: MultipleChoice): ChoiceInput[] => {
+  return mc.choices.map((choice, choiceIndex) =>
+    newChoiceInput({
+      answer: choice.answer,
+      isFixedPosition: choice.isFixedPosition,
+      isCorrect: choiceIndex == mc.correctChoiceIndex,
+    }),
+  )
 }
 
 function QuestionSetEditor({
