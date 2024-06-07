@@ -71,7 +71,7 @@ class UIServiceInteractor {
     return this
   }
 
-  getSavedQuestionSet() {
+  getQuestionSetByInputtedName() {
     return this.questionSetRepo.getQuestionSetByName(this.questionSetName)
   }
 
@@ -191,7 +191,7 @@ describe('QuestionSetEditor', () => {
       .clickCorrectAnswer({ choiceNumber: 2 })
       .clickSave()
 
-    const actualQuestionSet = interactor.getSavedQuestionSet()
+    const actualQuestionSet = interactor.getQuestionSetByInputtedName()
 
     expect(actualQuestionSet.name).toBe('Test name')
     expect(actualQuestionSet.questions).toEqual([
@@ -230,7 +230,7 @@ describe('QuestionSetEditor', () => {
       .clickFixedPosition({ choiceNumber: 3 })
       .clickSave()
 
-    const actualQuestionSet = interactor.getSavedQuestionSet()
+    const actualQuestionSet = interactor.getQuestionSetByInputtedName()
     expect(actualQuestionSet.questions[0]).toEqual({
       description: '1 + 1 = ?',
       mc: new MultipleChoice({
@@ -289,7 +289,7 @@ describe('QuestionSetEditor', () => {
 
     interactor.clickSave()
 
-    const actualQuestionSet = interactor.getSavedQuestionSet()
+    const actualQuestionSet = interactor.getQuestionSetByInputtedName()
     expect(actualQuestionSet.questions).toEqual([
       {
         description: '1 + 1 = ?',
@@ -368,7 +368,7 @@ describe('QuestionSetEditor', () => {
       .clickCorrectAnswer({ choiceNumber: 2 })
       .clickSave()
 
-    const actualQuestionSet = interactor.getSavedQuestionSet()
+    const actualQuestionSet = interactor.getQuestionSetByInputtedName()
     expect(actualQuestionSet.questions[0].mc.correctChoiceIndex).toBe(1)
 
     // also check that the UI is updated correctly
@@ -400,7 +400,7 @@ describe('QuestionSetEditor', () => {
       .clickCorrectAnswer({ choiceNumber: 3 })
       .clickSave()
 
-    const actualQuestionSet = interactor.getSavedQuestionSet()
+    const actualQuestionSet = interactor.getQuestionSetByInputtedName()
     expect(actualQuestionSet.questions[0].mc.choices).toEqual([
       {
         answer: 'I. 0',
@@ -533,7 +533,7 @@ describe('QuestionSetEditor', () => {
     expect(
       screen.queryByLabelText(QuestionSetEditorAriaLabel.ERROR_PROMPT),
     ).toBeNull()
-    interactor.getSavedQuestionSet() // should not throw
+    interactor.getQuestionSetByInputtedName() // should not throw
   })
 
   it('should not save if same name as existing question set', () => {
@@ -558,7 +558,9 @@ describe('QuestionSetEditor', () => {
     // change name and save again
     interactor.setQuestionSetName('Test name 2').clickSave()
 
-    expect(interactor.getSavedQuestionSet()['name']).toBe('Test name 2')
+    expect(interactor.getQuestionSetByInputtedName()['name']).toBe(
+      'Test name 2',
+    )
   })
 
   it('should show remove question button when questions are more than one', () => {
@@ -738,7 +740,7 @@ describe('QuestionSetEditor', () => {
     expect(
       screen.queryByLabelText(QuestionSetEditorAriaLabel.ERROR_PROMPT),
     ).toBeNull()
-    expect(interactor.getSavedQuestionSet()).toEqual(questionSet)
+    expect(interactor.getQuestionSetByInputtedName()).toEqual(questionSet)
   })
 
   it('should able to modify the existing question set and save', () => {
@@ -778,7 +780,7 @@ describe('QuestionSetEditor', () => {
       .setCorrectChoiceIndex(1)
       .build()
 
-    expect(interactor.getSavedQuestionSet()).toEqual(questionSet)
+    expect(interactor.getQuestionSetByInputtedName()).toEqual(questionSet)
   })
 })
 
@@ -793,7 +795,7 @@ function expectCannotCreateQuestionSet({
     screen.getByLabelText(QuestionSetEditorAriaLabel.ERROR_PROMPT),
   ).toHaveTextContent(errorMessage)
   expect(() => {
-    interactor.getSavedQuestionSet()
+    interactor.getQuestionSetByInputtedName()
   }).toThrow()
 }
 
