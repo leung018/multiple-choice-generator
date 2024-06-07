@@ -177,7 +177,7 @@ const mapQuestionSetToQuestionSetInput = (
       })),
     })),
   }
-  input.questions.push(newQuestion())
+  if (input.questions.length == 0) input.questions.push(newQuestion())
   return input
 }
 
@@ -251,10 +251,8 @@ function QuestionSetEditor({
       questions.push(question!)
     }
 
-    const questionSet = QuestionSet.create({
-      name: questionSetInput.name,
-      questions,
-    })
+    questionSet.name = questionSetInput.name
+    questionSet.questions = questions
 
     return saveQuestionSet(questionSet)
   }

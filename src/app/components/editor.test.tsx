@@ -719,6 +719,46 @@ describe('QuestionSetEditor', () => {
       interactor.getIsFixedPositionCheckbox({ choiceNumber: 3 }),
     ).toBeChecked()
   })
+
+  it('should able to modify the existing question set and save', () => {
+    const questionSetRepo = LocalStorageQuestionSetRepo.createNull()
+    const questionSet = QuestionSet.create({
+      name: 'Hello World',
+      questions: [
+        {
+          description: 'Which one is larger than 1.1?',
+          mc: new MultipleChoiceBuilder()
+            .appendNonFixedChoice('1')
+            .appendNonFixedChoice('2')
+            .appendFixedChoice('All of the above')
+            .setCorrectChoiceIndex(1)
+            .build(),
+        },
+      ],
+    })
+    questionSetRepo.upsertQuestionSet(questionSet)
+
+    const interactor = new UIServiceInteractor({
+      questionSetRepo,
+    })
+    interactor.renderModifyingPage(questionSet.id)
+
+    // make some modifications
+    interactor
+      .setQuestionSetName('A whole new world')
+      .clickRemoveChoice({ choiceNumber: 3 })
+      .clickSave()
+
+    // set the expected values of the questionSet
+    questionSet.name = 'A whole new world'
+    questionSet.questions[0].mc = new MultipleChoiceBuilder()
+      .appendNonFixedChoice('1')
+      .appendNonFixedChoice('2')
+      .setCorrectChoiceIndex(1)
+      .build()
+
+    expect(interactor.getSavedQuestionSet()).toEqual(questionSet)
+  })
 })
 
 function expectCannotCreateQuestionSet({
