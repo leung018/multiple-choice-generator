@@ -661,7 +661,7 @@ describe('QuestionSetEditor', () => {
 
   it('should modifying page load the contents in original question set', () => {
     const questionSetRepo = LocalStorageQuestionSetRepo.createNull()
-    const questionSet = QuestionSet.create({
+    const questionSet = new QuestionSet({
       name: 'Hello World',
       questions: [
         {
@@ -745,7 +745,7 @@ describe('QuestionSetEditor', () => {
 
   it('should able to modify the existing question set and save', () => {
     const questionSetRepo = LocalStorageQuestionSetRepo.createNull()
-    const questionSet = QuestionSet.create({
+    const questionSet = new QuestionSet({
       name: 'Hello World',
       questions: [
         {

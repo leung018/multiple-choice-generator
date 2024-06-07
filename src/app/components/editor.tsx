@@ -98,7 +98,7 @@ export class QuestionSetEditorUIService {
     return (
       <QuestionSetEditor
         saveQuestionSet={this.saveQuestionSet}
-        questionSet={QuestionSet.create({ name: '', questions: [] })}
+        questionSet={new QuestionSet({ name: '', questions: [] })}
       />
     )
   }
