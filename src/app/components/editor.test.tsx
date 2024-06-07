@@ -52,6 +52,11 @@ class UIServiceInteractor {
       }).getModifyingPageElement(questionSetId),
     )
 
+    const questionSetNameInput = screen.getByLabelText(
+      'Question Set Name:',
+    ) as HTMLInputElement
+    this.setQuestionSetName(questionSetNameInput.value)
+
     return this
   }
 
@@ -718,6 +723,24 @@ describe('QuestionSetEditor', () => {
     expect(
       interactor.getIsFixedPositionCheckbox({ choiceNumber: 3 }),
     ).toBeChecked()
+  })
+
+  it('should able to save question set again without any changes in modifying page', () => {
+    const questionSetRepo = LocalStorageQuestionSetRepo.createNull()
+    const questionSet = new QuestionSetBuilderForTest().appendQuestion().build()
+    questionSetRepo.upsertQuestionSet(questionSet)
+
+    const interactor = new UIServiceInteractor({
+      questionSetRepo,
+    })
+    interactor.renderModifyingPage(questionSet.id)
+
+    interactor.clickSave()
+
+    expect(
+      screen.queryByLabelText(QuestionSetEditorAriaLabel.ERROR_PROMPT),
+    ).toBeNull()
+    expect(interactor.getSavedQuestionSet()).toEqual(questionSet)
   })
 
   it('should able to modify the existing question set and save', () => {
