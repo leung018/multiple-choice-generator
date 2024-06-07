@@ -7,9 +7,12 @@ import {
   QuestionSetEditorAriaLabel,
   QuestionSetEditorUIService,
 } from './editor'
-import { MultipleChoice } from '../../model/mc'
+import { MultipleChoiceBuilder, MultipleChoice } from '../../model/mc'
 import '@testing-library/jest-dom'
-import { QuestionSetBuilderForTest } from '../../model/question_set'
+import {
+  QuestionSet,
+  QuestionSetBuilderForTest,
+} from '../../model/question_set'
 
 class UIServiceInteractor {
   private readonly questionSetRepo: QuestionSetRepo
@@ -36,9 +39,22 @@ class UIServiceInteractor {
         questionSetRepo: this.questionSetRepo,
       }).getCreationPageElement(),
     )
-
-    this.questionSetName = questionSetName
     this.setQuestionSetName(questionSetName)
+    return this
+  }
+
+  renderModifyingPage(questionSetId: string) {
+    render(
+      QuestionSetEditorUIService.createNull({
+        questionSetRepo: this.questionSetRepo,
+      }).getModifyingPageElement(questionSetId),
+    )
+
+    const questionSetNameInput = screen.getByLabelText(
+      'Question Set Name:',
+    ) as HTMLInputElement
+    this.setQuestionSetName(questionSetNameInput.value)
+
     return this
   }
 
@@ -55,18 +71,19 @@ class UIServiceInteractor {
     return this
   }
 
-  getSavedQuestionSet() {
+  getQuestionSetByInputtedName() {
     return this.questionSetRepo.getQuestionSetByName(this.questionSetName)
   }
 
   inputQuestionDescription({ description }: { description: string }) {
-    fireEvent.change(
-      screen.getByLabelText(`Question ${this.questionNumberFocus}:`),
-      {
-        target: { value: description },
-      },
-    )
+    fireEvent.change(this.getQuestionDescriptionInput(), {
+      target: { value: description },
+    })
     return this
+  }
+
+  getQuestionDescriptionInput() {
+    return screen.getByLabelText(`Question ${this.questionNumberFocus}:`)
   }
 
   inputAnswer({
@@ -76,30 +93,33 @@ class UIServiceInteractor {
     choiceNumber: number
     answer: string
   }) {
-    fireEvent.change(
-      screen.getByLabelText(
-        QuestionSetEditorAriaLabel.answerInput({
-          questionNumber: this.questionNumberFocus,
-          choiceNumber,
-        }),
-      ),
-      {
-        target: { value: answer },
-      },
-    )
+    fireEvent.change(this.getAnswerInput({ choiceNumber }), {
+      target: { value: answer },
+    })
     return this
   }
 
-  clickFixedPosition({ choiceNumber }: { choiceNumber: number }) {
-    fireEvent.click(
-      screen.getByLabelText(
-        QuestionSetEditorAriaLabel.isFixedPositionCheckbox({
-          questionNumber: this.questionNumberFocus,
-          choiceNumber,
-        }),
-      ),
+  getAnswerInput({ choiceNumber }: { choiceNumber: number }) {
+    return screen.getByLabelText(
+      QuestionSetEditorAriaLabel.answerInput({
+        questionNumber: this.questionNumberFocus,
+        choiceNumber,
+      }),
     )
+  }
+
+  clickFixedPosition({ choiceNumber }: { choiceNumber: number }) {
+    fireEvent.click(this.getIsFixedPositionCheckbox({ choiceNumber }))
     return this
+  }
+
+  getIsFixedPositionCheckbox({ choiceNumber }: { choiceNumber: number }) {
+    return screen.getByLabelText(
+      QuestionSetEditorAriaLabel.isFixedPositionCheckbox({
+        questionNumber: this.questionNumberFocus,
+        choiceNumber,
+      }),
+    )
   }
 
   clickCorrectAnswer({ choiceNumber }: { choiceNumber: number }) {
@@ -171,7 +191,7 @@ describe('QuestionSetEditor', () => {
       .clickCorrectAnswer({ choiceNumber: 2 })
       .clickSave()
 
-    const actualQuestionSet = interactor.getSavedQuestionSet()
+    const actualQuestionSet = interactor.getQuestionSetByInputtedName()
 
     expect(actualQuestionSet.name).toBe('Test name')
     expect(actualQuestionSet.questions).toEqual([
@@ -210,7 +230,7 @@ describe('QuestionSetEditor', () => {
       .clickFixedPosition({ choiceNumber: 3 })
       .clickSave()
 
-    const actualQuestionSet = interactor.getSavedQuestionSet()
+    const actualQuestionSet = interactor.getQuestionSetByInputtedName()
     expect(actualQuestionSet.questions[0]).toEqual({
       description: '1 + 1 = ?',
       mc: new MultipleChoice({
@@ -269,7 +289,7 @@ describe('QuestionSetEditor', () => {
 
     interactor.clickSave()
 
-    const actualQuestionSet = interactor.getSavedQuestionSet()
+    const actualQuestionSet = interactor.getQuestionSetByInputtedName()
     expect(actualQuestionSet.questions).toEqual([
       {
         description: '1 + 1 = ?',
@@ -348,7 +368,7 @@ describe('QuestionSetEditor', () => {
       .clickCorrectAnswer({ choiceNumber: 2 })
       .clickSave()
 
-    const actualQuestionSet = interactor.getSavedQuestionSet()
+    const actualQuestionSet = interactor.getQuestionSetByInputtedName()
     expect(actualQuestionSet.questions[0].mc.correctChoiceIndex).toBe(1)
 
     // also check that the UI is updated correctly
@@ -380,7 +400,7 @@ describe('QuestionSetEditor', () => {
       .clickCorrectAnswer({ choiceNumber: 3 })
       .clickSave()
 
-    const actualQuestionSet = interactor.getSavedQuestionSet()
+    const actualQuestionSet = interactor.getQuestionSetByInputtedName()
     expect(actualQuestionSet.questions[0].mc.choices).toEqual([
       {
         answer: 'I. 0',
@@ -513,7 +533,7 @@ describe('QuestionSetEditor', () => {
     expect(
       screen.queryByLabelText(QuestionSetEditorAriaLabel.ERROR_PROMPT),
     ).toBeNull()
-    interactor.getSavedQuestionSet() // should not throw
+    interactor.getQuestionSetByInputtedName() // should not throw
   })
 
   it('should not save if same name as existing question set', () => {
@@ -538,7 +558,9 @@ describe('QuestionSetEditor', () => {
     // change name and save again
     interactor.setQuestionSetName('Test name 2').clickSave()
 
-    expect(interactor.getSavedQuestionSet()['name']).toBe('Test name 2')
+    expect(interactor.getQuestionSetByInputtedName()['name']).toBe(
+      'Test name 2',
+    )
   })
 
   it('should show remove question button when questions are more than one', () => {
@@ -548,10 +570,10 @@ describe('QuestionSetEditor', () => {
     interactor.clickAddQuestion()
 
     interactor.setQuestionNumberFocus(1)
-    expect(interactor.queryRemoveQuestionButton()).not.toBeNull()
+    expect(interactor.queryRemoveQuestionButton()).toBeInTheDocument()
 
     interactor.setQuestionNumberFocus(2)
-    expect(interactor.queryRemoveQuestionButton()).not.toBeNull()
+    expect(interactor.queryRemoveQuestionButton()).toBeInTheDocument()
   })
 
   it('should hide remove question button when there is only one question', () => {
@@ -582,7 +604,7 @@ describe('QuestionSetEditor', () => {
 
     interactor.setQuestionNumberFocus(1).clickRemoveQuestion()
 
-    expect(screen.queryByDisplayValue('I will be kept')).not.toBeNull()
+    expect(screen.queryByDisplayValue('I will be kept')).toBeInTheDocument()
     expect(screen.queryByDisplayValue('I will be removed')).toBeNull()
   })
 
@@ -594,13 +616,13 @@ describe('QuestionSetEditor', () => {
 
     expect(
       interactor.queryRemoveChoiceButton({ choiceNumber: 1 }),
-    ).not.toBeNull()
+    ).toBeInTheDocument()
     expect(
       interactor.queryRemoveChoiceButton({ choiceNumber: 2 }),
-    ).not.toBeNull()
+    ).toBeInTheDocument()
     expect(
       interactor.queryRemoveChoiceButton({ choiceNumber: 3 }),
-    ).not.toBeNull()
+    ).toBeInTheDocument()
   })
 
   it('should hide remove choice button when there are only two choices', () => {
@@ -632,9 +654,133 @@ describe('QuestionSetEditor', () => {
 
     interactor.clickRemoveChoice({ choiceNumber: 1 })
 
-    expect(screen.queryByDisplayValue('I will be kept')).not.toBeNull()
-    expect(screen.queryByDisplayValue('I will be kept too')).not.toBeNull()
+    expect(screen.queryByDisplayValue('I will be kept')).toBeInTheDocument()
+    expect(screen.queryByDisplayValue('I will be kept too')).toBeInTheDocument()
     expect(screen.queryByDisplayValue('I will be removed')).toBeNull()
+  })
+
+  it('should modifying page load the contents in original question set', () => {
+    const questionSetRepo = LocalStorageQuestionSetRepo.createNull()
+    const questionSet = QuestionSet.create({
+      name: 'Hello World',
+      questions: [
+        {
+          description: 'Which one is larger than 1.1?',
+          mc: new MultipleChoiceBuilder()
+            .appendNonFixedChoice('1')
+            .appendNonFixedChoice('2')
+            .appendFixedChoice('All of the above')
+            .setCorrectChoiceIndex(1)
+            .build(),
+        },
+      ],
+    })
+    questionSetRepo.upsertQuestionSet(questionSet)
+
+    const interactor = new UIServiceInteractor({
+      questionSetRepo,
+    })
+    interactor.renderModifyingPage(questionSet.id)
+
+    expect(screen.getByLabelText('Question Set Name:')).toHaveDisplayValue(
+      'Hello World',
+    )
+
+    interactor.setQuestionNumberFocus(1)
+    expect(interactor.getQuestionDescriptionInput()).toHaveDisplayValue(
+      'Which one is larger than 1.1?',
+    )
+
+    // Choice 1
+    expect(interactor.getAnswerInput({ choiceNumber: 1 })).toHaveDisplayValue(
+      '1',
+    )
+    expect(
+      interactor.getCorrectAnswerCheckbox({ choiceNumber: 1 }),
+    ).not.toBeChecked()
+    expect(
+      interactor.getIsFixedPositionCheckbox({ choiceNumber: 1 }),
+    ).not.toBeChecked()
+
+    // Choice 2
+    expect(interactor.getAnswerInput({ choiceNumber: 2 })).toHaveDisplayValue(
+      '2',
+    )
+    expect(
+      interactor.getCorrectAnswerCheckbox({ choiceNumber: 2 }),
+    ).toBeChecked()
+    expect(
+      interactor.getIsFixedPositionCheckbox({ choiceNumber: 2 }),
+    ).not.toBeChecked()
+
+    // Choice 3
+    expect(interactor.getAnswerInput({ choiceNumber: 3 })).toHaveDisplayValue(
+      'All of the above',
+    )
+    expect(
+      interactor.getCorrectAnswerCheckbox({ choiceNumber: 3 }),
+    ).not.toBeChecked()
+    expect(
+      interactor.getIsFixedPositionCheckbox({ choiceNumber: 3 }),
+    ).toBeChecked()
+  })
+
+  it('should able to save question set again without any changes in modifying page', () => {
+    const questionSetRepo = LocalStorageQuestionSetRepo.createNull()
+    const questionSet = new QuestionSetBuilderForTest().appendQuestion().build()
+    questionSetRepo.upsertQuestionSet(questionSet)
+
+    const interactor = new UIServiceInteractor({
+      questionSetRepo,
+    })
+    interactor.renderModifyingPage(questionSet.id)
+
+    interactor.clickSave()
+
+    expect(
+      screen.queryByLabelText(QuestionSetEditorAriaLabel.ERROR_PROMPT),
+    ).toBeNull()
+    expect(interactor.getQuestionSetByInputtedName()).toEqual(questionSet)
+  })
+
+  it('should able to modify the existing question set and save', () => {
+    const questionSetRepo = LocalStorageQuestionSetRepo.createNull()
+    const questionSet = QuestionSet.create({
+      name: 'Hello World',
+      questions: [
+        {
+          description: 'Which one is larger than 1.1?',
+          mc: new MultipleChoiceBuilder()
+            .appendNonFixedChoice('1')
+            .appendNonFixedChoice('2')
+            .appendFixedChoice('All of the above')
+            .setCorrectChoiceIndex(1)
+            .build(),
+        },
+      ],
+    })
+    questionSetRepo.upsertQuestionSet(questionSet)
+
+    const interactor = new UIServiceInteractor({
+      questionSetRepo,
+    })
+    interactor.renderModifyingPage(questionSet.id)
+
+    // make some modifications
+    interactor
+      .setQuestionSetName('A whole new world')
+      .clickRemoveChoice({ choiceNumber: 3 })
+      .clickSave()
+
+    // set the expected values of the questionSet
+    questionSet.name = 'A whole new world'
+    questionSet.questions[0].mc = new MultipleChoiceBuilder()
+      .appendNonFixedChoice('1')
+      .appendNonFixedChoice('2')
+      .setCorrectChoiceIndex(1)
+      .build()
+
+    expect(interactor.getQuestionSetByInputtedName()).toEqual(questionSet)
   })
 })
 
@@ -649,7 +795,7 @@ function expectCannotCreateQuestionSet({
     screen.getByLabelText(QuestionSetEditorAriaLabel.ERROR_PROMPT),
   ).toHaveTextContent(errorMessage)
   expect(() => {
-    interactor.getSavedQuestionSet()
+    interactor.getQuestionSetByInputtedName()
   }).toThrow()
 }
 
