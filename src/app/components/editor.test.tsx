@@ -568,10 +568,10 @@ describe('QuestionSetEditor', () => {
     interactor.clickAddQuestion()
 
     interactor.setQuestionNumberFocus(1)
-    expect(interactor.queryRemoveQuestionButton()).not.toBeNull()
+    expect(interactor.queryRemoveQuestionButton()).toBeInTheDocument()
 
     interactor.setQuestionNumberFocus(2)
-    expect(interactor.queryRemoveQuestionButton()).not.toBeNull()
+    expect(interactor.queryRemoveQuestionButton()).toBeInTheDocument()
   })
 
   it('should hide remove question button when there is only one question', () => {
@@ -602,7 +602,7 @@ describe('QuestionSetEditor', () => {
 
     interactor.setQuestionNumberFocus(1).clickRemoveQuestion()
 
-    expect(screen.queryByDisplayValue('I will be kept')).not.toBeNull()
+    expect(screen.queryByDisplayValue('I will be kept')).toBeInTheDocument()
     expect(screen.queryByDisplayValue('I will be removed')).toBeNull()
   })
 
@@ -614,13 +614,13 @@ describe('QuestionSetEditor', () => {
 
     expect(
       interactor.queryRemoveChoiceButton({ choiceNumber: 1 }),
-    ).not.toBeNull()
+    ).toBeInTheDocument()
     expect(
       interactor.queryRemoveChoiceButton({ choiceNumber: 2 }),
-    ).not.toBeNull()
+    ).toBeInTheDocument()
     expect(
       interactor.queryRemoveChoiceButton({ choiceNumber: 3 }),
-    ).not.toBeNull()
+    ).toBeInTheDocument()
   })
 
   it('should hide remove choice button when there are only two choices', () => {
@@ -652,8 +652,8 @@ describe('QuestionSetEditor', () => {
 
     interactor.clickRemoveChoice({ choiceNumber: 1 })
 
-    expect(screen.queryByDisplayValue('I will be kept')).not.toBeNull()
-    expect(screen.queryByDisplayValue('I will be kept too')).not.toBeNull()
+    expect(screen.queryByDisplayValue('I will be kept')).toBeInTheDocument()
+    expect(screen.queryByDisplayValue('I will be kept too')).toBeInTheDocument()
     expect(screen.queryByDisplayValue('I will be removed')).toBeNull()
   })
 
