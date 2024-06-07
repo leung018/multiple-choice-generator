@@ -146,7 +146,7 @@ interface ChoiceInput {
 
 let choiceCounter = 0
 
-const newChoice = (): ChoiceInput => ({
+const newChoiceInput = (): ChoiceInput => ({
   id: choiceCounter++,
   answer: '',
   isFixedPosition: false,
@@ -155,10 +155,10 @@ const newChoice = (): ChoiceInput => ({
 
 let questionCounter = 0
 
-const newQuestion = (): QuestionInput => ({
+const newQuestionInput = (): QuestionInput => ({
   id: questionCounter++,
   description: '',
-  choices: [newChoice(), newChoice()],
+  choices: [newChoiceInput(), newChoiceInput()],
 })
 
 const mapQuestionSetToQuestionSetInput = (
@@ -177,7 +177,7 @@ const mapQuestionSetToQuestionSetInput = (
       })),
     })),
   }
-  if (input.questions.length == 0) input.questions.push(newQuestion())
+  if (input.questions.length == 0) input.questions.push(newQuestionInput())
   return input
 }
 
@@ -383,7 +383,7 @@ function QuestionSetEditor({
           onClick={() => {
             setQuestionSetInput({
               ...questionSetInput,
-              questions: [...questionSetInput.questions, newQuestion()],
+              questions: [...questionSetInput.questions, newQuestionInput()],
             })
           }}
         >
@@ -547,7 +547,7 @@ function ChoicesEditor(props: {
         type="button"
         className="bg-blue-500 text-white px-4 py-2 rounded"
         onClick={() => {
-          onChoicesUpdate([...choices, newChoice()])
+          onChoicesUpdate([...choices, newChoiceInput()])
         }}
       >
         Add Choice
