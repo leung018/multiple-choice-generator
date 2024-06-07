@@ -333,7 +333,7 @@ function QuestionSetEditor({
             <input
               type="text"
               className="border border-gray-300 px-2 py-1 w-full"
-              value={questionSet.name}
+              value={questionSetInput.name}
               onChange={(e) => {
                 setQuestionSetInput({
                   ...questionSetInput,
