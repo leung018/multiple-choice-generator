@@ -20,7 +20,9 @@ class UIServiceInteractor {
   private questionNumberFocus = 1
 
   /**
-   * Initializes a new instance of UIServiceInteractor, providing methods for rendering the associated UI using `testing-library/react` and interact with it
+   * Initializes a new instance of UIServiceInteractor, providing methods for rendering the associated UI using `testing-library/react` and interact with it.
+   * Use `setQuestionNumberFocus` to specify the question number before interacting with any UI elements related to a specific question.
+   * Note that querying UI elements unrelated to any specific question is not the responsibility of this class.
    *
    * @param questionSetRepo Repository for storing the submitted question set after it is submitted through this page.
    */
@@ -75,7 +77,7 @@ class UIServiceInteractor {
     return this.questionSetRepo.getQuestionSetByName(this.questionSetName)
   }
 
-  inputQuestionDescription({ description }: { description: string }) {
+  inputQuestionDescription(description: string) {
     fireEvent.change(this.getQuestionDescriptionInput(), {
       target: { value: description },
     })
@@ -184,7 +186,7 @@ describe('QuestionSetEditor', () => {
     interactor.renderCreationPage({ questionSetName: 'Test name' })
     interactor
       .setQuestionNumberFocus(1)
-      .inputQuestionDescription({ description: 'Am I handsome?' })
+      .inputQuestionDescription('Am I handsome?')
       .inputAnswer({ choiceNumber: 1, answer: 'True' })
       .clickFixedPosition({ choiceNumber: 1 })
       .inputAnswer({ choiceNumber: 2, answer: 'False' })
@@ -217,9 +219,7 @@ describe('QuestionSetEditor', () => {
   it('should also save all input specified in extra option', () => {
     const interactor = new UIServiceInteractor()
     interactor.renderCreationPage()
-    interactor
-      .setQuestionNumberFocus(1)
-      .inputQuestionDescription({ description: '1 + 1 = ?' })
+    interactor.setQuestionNumberFocus(1).inputQuestionDescription('1 + 1 = ?')
 
     interactor
       .inputAnswer({ choiceNumber: 1, answer: '1' })
@@ -259,7 +259,7 @@ describe('QuestionSetEditor', () => {
 
     interactor
       .setQuestionNumberFocus(1)
-      .inputQuestionDescription({ description: '1 + 1 = ?' })
+      .inputQuestionDescription('1 + 1 = ?')
       .inputAnswer({ choiceNumber: 1, answer: '2' })
       .inputAnswer({ choiceNumber: 2, answer: '0' })
       .clickCorrectAnswer({ choiceNumber: 1 })
@@ -268,7 +268,7 @@ describe('QuestionSetEditor', () => {
 
     interactor
       .setQuestionNumberFocus(2)
-      .inputQuestionDescription({ description: '1 + 2 = ?' })
+      .inputQuestionDescription('1 + 2 = ?')
       .inputAnswer({ choiceNumber: 1, answer: '3' })
       .inputAnswer({ choiceNumber: 2, answer: '0' })
       .clickCorrectAnswer({ choiceNumber: 1 })
@@ -277,7 +277,7 @@ describe('QuestionSetEditor', () => {
 
     interactor
       .setQuestionNumberFocus(3)
-      .inputQuestionDescription({ description: '1 + 3 = ?' })
+      .inputQuestionDescription('1 + 3 = ?')
       .inputAnswer({ choiceNumber: 1, answer: '1' })
       .inputAnswer({ choiceNumber: 2, answer: '3' })
       .clickAddChoice()
@@ -356,7 +356,7 @@ describe('QuestionSetEditor', () => {
 
     interactor
       .setQuestionNumberFocus(1)
-      .inputQuestionDescription({ description: '1 + 1 = ?' })
+      .inputQuestionDescription('1 + 1 = ?')
       .inputAnswer({ choiceNumber: 1, answer: '0' })
       .inputAnswer({ choiceNumber: 2, answer: '2' })
       .clickAddChoice()
@@ -389,7 +389,7 @@ describe('QuestionSetEditor', () => {
 
     interactor
       .setQuestionNumberFocus(1)
-      .inputQuestionDescription({ description: '1 + 1 = ?' })
+      .inputQuestionDescription('1 + 1 = ?')
       .inputAnswer({ choiceNumber: 1, answer: 'I. 0' })
       .inputAnswer({ choiceNumber: 2, answer: 'II. 1' })
       .clickAddChoice()
@@ -448,7 +448,7 @@ describe('QuestionSetEditor', () => {
     setFirstValidQuestion(interactor)
     interactor
       .setQuestionNumberFocus(1)
-      .inputQuestionDescription({ description: '' })
+      .inputQuestionDescription('')
       .clickSave()
 
     expectCannotCreateQuestionSet({
@@ -463,7 +463,7 @@ describe('QuestionSetEditor', () => {
 
     interactor
       .setQuestionNumberFocus(1)
-      .inputQuestionDescription({ description: '1 + 1 = ?' })
+      .inputQuestionDescription('1 + 1 = ?')
       .inputAnswer({ choiceNumber: 1, answer: '2' })
       .inputAnswer({ choiceNumber: 2, answer: '' })
       .clickCorrectAnswer({ choiceNumber: 1 })
@@ -481,7 +481,7 @@ describe('QuestionSetEditor', () => {
 
     interactor
       .setQuestionNumberFocus(1)
-      .inputQuestionDescription({ description: '1 + 1 = ?' })
+      .inputQuestionDescription('1 + 1 = ?')
       .inputAnswer({ choiceNumber: 1, answer: '2' })
       .inputAnswer({ choiceNumber: 2, answer: '0' })
       .clickSave()
@@ -498,7 +498,7 @@ describe('QuestionSetEditor', () => {
 
     interactor
       .setQuestionNumberFocus(1)
-      .inputQuestionDescription({ description: '1 + 1 = ?' })
+      .inputQuestionDescription('1 + 1 = ?')
       .inputAnswer({ choiceNumber: 1, answer: '2' })
       .inputAnswer({ choiceNumber: 2, answer: '2' })
       .clickCorrectAnswer({ choiceNumber: 1 })
@@ -516,7 +516,7 @@ describe('QuestionSetEditor', () => {
 
     interactor
       .setQuestionNumberFocus(1)
-      .inputQuestionDescription({ description: '1 + 1 = ?' })
+      .inputQuestionDescription('1 + 1 = ?')
       .inputAnswer({ choiceNumber: 1, answer: '2' })
       .inputAnswer({ choiceNumber: 2, answer: '0' })
       .clickCorrectAnswer({ choiceNumber: 1 })
@@ -524,7 +524,7 @@ describe('QuestionSetEditor', () => {
     interactor
       .clickAddQuestion()
       .setQuestionNumberFocus(2)
-      .inputQuestionDescription({ description: '1 + 2 = ?' })
+      .inputQuestionDescription('1 + 2 = ?')
       .inputAnswer({ choiceNumber: 1, answer: '3' })
       .inputAnswer({ choiceNumber: 2, answer: '2' })
       .clickCorrectAnswer({ choiceNumber: 1 })
@@ -595,12 +595,12 @@ describe('QuestionSetEditor', () => {
 
     interactor
       .setQuestionNumberFocus(1)
-      .inputQuestionDescription({ description: 'I will be removed' })
+      .inputQuestionDescription('I will be removed')
 
     interactor
       .clickAddQuestion()
       .setQuestionNumberFocus(2)
-      .inputQuestionDescription({ description: 'I will be kept' })
+      .inputQuestionDescription('I will be kept')
 
     interactor.setQuestionNumberFocus(1).clickRemoveQuestion()
 
@@ -802,7 +802,7 @@ function expectCannotCreateQuestionSet({
 function setFirstValidQuestion(interactor: UIServiceInteractor) {
   interactor
     .setQuestionNumberFocus(1)
-    .inputQuestionDescription({ description: '1 + 1 = ?' })
+    .inputQuestionDescription('1 + 1 = ?')
     .inputAnswer({ choiceNumber: 1, answer: '2' })
     .inputAnswer({ choiceNumber: 2, answer: '0' })
     .clickCorrectAnswer({ choiceNumber: 1 })
