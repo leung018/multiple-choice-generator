@@ -209,7 +209,7 @@ function QuestionSetEditor({
   saveQuestionSet: (questionSet: QuestionSet) => OperationResult
 }) {
   const router = useRouter()
-  const questionSetRef = useRef<QuestionSet>()
+  const questionSetIdRef = useRef<string>('')
 
   const [questionSetInput, setQuestionSetInput] = useState<QuestionSetInput>({
     name: '',
@@ -218,10 +218,9 @@ function QuestionSetEditor({
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
 
   useEffect(() => {
-    questionSetRef.current = fetchQuestionSet()
-    setQuestionSetInput(
-      mapQuestionSetToQuestionSetInput(questionSetRef.current),
-    )
+    const questionSet = fetchQuestionSet()
+    questionSetIdRef.current = questionSet.id
+    setQuestionSetInput(mapQuestionSetToQuestionSetInput(questionSet))
   }, [fetchQuestionSet])
 
   const handleQuestionUpdate = (
@@ -280,10 +279,13 @@ function QuestionSetEditor({
       questions.push(question!)
     }
 
-    questionSetRef.current!.name = questionSetInput.name
-    questionSetRef.current!.questions = questions
+    const questionSet = new QuestionSet({
+      name: questionSetInput.name,
+      questions,
+      id: questionSetIdRef.current,
+    })
 
-    return saveQuestionSet(questionSetRef.current!)
+    return saveQuestionSet(questionSet)
   }
 
   const mapQuestionInputToQuestion = (
