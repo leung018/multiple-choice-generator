@@ -64,8 +64,14 @@ export class QuestionSetEditorAriaLabel {
   }
 }
 
-interface OperationResult {
-  error?: string
+type OperationResult<T = undefined> = SuccessResult<T> | FailureResult
+
+interface SuccessResult<T> {
+  result: T
+}
+
+interface FailureResult {
+  error: string
 }
 
 export class QuestionSetEditorUIService {
@@ -129,7 +135,9 @@ export class QuestionSetEditorUIService {
       }
       throw e
     }
-    return {}
+    return {
+      result: undefined,
+    }
   }
 }
 
@@ -248,9 +256,9 @@ function QuestionSetEditor({
   }
 
   const handleSaveClick = () => {
-    const { error } = saveChanges()
-    if (error) {
-      setErrorMessage(error)
+    const response = saveChanges()
+    if ('error' in response) {
+      setErrorMessage(response.error)
       return
     }
 
@@ -258,18 +266,16 @@ function QuestionSetEditor({
   }
 
   const saveChanges = (): OperationResult => {
-    const { error, questionSet } = buildQuestionSet(questionSetInput)
-    if (error) {
-      return { error }
+    const response = buildQuestionSet(questionSetInput)
+    if ('error' in response) {
+      return response
     }
-    return saveQuestionSet(questionSet!)
+    return saveQuestionSet(response.result)
   }
 
   const buildQuestionSet = (
     questionSetInput: QuestionSetInput,
-  ): OperationResult & {
-    questionSet?: QuestionSet
-  } => {
+  ): OperationResult<QuestionSet> => {
     if (questionSetInput.name === '') {
       return { error: "Question set name can't be empty" }
     }
@@ -280,16 +286,18 @@ function QuestionSetEditor({
       const questionInput = questionSetInput.questions[i]
       const questionNumber = i + 1
 
-      const { error, question } = buildQuestion(questionInput, questionNumber)
-      if (error) {
-        return { error }
+      const response = buildQuestion(questionInput, questionNumber)
+      if ('error' in response) {
+        return {
+          error: response.error,
+        }
       }
 
-      questions.push(question!)
+      questions.push(response.result)
     }
 
     return {
-      questionSet: new QuestionSet({
+      result: new QuestionSet({
         name: questionSetInput.name,
         questions,
         id: questionSetIdRef.current,
@@ -300,9 +308,7 @@ function QuestionSetEditor({
   const buildQuestion = (
     input: QuestionInput,
     questionNumber: number,
-  ): OperationResult & {
-    question?: Question
-  } => {
+  ): OperationResult<Question> => {
     if (input.description === '') {
       return {
         error: `Question ${questionNumber}: description can't be empty`,
@@ -327,7 +333,7 @@ function QuestionSetEditor({
     try {
       const mc = mcBuilder.build()
       return {
-        question: {
+        result: {
           description: input.description,
           mc,
         },
