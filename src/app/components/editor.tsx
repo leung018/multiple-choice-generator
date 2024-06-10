@@ -115,13 +115,11 @@ export class QuestionSetEditorUIService {
     return (
       <QuestionSetEditor
         saveQuestionSet={this.saveQuestionSet}
-        fetchQuestionSet={() => this.fetchQuestionSet(questionSetId)}
+        fetchQuestionSet={() =>
+          this.questionSetRepo.getQuestionSetById(questionSetId)
+        }
       />
     )
-  }
-
-  private fetchQuestionSet(questionSetId: string): QuestionSet {
-    return this.questionSetRepo.getQuestionSetById(questionSetId)
   }
 
   private saveQuestionSet = (questionSet: QuestionSet): OperationResult => {
