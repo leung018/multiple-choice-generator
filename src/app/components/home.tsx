@@ -81,9 +81,14 @@ function HomePage({
                 >
                   Take Quiz
                 </button>
-                {
-                  // TODO: Add Edit feature. (See the git blame of this line to see the original edit button code)
-                }
+                <button
+                  className="ml-2 px-4 py-2 bg-green-500 text-white rounded hover:bg-green-700 transition-colors"
+                  onClick={() => {
+                    router.push(`/edit?id=${set.id}`)
+                  }}
+                >
+                  Edit
+                </button>
               </div>
             </div>
           </li>

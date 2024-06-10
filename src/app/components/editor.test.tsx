@@ -52,10 +52,11 @@ class UIServiceInteractor {
       }).getModifyingPageElement(questionSetId),
     )
 
-    const questionSetNameInput = screen.getByLabelText(
+    const questionSetNameInput = screen.queryByLabelText(
       'Question Set Name:',
-    ) as HTMLInputElement
-    this.setQuestionSetName(questionSetNameInput.value)
+    ) as HTMLInputElement | null
+    if (questionSetNameInput)
+      this.setQuestionSetName(questionSetNameInput.value)
 
     return this
   }
@@ -657,6 +658,13 @@ describe('QuestionSetEditor', () => {
     expect(screen.queryByDisplayValue('I will be kept')).toBeInTheDocument()
     expect(screen.queryByDisplayValue('I will be kept too')).toBeInTheDocument()
     expect(screen.queryByDisplayValue('I will be removed')).toBeNull()
+  })
+
+  it("should render not found when modify a question set that doesn't exist", () => {
+    const interactor = new UIServiceInteractor()
+    interactor.renderModifyingPage('unknown_question_set_id')
+
+    expect(screen.getByText('404')).toBeInTheDocument()
   })
 
   it('should modifying page load the contents in original question set', () => {

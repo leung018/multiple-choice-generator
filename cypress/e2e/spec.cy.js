@@ -66,6 +66,17 @@ describe('End to end tests', () => {
     cy.contains('Valid Question Set Name')
   })
 
+  it('should able to modify existing question set', () => {
+    createQuestionSet({ cy })
+
+    cy.contains('Edit').click()
+    cy.contains('Question Set Name').type('Edited name')
+    cy.contains('Save').click()
+
+    assertIsInHomePage(cy)
+    cy.contains('Edited name')
+  })
+
   it('should allow navigate to home page after submitted quiz', () => {
     createQuestionSet({ cy })
 

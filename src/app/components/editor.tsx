@@ -1,10 +1,11 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import {
   QuestionSetRepo,
   LocalStorageQuestionSetRepo,
   UpsertQuestionSetError,
+  GetQuestionSetError,
 } from '../../repo/question_set'
 import { Question, QuestionSet } from '../../model/question_set'
 import {
@@ -13,6 +14,8 @@ import {
   MultipleChoiceError,
 } from '../../model/mc'
 import { useRouter } from 'next/navigation'
+import Error from 'next/error'
+import LoadingSpinner from './loading'
 
 export class QuestionSetEditorAriaLabel {
   // If update of labels in this class, may need also to update e2e test
@@ -64,8 +67,14 @@ export class QuestionSetEditorAriaLabel {
   }
 }
 
-interface OperationResult {
-  error?: string
+type OperationResult<T = undefined> = SuccessResult<T> | FailureResult
+
+interface SuccessResult<T> {
+  result: T
+}
+
+interface FailureResult {
+  error: string
 }
 
 export class QuestionSetEditorUIService {
@@ -98,17 +107,18 @@ export class QuestionSetEditorUIService {
     return (
       <QuestionSetEditor
         saveQuestionSet={this.saveQuestionSet}
-        questionSet={new QuestionSet({ name: '', questions: [] })}
+        fetchQuestionSet={() => new QuestionSet({ name: '', questions: [] })}
       />
     )
   }
 
   getModifyingPageElement(questionSetId: string) {
-    const questionSet = this.questionSetRepo.getQuestionSetById(questionSetId)
     return (
       <QuestionSetEditor
         saveQuestionSet={this.saveQuestionSet}
-        questionSet={questionSet}
+        fetchQuestionSet={() =>
+          this.questionSetRepo.getQuestionSetById(questionSetId)
+        }
       />
     )
   }
@@ -126,7 +136,9 @@ export class QuestionSetEditorUIService {
       }
       throw e
     }
-    return {}
+    return {
+      result: undefined,
+    }
   }
 }
 
@@ -199,18 +211,41 @@ const mapMultipleChoiceToChoiceInputs = (mc: MultipleChoice): ChoiceInput[] => {
 }
 
 function QuestionSetEditor({
-  questionSet,
   saveQuestionSet,
+  fetchQuestionSet,
 }: {
-  questionSet: QuestionSet
+  fetchQuestionSet: () => QuestionSet
   saveQuestionSet: (questionSet: QuestionSet) => OperationResult
 }) {
   const router = useRouter()
+  const [isLoading, setLoading] = useState(true)
+  const [isNotFound, setNotFound] = useState(false)
 
-  const [questionSetInput, setQuestionSetInput] = useState<QuestionSetInput>(
-    mapQuestionSetToQuestionSetInput(questionSet),
-  )
+  const questionSetIdRef = useRef<string>('')
+
+  const [questionSetInput, setQuestionSetInput] = useState<QuestionSetInput>({
+    name: '',
+    questions: [],
+  })
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
+
+  useEffect(() => {
+    try {
+      const questionSet = fetchQuestionSet()
+      questionSetIdRef.current = questionSet.id
+      setQuestionSetInput(mapQuestionSetToQuestionSetInput(questionSet))
+      setLoading(false)
+    } catch (e) {
+      if (
+        e instanceof GetQuestionSetError &&
+        e.cause.code === 'QUESTION_SET_NOT_FOUND'
+      ) {
+        setNotFound(true)
+        return
+      }
+      throw e
+    }
+  }, [fetchQuestionSet])
 
   const handleQuestionUpdate = (
     questionId: number,
@@ -237,9 +272,9 @@ function QuestionSetEditor({
   }
 
   const handleSaveClick = () => {
-    const { error } = saveChanges()
-    if (error) {
-      setErrorMessage(error)
+    const response = saveChanges()
+    if ('error' in response) {
+      setErrorMessage(response.error)
       return
     }
 
@@ -247,39 +282,49 @@ function QuestionSetEditor({
   }
 
   const saveChanges = (): OperationResult => {
+    const response = buildQuestionSet(questionSetInput)
+    if ('error' in response) {
+      return response
+    }
+    return saveQuestionSet(response.result)
+  }
+
+  const buildQuestionSet = (
+    questionSetInput: QuestionSetInput,
+  ): OperationResult<QuestionSet> => {
     if (questionSetInput.name === '') {
       return { error: "Question set name can't be empty" }
     }
 
+    // build Questions
     const questions: Question[] = []
-
     for (let i = 0; i < questionSetInput.questions.length; i++) {
       const questionInput = questionSetInput.questions[i]
       const questionNumber = i + 1
 
-      const { error, question } = mapQuestionInputToQuestion(
-        questionInput,
-        questionNumber,
-      )
-      if (error) {
-        return { error }
+      const response = buildQuestion(questionInput, questionNumber)
+      if ('error' in response) {
+        return {
+          error: response.error,
+        }
       }
 
-      questions.push(question!)
+      questions.push(response.result)
     }
 
-    questionSet.name = questionSetInput.name
-    questionSet.questions = questions
-
-    return saveQuestionSet(questionSet)
+    return {
+      result: new QuestionSet({
+        name: questionSetInput.name,
+        questions,
+        id: questionSetIdRef.current,
+      }),
+    }
   }
 
-  const mapQuestionInputToQuestion = (
+  const buildQuestion = (
     input: QuestionInput,
     questionNumber: number,
-  ): OperationResult & {
-    question?: Question
-  } => {
+  ): OperationResult<Question> => {
     if (input.description === '') {
       return {
         error: `Question ${questionNumber}: description can't be empty`,
@@ -304,7 +349,7 @@ function QuestionSetEditor({
     try {
       const mc = mcBuilder.build()
       return {
-        question: {
+        result: {
           description: input.description,
           mc,
         },
@@ -322,6 +367,14 @@ function QuestionSetEditor({
       }
       throw e
     }
+  }
+
+  if (isNotFound) {
+    return <Error statusCode={404} />
+  }
+
+  if (isLoading) {
+    return <LoadingSpinner />
   }
 
   return (

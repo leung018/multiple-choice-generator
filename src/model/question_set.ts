@@ -7,10 +7,18 @@ export class QuestionSet {
 
   readonly id: string
 
-  constructor({ name, questions }: { name: string; questions: Question[] }) {
+  constructor({
+    name,
+    questions,
+    id = uuidv4(),
+  }: {
+    name: string
+    questions: Question[]
+    id?: string
+  }) {
     this.name = name
     this.questions = questions
-    this.id = uuidv4()
+    this.id = id
   }
 }
 
