@@ -258,20 +258,29 @@ function QuestionSetEditor({
   }
 
   const saveChanges = (): OperationResult => {
+    const { error, questionSet } = buildQuestionSet(questionSetInput)
+    if (error) {
+      return { error }
+    }
+    return saveQuestionSet(questionSet!)
+  }
+
+  const buildQuestionSet = (
+    questionSetInput: QuestionSetInput,
+  ): OperationResult & {
+    questionSet?: QuestionSet
+  } => {
     if (questionSetInput.name === '') {
       return { error: "Question set name can't be empty" }
     }
 
+    // build Questions
     const questions: Question[] = []
-
     for (let i = 0; i < questionSetInput.questions.length; i++) {
       const questionInput = questionSetInput.questions[i]
       const questionNumber = i + 1
 
-      const { error, question } = mapQuestionInputToQuestion(
-        questionInput,
-        questionNumber,
-      )
+      const { error, question } = buildQuestion(questionInput, questionNumber)
       if (error) {
         return { error }
       }
@@ -279,16 +288,16 @@ function QuestionSetEditor({
       questions.push(question!)
     }
 
-    const questionSet = new QuestionSet({
-      name: questionSetInput.name,
-      questions,
-      id: questionSetIdRef.current,
-    })
-
-    return saveQuestionSet(questionSet)
+    return {
+      questionSet: new QuestionSet({
+        name: questionSetInput.name,
+        questions,
+        id: questionSetIdRef.current,
+      }),
+    }
   }
 
-  const mapQuestionInputToQuestion = (
+  const buildQuestion = (
     input: QuestionInput,
     questionNumber: number,
   ): OperationResult & {
