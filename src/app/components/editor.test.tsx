@@ -20,7 +20,9 @@ class UIServiceInteractor {
   private questionNumberFocus = 1
 
   /**
-   * Initializes a new instance of UIServiceInteractor, providing methods for rendering the associated UI using `testing-library/react` and interact with it
+   * Initializes a new instance of UIServiceInteractor, providing methods for rendering the associated UI using `testing-library/react` and interact with it.
+   * Use `setQuestionNumberFocus` to specify the question number before interacting with any UI elements related to a specific question.
+   * Note that querying UI elements unrelated to any specific question is not the responsibility of this class.
    *
    * @param questionSetRepo Repository for storing the submitted question set after it is submitted through this page.
    */
