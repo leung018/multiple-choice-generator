@@ -5,6 +5,7 @@ import {
   QuestionSetRepo,
   LocalStorageQuestionSetRepo,
   UpsertQuestionSetError,
+  GetQuestionSetError,
 } from '../../repo/question_set'
 import { Question, QuestionSet } from '../../model/question_set'
 import {
@@ -13,6 +14,7 @@ import {
   MultipleChoiceError,
 } from '../../model/mc'
 import { useRouter } from 'next/navigation'
+import Error from 'next/error'
 
 export class QuestionSetEditorAriaLabel {
   // If update of labels in this class, may need also to update e2e test
@@ -217,6 +219,8 @@ function QuestionSetEditor({
   saveQuestionSet: (questionSet: QuestionSet) => OperationResult
 }) {
   const router = useRouter()
+  const [isNotFound, setNotFound] = useState(false)
+
   const questionSetIdRef = useRef<string>('')
 
   const [questionSetInput, setQuestionSetInput] = useState<QuestionSetInput>({
@@ -226,9 +230,20 @@ function QuestionSetEditor({
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
 
   useEffect(() => {
-    const questionSet = fetchQuestionSet()
-    questionSetIdRef.current = questionSet.id
-    setQuestionSetInput(mapQuestionSetToQuestionSetInput(questionSet))
+    try {
+      const questionSet = fetchQuestionSet()
+      questionSetIdRef.current = questionSet.id
+      setQuestionSetInput(mapQuestionSetToQuestionSetInput(questionSet))
+    } catch (e) {
+      if (
+        e instanceof GetQuestionSetError &&
+        e.cause.code === 'QUESTION_SET_NOT_FOUND'
+      ) {
+        setNotFound(true)
+        return
+      }
+      throw e
+    }
   }, [fetchQuestionSet])
 
   const handleQuestionUpdate = (
@@ -351,6 +366,10 @@ function QuestionSetEditor({
       }
       throw e
     }
+  }
+
+  if (isNotFound) {
+    return <Error statusCode={404} />
   }
 
   return (
