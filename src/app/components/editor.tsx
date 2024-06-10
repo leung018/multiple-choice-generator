@@ -15,6 +15,7 @@ import {
 } from '../../model/mc'
 import { useRouter } from 'next/navigation'
 import Error from 'next/error'
+import LoadingSpinner from './loading'
 
 export class QuestionSetEditorAriaLabel {
   // If update of labels in this class, may need also to update e2e test
@@ -217,6 +218,7 @@ function QuestionSetEditor({
   saveQuestionSet: (questionSet: QuestionSet) => OperationResult
 }) {
   const router = useRouter()
+  const [isLoading, setLoading] = useState(true)
   const [isNotFound, setNotFound] = useState(false)
 
   const questionSetIdRef = useRef<string>('')
@@ -232,6 +234,7 @@ function QuestionSetEditor({
       const questionSet = fetchQuestionSet()
       questionSetIdRef.current = questionSet.id
       setQuestionSetInput(mapQuestionSetToQuestionSetInput(questionSet))
+      setLoading(false)
     } catch (e) {
       if (
         e instanceof GetQuestionSetError &&
@@ -368,6 +371,10 @@ function QuestionSetEditor({
 
   if (isNotFound) {
     return <Error statusCode={404} />
+  }
+
+  if (isLoading) {
+    return <LoadingSpinner />
   }
 
   return (
