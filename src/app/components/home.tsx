@@ -42,23 +42,23 @@ export class HomePageUIService {
   }
 
   getElement() {
-    return <HomePage getQuestionSets={this.getSortedQuestionSets}></HomePage>
+    return <HomePage fetchQuestionSets={this.getSortedQuestionSets}></HomePage>
   }
 }
 
 function HomePage({
-  getQuestionSets,
+  fetchQuestionSets,
 }: {
-  getQuestionSets: () => readonly QuestionSet[]
+  fetchQuestionSets: () => readonly QuestionSet[]
 }) {
   const router = useRouter()
   const [isLoading, setLoading] = useState(true)
 
   const [questionSets, setQuestionSets] = useState<readonly QuestionSet[]>([])
   useEffect(() => {
-    setQuestionSets(getQuestionSets())
+    setQuestionSets(fetchQuestionSets())
     setLoading(false)
-  }, [getQuestionSets])
+  }, [fetchQuestionSets])
 
   if (isLoading) {
     return <LoadingSpinner />
