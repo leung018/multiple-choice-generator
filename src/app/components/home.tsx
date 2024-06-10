@@ -49,12 +49,14 @@ export class HomePageUIService {
 function HomePage({
   fetchQuestionSets,
 }: {
-  fetchQuestionSets: () => readonly QuestionSet[]
+  fetchQuestionSets: () => ReadonlyArray<QuestionSet>
 }) {
   const router = useRouter()
   const [isLoading, setLoading] = useState(true)
 
-  const [questionSets, setQuestionSets] = useState<readonly QuestionSet[]>([])
+  const [questionSets, setQuestionSets] = useState<ReadonlyArray<QuestionSet>>(
+    [],
+  )
   useEffect(() => {
     setQuestionSets(fetchQuestionSets())
     setLoading(false)
