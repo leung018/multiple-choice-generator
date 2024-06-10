@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import {
   QuestionSetRepo,
   LocalStorageQuestionSetRepo,
@@ -98,19 +98,22 @@ export class QuestionSetEditorUIService {
     return (
       <QuestionSetEditor
         saveQuestionSet={this.saveQuestionSet}
-        questionSet={new QuestionSet({ name: '', questions: [] })}
+        fetchQuestionSet={() => new QuestionSet({ name: '', questions: [] })}
       />
     )
   }
 
   getModifyingPageElement(questionSetId: string) {
-    const questionSet = this.questionSetRepo.getQuestionSetById(questionSetId)
     return (
       <QuestionSetEditor
         saveQuestionSet={this.saveQuestionSet}
-        questionSet={questionSet}
+        fetchQuestionSet={() => this.fetchQuestionSet(questionSetId)}
       />
     )
+  }
+
+  private fetchQuestionSet(questionSetId: string): QuestionSet {
+    return this.questionSetRepo.getQuestionSetById(questionSetId)
   }
 
   private saveQuestionSet = (questionSet: QuestionSet): OperationResult => {
@@ -199,18 +202,27 @@ const mapMultipleChoiceToChoiceInputs = (mc: MultipleChoice): ChoiceInput[] => {
 }
 
 function QuestionSetEditor({
-  questionSet,
   saveQuestionSet,
+  fetchQuestionSet,
 }: {
-  questionSet: QuestionSet
+  fetchQuestionSet: () => QuestionSet
   saveQuestionSet: (questionSet: QuestionSet) => OperationResult
 }) {
   const router = useRouter()
+  const questionSetRef = useRef<QuestionSet>()
 
-  const [questionSetInput, setQuestionSetInput] = useState<QuestionSetInput>(
-    mapQuestionSetToQuestionSetInput(questionSet),
-  )
+  const [questionSetInput, setQuestionSetInput] = useState<QuestionSetInput>({
+    name: '',
+    questions: [],
+  })
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
+
+  useEffect(() => {
+    questionSetRef.current = fetchQuestionSet()
+    setQuestionSetInput(
+      mapQuestionSetToQuestionSetInput(questionSetRef.current),
+    )
+  }, [fetchQuestionSet])
 
   const handleQuestionUpdate = (
     questionId: number,
@@ -268,10 +280,10 @@ function QuestionSetEditor({
       questions.push(question!)
     }
 
-    questionSet.name = questionSetInput.name
-    questionSet.questions = questions
+    questionSetRef.current!.name = questionSetInput.name
+    questionSetRef.current!.questions = questions
 
-    return saveQuestionSet(questionSet)
+    return saveQuestionSet(questionSetRef.current!)
   }
 
   const mapQuestionInputToQuestion = (

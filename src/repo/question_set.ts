@@ -2,6 +2,10 @@ import { QuestionSet } from '../model/question_set'
 import { CustomBaseError } from '../utils/err'
 import { LocalStorageOperator } from '../utils/local_storage'
 
+/**
+ * For React components that utilize this interface, ensure that calls to this interface are wrapped in useEffect.
+ * This precaution helps prevent errors such as `ReferenceError: localStorage is not defined`, which can occur if the localStorage version of this repository is accessed.
+ */
 export interface QuestionSetRepo {
   /**
    * @throws {UpsertQuestionSetError}
