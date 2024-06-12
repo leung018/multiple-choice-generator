@@ -31,14 +31,14 @@ describe('LocalStorageQuestionSetRepo', () => {
     expect(repo.getQuestionSetByName(questionSet.name)).toEqual(questionSet)
   })
 
-  it("should throw error when question set name doesn't exist", () => {
+  it("should throw error when question set name doesn't exist for getting question set by name", () => {
     expect(() => repo.getQuestionSetByName('unknown')).toThrowCustomError(
       GetQuestionSetError,
       'QUESTION_SET_NOT_FOUND',
     )
   })
 
-  it('should throw error when question set name is taken by other questionSet', () => {
+  it('should throw error when upserting a question set that its name is taken by other question set', () => {
     repo.upsertQuestionSet(questionSet)
 
     const anotherQuestionSet = new QuestionSetBuilderForTest()
@@ -58,25 +58,25 @@ describe('LocalStorageQuestionSetRepo', () => {
     expect(repo.getQuestionSetById(questionSet.id)).toEqual(questionSet)
   })
 
-  it("should throw error when question set id doesn't exist", () => {
+  it("should throw error when question set id doesn't exist for getting question set by id", () => {
     expect(() => repo.getQuestionSetById('unknown_id')).toThrowCustomError(
       GetQuestionSetError,
       'QUESTION_SET_NOT_FOUND',
     )
   })
 
-  it('should get all question sets for added', () => {
+  it('should able to get all question sets for added', () => {
     const questionSet2 = new QuestionSetBuilderForTest().setName('2').build()
     repo.upsertQuestionSet(questionSet)
     repo.upsertQuestionSet(questionSet2)
     expect(repo.getQuestionSets()).toEqual([questionSet, questionSet2])
   })
 
-  it('should get empty list for getQuestionSets when no question set added', () => {
+  it('should return empty list for getting all question sets when no question set added', () => {
     expect(repo.getQuestionSets()).toEqual([])
   })
 
-  it('should update questionSet', () => {
+  it('should able to update existing question set', () => {
     repo.upsertQuestionSet(questionSet)
 
     const updatedQuestionSet = {
@@ -88,5 +88,18 @@ describe('LocalStorageQuestionSetRepo', () => {
     expect(repo.getQuestionSetById(questionSet.id).name).toEqual(
       updatedQuestionSet.name,
     )
+  })
+
+  it('should able to delete existing question set', () => {
+    repo.upsertQuestionSet(questionSet)
+
+    const questionSetToBeDeleted = new QuestionSetBuilderForTest()
+      .setName('I will be deleted')
+      .build()
+    repo.upsertQuestionSet(questionSetToBeDeleted)
+
+    repo.deleteQuestionSet(questionSetToBeDeleted.id)
+
+    expect(repo.getQuestionSets()).toEqual([questionSet])
   })
 })
