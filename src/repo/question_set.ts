@@ -12,6 +12,8 @@ export interface QuestionSetRepo {
    */
   upsertQuestionSet(questionSet: QuestionSet): void
 
+  deleteQuestionSet(questionSetId: string): void
+
   /**
    * @throws {GetQuestionSetError}
    */
@@ -96,6 +98,12 @@ export class LocalStorageQuestionSetRepo implements QuestionSetRepo {
     }
 
     questionSetMap[questionSet.id] = questionSet
+    this.setQuestionSetMap(questionSetMap)
+  }
+
+  deleteQuestionSet(questionSetId: string): void {
+    const questionSetMap = this.getQuestionSetMap()
+    delete questionSetMap[questionSetId]
     this.setQuestionSetMap(questionSetMap)
   }
 

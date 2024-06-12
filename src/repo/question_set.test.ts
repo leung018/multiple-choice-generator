@@ -89,4 +89,17 @@ describe('LocalStorageQuestionSetRepo', () => {
       updatedQuestionSet.name,
     )
   })
+
+  it('should able to delete existing questionSet', () => {
+    repo.upsertQuestionSet(questionSet)
+
+    const questionSetToBeDeleted = new QuestionSetBuilderForTest()
+      .setName('I will be deleted')
+      .build()
+    repo.upsertQuestionSet(questionSetToBeDeleted)
+
+    repo.deleteQuestionSet(questionSetToBeDeleted.id)
+
+    expect(repo.getQuestionSets()).toEqual([questionSet])
+  })
 })
