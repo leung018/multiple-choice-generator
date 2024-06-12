@@ -165,6 +165,11 @@ class UIServiceInteractor {
     return this
   }
 
+  performDeleteFlow() {
+    fireEvent.click(screen.getByText('Delete'))
+    return this
+  }
+
   queryRemoveQuestionButton() {
     return screen.queryByLabelText(
       QuestionSetEditorAriaLabel.removeQuestionButton(this.questionNumberFocus),
@@ -797,6 +802,21 @@ describe('QuestionSetEditor', () => {
     expect(interactor.getQuestionSetByInputtedName()).toEqual(
       updatedQuestionSet,
     )
+  })
+
+  it('should able to delete the existing question set', () => {
+    const questionSetRepo = LocalStorageQuestionSetRepo.createNull()
+    const questionSet = new QuestionSetBuilderForTest().appendQuestion().build()
+    questionSetRepo.upsertQuestionSet(questionSet)
+
+    const interactor = new UIServiceInteractor({
+      questionSetRepo,
+    })
+    interactor.renderModifyingPage(questionSet.id)
+
+    interactor.performDeleteFlow()
+
+    expect(questionSetRepo.getQuestionSets()).toEqual([])
   })
 })
 
