@@ -818,6 +818,13 @@ describe('QuestionSetEditor', () => {
 
     expect(questionSetRepo.getQuestionSets()).toEqual([])
   })
+
+  it('should hide delete button in creation page', () => {
+    const interactor = new UIServiceInteractor()
+    interactor.renderCreationPage()
+
+    expect(screen.queryByRole('button', { name: 'Delete' })).toBeNull()
+  })
 })
 
 function expectCannotCreateQuestionSet({

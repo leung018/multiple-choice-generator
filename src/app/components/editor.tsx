@@ -107,7 +107,6 @@ export class QuestionSetEditorUIService {
       <QuestionSetEditor
         saveQuestionSet={this.saveQuestionSet}
         fetchQuestionSet={() => QuestionSet.create({ name: '', questions: [] })}
-        deleteQuestionSet={this.questionSetRepo.deleteQuestionSet}
       />
     )
   }
@@ -218,7 +217,7 @@ function QuestionSetEditor({
 }: {
   fetchQuestionSet: () => QuestionSet
   saveQuestionSet: (questionSet: QuestionSet) => OperationResult
-  deleteQuestionSet: (questionSetId: string) => void
+  deleteQuestionSet?: (questionSetId: string) => void
 }) {
   const router = useRouter()
   const [isLoading, setLoading] = useState(true)
@@ -272,10 +271,6 @@ function QuestionSetEditor({
         (question) => question.id !== questionId,
       ),
     })
-  }
-
-  const handleDeleteClick = () => {
-    deleteQuestionSet(questionSetIdRef.current)
   }
 
   const handleSaveClick = () => {
@@ -477,15 +472,17 @@ function QuestionSetEditor({
           >
             Save
           </button>
-          <button
-            type="button"
-            className="bg-red-500 text-white px-4 py-2 rounded ml-2"
-            onClick={() => {
-              handleDeleteClick()
-            }}
-          >
-            Delete
-          </button>
+          {deleteQuestionSet && (
+            <button
+              type="button"
+              className="bg-red-500 text-white px-4 py-2 rounded ml-2"
+              onClick={() => {
+                deleteQuestionSet(questionSetIdRef.current)
+              }}
+            >
+              Delete
+            </button>
+          )}
           {errorMessage && (
             <div
               id="error-message"
