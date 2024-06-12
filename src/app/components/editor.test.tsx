@@ -165,8 +165,13 @@ class UIServiceInteractor {
     return this
   }
 
-  performDeleteFlow() {
+  async performDeleteFlow() {
     fireEvent.click(screen.getByText('Delete'))
+
+    const confirmDeleteButton = await screen.findByRole('button', {
+      name: 'Confirm',
+    })
+    fireEvent.click(confirmDeleteButton)
     return this
   }
 
@@ -804,7 +809,7 @@ describe('QuestionSetEditor', () => {
     )
   })
 
-  it('should able to delete the existing question set', () => {
+  it('should able to delete the existing question set', async () => {
     const questionSetRepo = LocalStorageQuestionSetRepo.createNull()
     const questionSet = new QuestionSetBuilderForTest().appendQuestion().build()
     questionSetRepo.upsertQuestionSet(questionSet)
@@ -814,7 +819,7 @@ describe('QuestionSetEditor', () => {
     })
     interactor.renderModifyingPage(questionSet.id)
 
-    interactor.performDeleteFlow()
+    await interactor.performDeleteFlow()
 
     expect(questionSetRepo.getQuestionSets()).toEqual([])
   })
