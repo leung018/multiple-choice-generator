@@ -17,7 +17,7 @@ describe('MultipleChoiceQuiz', () => {
     const {
       renderResult: { getByText },
     } = renderMultipleChoicePage({
-      originalQuestionSet: new QuestionSetBuilderForTest()
+      questionSet: new QuestionSetBuilderForTest()
         .setName('My Question Set')
         .build(),
     })
@@ -28,7 +28,7 @@ describe('MultipleChoiceQuiz', () => {
     const {
       renderResult: { getByText, getByLabelText },
     } = renderMultipleChoicePage({
-      originalQuestionSet: new QuestionSetBuilderForTest()
+      questionSet: new QuestionSetBuilderForTest()
         .appendQuestion({
           description: 'Sample Question?',
           mc: presetCorrectChoiceMcBuilder()
@@ -47,7 +47,7 @@ describe('MultipleChoiceQuiz', () => {
     const {
       renderResult: { getByText },
     } = renderMultipleChoicePage({
-      originalQuestionSet: new QuestionSetBuilderForTest()
+      questionSet: new QuestionSetBuilderForTest()
         .appendQuestion({
           description: 'Question 1',
         })
@@ -64,7 +64,7 @@ describe('MultipleChoiceQuiz', () => {
     const {
       renderResult: { getByLabelText },
     } = renderMultipleChoicePage({
-      originalQuestionSet: new QuestionSetBuilderForTest()
+      questionSet: new QuestionSetBuilderForTest()
         .appendQuestion({
           mc: presetCorrectChoiceMcBuilder()
             .appendNonFixedChoice('Choice 1')
@@ -91,7 +91,7 @@ describe('MultipleChoiceQuiz', () => {
     const {
       renderResult: { getByLabelText },
     } = renderMultipleChoicePage({
-      originalQuestionSet: new QuestionSetBuilderForTest()
+      questionSet: new QuestionSetBuilderForTest()
         .appendQuestion({
           mc: presetCorrectChoiceMcBuilder()
             .appendNonFixedChoice('Question 1 Choice A')
@@ -131,7 +131,7 @@ describe('MultipleChoiceQuiz', () => {
     const {
       renderResult: { findByText, getByText, getByLabelText },
     } = renderMultipleChoicePage({
-      originalQuestionSet: new QuestionSetBuilderForTest()
+      questionSet: new QuestionSetBuilderForTest()
         .appendQuestion({
           mc: new MultipleChoiceBuilder()
             .setCorrectChoiceIndex(0)
@@ -172,7 +172,7 @@ describe('MultipleChoiceQuiz', () => {
     const {
       renderResult: { getByText, getByLabelText },
     } = renderMultipleChoicePage({
-      originalQuestionSet: new QuestionSetBuilderForTest()
+      questionSet: new QuestionSetBuilderForTest()
         .appendQuestion({
           mc: presetCorrectChoiceMcBuilder()
             .appendNonFixedChoice('Question 1 Choice 1')
@@ -194,7 +194,7 @@ describe('MultipleChoiceQuiz', () => {
     const {
       renderResult: { getByText, getByLabelText },
     } = renderMultipleChoicePage({
-      originalQuestionSet: new QuestionSetBuilderForTest()
+      questionSet: new QuestionSetBuilderForTest()
         .appendQuestion({
           mc: new MultipleChoiceBuilder()
             .setCorrectChoiceIndex(0)
@@ -238,7 +238,7 @@ describe('MultipleChoiceQuiz', () => {
       renderResult: { getByText },
       questionSetRepo,
     } = renderMultipleChoicePage({
-      originalQuestionSet,
+      questionSet: originalQuestionSet,
     })
 
     fireEvent.click(getByText('Submit'))
@@ -262,7 +262,7 @@ describe('MultipleChoiceQuiz', () => {
     const {
       renderResult: { getByLabelText },
     } = renderMultipleChoicePage({
-      originalQuestionSet: questionSet.newSwappedChoicesQuestionSet(),
+      questionSet: questionSet.newSwappedChoicesQuestionSet(),
     })
 
     // Choices are swapped in the page
@@ -275,18 +275,18 @@ describe('MultipleChoiceQuiz', () => {
 })
 
 function renderMultipleChoicePage({
-  originalQuestionSet = new QuestionSetBuilderForTest().build(),
+  questionSet = new QuestionSetBuilderForTest().build(),
 }: {
-  originalQuestionSet?: QuestionSet
+  questionSet?: QuestionSet
 } = {}) {
   const questionSetRepo = LocalStorageQuestionSetRepo.createNull()
-  questionSetRepo.upsertQuestionSet(originalQuestionSet)
+  questionSetRepo.upsertQuestionSet(questionSet)
 
   return {
     renderResult: render(
       MultipleChoiceQuizUIService.createNull({
         questionSetRepo,
-        questionSetId: originalQuestionSet.id,
+        questionSetId: questionSet.id,
       }).getElement(),
     ),
     questionSetRepo: questionSetRepo,
