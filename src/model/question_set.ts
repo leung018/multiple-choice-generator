@@ -27,6 +27,14 @@ export class QuestionSet {
     })
   }
 
+  static serialize(questionSet: QuestionSet): string {
+    return JSON.stringify(questionSet)
+  }
+
+  static deserialize(payload: string): QuestionSet {
+    return new QuestionSet(JSON.parse(payload))
+  }
+
   private constructor({
     name,
     questions,

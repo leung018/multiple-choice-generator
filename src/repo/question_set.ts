@@ -1,6 +1,10 @@
 import { QuestionSet } from '../model/question_set'
 import { CustomBaseError } from '../utils/err'
-import { LocalStorageOperator } from '../utils/local_storage'
+import {
+  FakeLocalStorageWrapper,
+  LocalStorageWrapper,
+  LocalStorageWrapperImpl,
+} from '../utils/local_storage'
 
 /**
  * For React components that utilize this interface, ensure that calls to this interface are wrapped in useEffect.
@@ -49,38 +53,57 @@ type QuestionSetMap = {
 }
 
 export class LocalStorageQuestionSetRepo implements QuestionSetRepo {
+  private storagePath: string
+
   static createNull(): LocalStorageQuestionSetRepo {
     return new LocalStorageQuestionSetRepo(
-      LocalStorageOperator.createNull('IN_MEMORY'),
+      new FakeLocalStorageWrapper(),
+      'IN_MEMORY',
     )
   }
 
   static createOriginalQuestionSetRepo(): LocalStorageQuestionSetRepo {
     return new LocalStorageQuestionSetRepo(
-      LocalStorageOperator.create('ORIGINAL_QUESTION_SET'),
+      new LocalStorageWrapperImpl(),
+      'ORIGINAL_QUESTION_SET',
     )
   }
 
   static createLastSubmittedQuestionSetRepo(): LocalStorageQuestionSetRepo {
     return new LocalStorageQuestionSetRepo(
-      LocalStorageOperator.create('LAST_SUBMITTED_QUESTION_SET'),
+      new LocalStorageWrapperImpl(),
+      'LAST_SUBMITTED_QUESTION_SET',
     )
   }
 
   private constructor(
-    localStorageOperator: LocalStorageOperator<QuestionSetMap>,
+    localStorageWrapper: LocalStorageWrapper,
+    storagePath: string,
   ) {
-    this.localStorageOperator = localStorageOperator
+    this.localStorageWrapper = localStorageWrapper
+    this.storagePath = storagePath
   }
 
-  private localStorageOperator: LocalStorageOperator<QuestionSetMap>
+  private localStorageWrapper: LocalStorageWrapper
 
   private getQuestionSetMap(): QuestionSetMap {
-    return this.localStorageOperator.getItem() ?? {}
+    const itemMap = JSON.parse(
+      this.localStorageWrapper.getItem(this.storagePath) ?? '{}',
+    )
+    for (const questionSetId in itemMap) {
+      itemMap[questionSetId] = QuestionSet.deserialize(itemMap[questionSetId])
+    }
+    return itemMap
   }
 
   private setQuestionSetMap(questionSetMap: QuestionSetMap): void {
-    this.localStorageOperator.setItem(questionSetMap)
+    const newMap: { [id: string]: string } = {}
+    for (const questionSetId in questionSetMap) {
+      newMap[questionSetId] = QuestionSet.serialize(
+        questionSetMap[questionSetId],
+      )
+    }
+    this.localStorageWrapper.setItem(this.storagePath, JSON.stringify(newMap))
   }
 
   upsertQuestionSet(questionSet: QuestionSet): void {
