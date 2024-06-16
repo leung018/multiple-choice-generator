@@ -10,7 +10,7 @@ describe('QuestionSet', () => {
 
   it('should allow building question set with the existing id', () => {
     const questionSet1 = new QuestionSetBuilderForTest().build()
-    const questionSet2 = new QuestionSet({
+    const questionSet2 = QuestionSet.create({
       name: questionSet1.name,
       questions: questionSet1.questions,
       id: questionSet1.id,

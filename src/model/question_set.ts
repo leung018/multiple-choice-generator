@@ -7,7 +7,7 @@ export class QuestionSet {
 
   readonly id: string
 
-  constructor({
+  static create({
     name,
     questions,
     id = uuidv4(),
@@ -15,6 +15,22 @@ export class QuestionSet {
     name: string
     questions: ReadonlyArray<Question>
     id?: string
+  }) {
+    return new QuestionSet({
+      name,
+      questions,
+      id,
+    })
+  }
+
+  private constructor({
+    name,
+    questions,
+    id,
+  }: {
+    name: string
+    questions: ReadonlyArray<Question>
+    id: string
   }) {
     this.name = name
     this.questions = questions
@@ -55,7 +71,7 @@ export class QuestionSetBuilderForTest {
   }
 
   build(): QuestionSet {
-    return new QuestionSet({
+    return QuestionSet.create({
       name: this.name,
       questions: this.questions,
     })

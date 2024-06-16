@@ -97,7 +97,7 @@ export class MultipleChoiceQuizUIService {
         mc: drawer.draw(possibleMcs),
       }
     })
-    return new QuestionSet({
+    return QuestionSet.create({
       ...questionSet,
       questions,
     })
@@ -116,7 +116,7 @@ function MultipleChoiceQuiz({
   const [isNotFound, setNotFound] = useState(false)
 
   const [questionSet, setQuestionSet] = useState<QuestionSet>(
-    new QuestionSet({
+    QuestionSet.create({
       id: '',
       name: '',
       questions: [],

@@ -669,7 +669,7 @@ describe('QuestionSetEditor', () => {
 
   it('should modifying page load the contents in original question set', () => {
     const questionSetRepo = LocalStorageQuestionSetRepo.createNull()
-    const questionSet = new QuestionSet({
+    const questionSet = QuestionSet.create({
       name: 'Hello World',
       questions: [
         {
@@ -753,7 +753,7 @@ describe('QuestionSetEditor', () => {
 
   it('should able to modify the existing question set and save', () => {
     const questionSetRepo = LocalStorageQuestionSetRepo.createNull()
-    const questionSet = new QuestionSet({
+    const questionSet = QuestionSet.create({
       name: 'Hello World',
       questions: [
         {
@@ -780,7 +780,7 @@ describe('QuestionSetEditor', () => {
       .clickRemoveChoice({ choiceNumber: 3 })
       .clickSave()
 
-    const updatedQuestionSet = new QuestionSet({
+    const updatedQuestionSet = QuestionSet.create({
       id: questionSet.id,
       name: 'A whole new world',
       questions: [
