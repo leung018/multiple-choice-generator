@@ -79,10 +79,10 @@ describe('LocalStorageQuestionSetRepo', () => {
   it('should able to update existing question set', () => {
     repo.upsertQuestionSet(questionSet)
 
-    const updatedQuestionSet = {
+    const updatedQuestionSet = new QuestionSet({
       ...questionSet,
       name: 'Updated name',
-    }
+    })
     repo.upsertQuestionSet(updatedQuestionSet)
 
     expect(repo.getQuestionSetById(questionSet.id).name).toEqual(
