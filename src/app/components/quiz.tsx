@@ -14,35 +14,35 @@ import { useRouter } from 'next/navigation'
 export class MultipleChoiceQuizUIService {
   static create({ questionSetId }: { questionSetId: string }) {
     return new MultipleChoiceQuizUIService({
-      originalQuestionSetRepo: LocalStorageQuestionSetRepo.create(),
+      questionSetRepo: LocalStorageQuestionSetRepo.create(),
       questionSetId,
     })
   }
 
   static createNull({
-    originalQuestionSetRepo = LocalStorageQuestionSetRepo.createNull(),
+    questionSetRepo = LocalStorageQuestionSetRepo.createNull(),
     questionSetId,
   }: {
-    originalQuestionSetRepo?: QuestionSetRepo
+    questionSetRepo?: QuestionSetRepo
     questionSetId: string
   }) {
     return new MultipleChoiceQuizUIService({
-      originalQuestionSetRepo: originalQuestionSetRepo,
+      questionSetRepo: questionSetRepo,
       questionSetId,
     })
   }
 
-  private readonly originalQuestionSetRepo: QuestionSetRepo
+  private readonly questionSetRepo: QuestionSetRepo
   private readonly questionSetId: string
 
   private constructor({
-    originalQuestionSetRepo,
+    questionSetRepo,
     questionSetId,
   }: {
-    originalQuestionSetRepo: QuestionSetRepo
+    questionSetRepo: QuestionSetRepo
     questionSetId: string
   }) {
-    this.originalQuestionSetRepo = originalQuestionSetRepo
+    this.questionSetRepo = questionSetRepo
     this.questionSetId = questionSetId
   }
 
@@ -50,10 +50,10 @@ export class MultipleChoiceQuizUIService {
     return (
       <MultipleChoiceQuiz
         fetchQuestionSet={() =>
-          this.originalQuestionSetRepo.getQuestionSetById(this.questionSetId)
+          this.questionSetRepo.getQuestionSetById(this.questionSetId)
         }
         onSubmit={(questionSet) => {
-          this.originalQuestionSetRepo.upsertQuestionSet(
+          this.questionSetRepo.upsertQuestionSet(
             questionSet.newSwappedChoicesQuestionSet(),
           )
         }}
