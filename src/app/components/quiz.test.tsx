@@ -17,7 +17,7 @@ describe('MultipleChoiceQuiz', () => {
     const {
       renderResult: { getByText },
     } = renderMultipleChoicePage({
-      originalQuestionSet: new QuestionSetBuilderForTest()
+      questionSet: new QuestionSetBuilderForTest()
         .setName('My Question Set')
         .build(),
     })
@@ -28,7 +28,7 @@ describe('MultipleChoiceQuiz', () => {
     const {
       renderResult: { getByText, getByLabelText },
     } = renderMultipleChoicePage({
-      originalQuestionSet: new QuestionSetBuilderForTest()
+      questionSet: new QuestionSetBuilderForTest()
         .appendQuestion({
           description: 'Sample Question?',
           mc: presetCorrectChoiceMcBuilder()
@@ -47,7 +47,7 @@ describe('MultipleChoiceQuiz', () => {
     const {
       renderResult: { getByText },
     } = renderMultipleChoicePage({
-      originalQuestionSet: new QuestionSetBuilderForTest()
+      questionSet: new QuestionSetBuilderForTest()
         .appendQuestion({
           description: 'Question 1',
         })
@@ -64,7 +64,7 @@ describe('MultipleChoiceQuiz', () => {
     const {
       renderResult: { getByLabelText },
     } = renderMultipleChoicePage({
-      originalQuestionSet: new QuestionSetBuilderForTest()
+      questionSet: new QuestionSetBuilderForTest()
         .appendQuestion({
           mc: presetCorrectChoiceMcBuilder()
             .appendNonFixedChoice('Choice 1')
@@ -91,7 +91,7 @@ describe('MultipleChoiceQuiz', () => {
     const {
       renderResult: { getByLabelText },
     } = renderMultipleChoicePage({
-      originalQuestionSet: new QuestionSetBuilderForTest()
+      questionSet: new QuestionSetBuilderForTest()
         .appendQuestion({
           mc: presetCorrectChoiceMcBuilder()
             .appendNonFixedChoice('Question 1 Choice A')
@@ -131,7 +131,7 @@ describe('MultipleChoiceQuiz', () => {
     const {
       renderResult: { findByText, getByText, getByLabelText },
     } = renderMultipleChoicePage({
-      originalQuestionSet: new QuestionSetBuilderForTest()
+      questionSet: new QuestionSetBuilderForTest()
         .appendQuestion({
           mc: new MultipleChoiceBuilder()
             .setCorrectChoiceIndex(0)
@@ -172,7 +172,7 @@ describe('MultipleChoiceQuiz', () => {
     const {
       renderResult: { getByText, getByLabelText },
     } = renderMultipleChoicePage({
-      originalQuestionSet: new QuestionSetBuilderForTest()
+      questionSet: new QuestionSetBuilderForTest()
         .appendQuestion({
           mc: presetCorrectChoiceMcBuilder()
             .appendNonFixedChoice('Question 1 Choice 1')
@@ -194,7 +194,7 @@ describe('MultipleChoiceQuiz', () => {
     const {
       renderResult: { getByText, getByLabelText },
     } = renderMultipleChoicePage({
-      originalQuestionSet: new QuestionSetBuilderForTest()
+      questionSet: new QuestionSetBuilderForTest()
         .appendQuestion({
           mc: new MultipleChoiceBuilder()
             .setCorrectChoiceIndex(0)
@@ -223,43 +223,33 @@ describe('MultipleChoiceQuiz', () => {
     expect(getByLabelText('Question 2 Choice 1 is wrong')).toBeVisible()
   })
 
-  it('should questionSet being saved to lastSubmittedQuestionSetRepo after submitting', async () => {
-    const questionSet = new QuestionSetBuilderForTest().build()
-
-    const {
-      renderResult: { getByText },
-      lastSubmittedQuestionSetRepo,
-    } = renderMultipleChoicePage({
-      originalQuestionSet: questionSet,
-    })
-
-    fireEvent.click(getByText('Submit'))
-
-    expect(
-      lastSubmittedQuestionSetRepo.getQuestionSetById(questionSet.id),
-    ).toEqual(questionSet)
-  })
-
-  it('should use originalQuestionSet if there is no lastSubmittedQuestionSet', async () => {
-    const originalQuestionSet = new QuestionSetBuilderForTest().build()
-
-    const {
-      renderResult: { getByText },
-      lastSubmittedQuestionSetRepo,
-    } = renderMultipleChoicePage({
-      originalQuestionSet,
-      lastSubmittedQuestionSet: null,
-    })
-
-    fireEvent.click(getByText('Submit'))
-
-    expect(
-      lastSubmittedQuestionSetRepo.getQuestionSetById(originalQuestionSet.id),
-    ).toEqual(originalQuestionSet)
-  })
-
-  it('should swap multiple choices of lastSubmittedQuestionSet if possible', async () => {
+  it('should questionSet being saved to questionSetRepo with swapped questionSet after submitting', async () => {
     const originalQuestionSet = new QuestionSetBuilderForTest()
+      .appendQuestion({
+        mc: new MultipleChoiceBuilder() // this mc contain only one swapped version, therefore newSwappedChoicesQuestionSet() must only have one possibility only.
+          .appendNonFixedChoice('Apple')
+          .appendNonFixedChoice('Banana')
+          .setCorrectChoiceIndex(1)
+          .build(),
+      })
+      .build()
+
+    const {
+      renderResult: { getByText },
+      questionSetRepo,
+    } = renderMultipleChoicePage({
+      questionSet: originalQuestionSet,
+    })
+
+    fireEvent.click(getByText('Submit'))
+
+    expect(questionSetRepo.getQuestionSetById(originalQuestionSet.id)).toEqual(
+      originalQuestionSet.newSwappedChoicesQuestionSet(),
+    )
+  })
+
+  it('should display getCurrentPlayQuestions of questionSet if they are different from its original questions', async () => {
+    const questionSet = new QuestionSetBuilderForTest()
       .appendQuestion({
         mc: new MultipleChoiceBuilder()
           .setCorrectChoiceIndex(0)
@@ -270,11 +260,9 @@ describe('MultipleChoiceQuiz', () => {
       .build()
 
     const {
-      renderResult: { getByText, getByLabelText },
-      lastSubmittedQuestionSetRepo,
+      renderResult: { getByLabelText },
     } = renderMultipleChoicePage({
-      originalQuestionSet,
-      lastSubmittedQuestionSet: originalQuestionSet,
+      questionSet: questionSet.newSwappedChoicesQuestionSet(),
     })
 
     // Choices are swapped in the page
@@ -283,42 +271,24 @@ describe('MultipleChoiceQuiz', () => {
     expect(choice2.compareDocumentPosition(choice1)).toBe(
       Node.DOCUMENT_POSITION_FOLLOWING,
     )
-
-    fireEvent.click(getByText('Submit'))
-
-    // Should save the swapped choices to lastSubmittedQuestionSetRepo
-    const lastSubmittedQuestionSet =
-      lastSubmittedQuestionSetRepo.getQuestionSetById(originalQuestionSet.id)
-    const question = lastSubmittedQuestionSet.questions[0]
-    const choices = question.mc.choices
-    expect(choices[0].answer).toBe('Question 1 Choice 2')
-    expect(choices[1].answer).toBe('Question 1 Choice 1 (Correct)')
   })
 })
 
 function renderMultipleChoicePage({
-  originalQuestionSet = new QuestionSetBuilderForTest().build(),
-  lastSubmittedQuestionSet = null,
+  questionSet = new QuestionSetBuilderForTest().build(),
 }: {
-  originalQuestionSet?: QuestionSet
-  lastSubmittedQuestionSet?: QuestionSet | null
+  questionSet?: QuestionSet
 } = {}) {
-  const originalQuestionSetRepo = LocalStorageQuestionSetRepo.createNull()
-  originalQuestionSetRepo.upsertQuestionSet(originalQuestionSet)
-
-  const lastSubmittedQuestionSetRepo = LocalStorageQuestionSetRepo.createNull()
-  if (lastSubmittedQuestionSet) {
-    lastSubmittedQuestionSetRepo.upsertQuestionSet(lastSubmittedQuestionSet)
-  }
+  const questionSetRepo = LocalStorageQuestionSetRepo.createNull()
+  questionSetRepo.upsertQuestionSet(questionSet)
 
   return {
     renderResult: render(
       MultipleChoiceQuizUIService.createNull({
-        originalQuestionSetRepo,
-        lastSubmittedQuestionSetRepo,
-        questionSetId: originalQuestionSet.id,
+        questionSetRepo,
+        questionSetId: questionSet.id,
       }).getElement(),
     ),
-    lastSubmittedQuestionSetRepo,
+    questionSetRepo: questionSetRepo,
   }
 }

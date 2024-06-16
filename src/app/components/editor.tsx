@@ -80,8 +80,7 @@ interface FailureResult {
 export class QuestionSetEditorUIService {
   static create() {
     return new QuestionSetEditorUIService({
-      questionSetRepo:
-        LocalStorageQuestionSetRepo.createOriginalQuestionSetRepo(),
+      questionSetRepo: LocalStorageQuestionSetRepo.create(),
     })
   }
 

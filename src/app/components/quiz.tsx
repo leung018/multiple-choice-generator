@@ -9,107 +9,65 @@ import {
 } from '../../repo/question_set'
 import LoadingSpinner from './loading'
 import Error from 'next/error'
-import { MultipleChoiceSwapper } from '../../model/swap'
-import { SetRandomDrawer } from '../../utils/random_draw'
 import { useRouter } from 'next/navigation'
 
 export class MultipleChoiceQuizUIService {
   static create({ questionSetId }: { questionSetId: string }) {
     return new MultipleChoiceQuizUIService({
-      originalQuestionSetRepo:
-        LocalStorageQuestionSetRepo.createOriginalQuestionSetRepo(),
-      lastSubmittedQuestionSetRepo:
-        LocalStorageQuestionSetRepo.createLastSubmittedQuestionSetRepo(),
+      questionSetRepo: LocalStorageQuestionSetRepo.create(),
       questionSetId,
     })
   }
 
   static createNull({
-    originalQuestionSetRepo = LocalStorageQuestionSetRepo.createNull(),
-    lastSubmittedQuestionSetRepo = LocalStorageQuestionSetRepo.createNull(),
+    questionSetRepo = LocalStorageQuestionSetRepo.createNull(),
     questionSetId,
   }: {
-    originalQuestionSetRepo?: QuestionSetRepo
-    lastSubmittedQuestionSetRepo?: QuestionSetRepo
+    questionSetRepo?: QuestionSetRepo
     questionSetId: string
   }) {
     return new MultipleChoiceQuizUIService({
-      originalQuestionSetRepo: originalQuestionSetRepo,
-      lastSubmittedQuestionSetRepo,
+      questionSetRepo: questionSetRepo,
       questionSetId,
     })
   }
 
-  private readonly originalQuestionSetRepo: QuestionSetRepo
-  private readonly lastSubmittedQuestionSetRepo: QuestionSetRepo
+  private readonly questionSetRepo: QuestionSetRepo
   private readonly questionSetId: string
 
   private constructor({
-    originalQuestionSetRepo,
-    lastSubmittedQuestionSetRepo,
+    questionSetRepo,
     questionSetId,
   }: {
-    originalQuestionSetRepo: QuestionSetRepo
-    lastSubmittedQuestionSetRepo: QuestionSetRepo
+    questionSetRepo: QuestionSetRepo
     questionSetId: string
   }) {
-    this.originalQuestionSetRepo = originalQuestionSetRepo
-    this.lastSubmittedQuestionSetRepo = lastSubmittedQuestionSetRepo
+    this.questionSetRepo = questionSetRepo
     this.questionSetId = questionSetId
   }
 
   getElement() {
     return (
       <MultipleChoiceQuiz
-        fetchQuestionSet={() => this.fetchQuestionSet()}
-        recordSubmittedQuestionSet={(questionSet) => {
-          this.lastSubmittedQuestionSetRepo.upsertQuestionSet(questionSet)
+        fetchQuestionSet={() =>
+          this.questionSetRepo.getQuestionSetById(this.questionSetId)
+        }
+        onSubmit={(questionSet) => {
+          this.questionSetRepo.upsertQuestionSet(
+            questionSet.newSwappedChoicesQuestionSet(),
+          )
         }}
       ></MultipleChoiceQuiz>
     )
-  }
-
-  private fetchQuestionSet(): QuestionSet {
-    try {
-      this.lastSubmittedQuestionSetRepo.getQuestionSetById(this.questionSetId)
-    } catch (e) {
-      if (e instanceof GetQuestionSetError)
-        return this.originalQuestionSetRepo.getQuestionSetById(
-          this.questionSetId,
-        )
-      throw e
-    }
-
-    return this.swappedChoicesQuestionSet(
-      this.lastSubmittedQuestionSetRepo.getQuestionSetById(this.questionSetId),
-    )
-  }
-
-  private swappedChoicesQuestionSet(questionSet: QuestionSet): QuestionSet {
-    const drawer = SetRandomDrawer.create()
-
-    const questions = questionSet.questions.map((question) => {
-      const possibleMcs = MultipleChoiceSwapper.getSignificantlySwapped(
-        question.mc,
-      )
-      return {
-        ...question,
-        mc: drawer.draw(possibleMcs),
-      }
-    })
-    return QuestionSet.create({
-      ...questionSet,
-      questions,
-    })
   }
 }
 
 function MultipleChoiceQuiz({
   fetchQuestionSet,
-  recordSubmittedQuestionSet,
+  onSubmit,
 }: {
   fetchQuestionSet: () => QuestionSet
-  recordSubmittedQuestionSet: (questionSet: QuestionSet) => void
+  onSubmit: (questionSet: QuestionSet) => void
 }) {
   const router = useRouter()
   const [isLoading, setLoading] = useState(true)
@@ -153,7 +111,7 @@ function MultipleChoiceQuiz({
 
   const handleSubmit = () => {
     setScore(calculateScore())
-    recordSubmittedQuestionSet(questionSet)
+    onSubmit(questionSet)
   }
 
   const isSubmitted = () => score !== null
@@ -182,7 +140,7 @@ function MultipleChoiceQuiz({
   return (
     <div className="p-4">
       <h1 className="text-xl font-semibold mb-6">{questionSet.name}</h1>
-      {questionSet.questions.map((question, questionIndex) => (
+      {questionSet.getCurrentPlayQuestions().map((question, questionIndex) => (
         <QuestionForm
           key={questionIndex}
           question={question}
