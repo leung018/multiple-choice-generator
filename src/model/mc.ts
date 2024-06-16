@@ -12,8 +12,8 @@ export class MultipleChoiceError extends CustomBaseError<MultipleChoiceErrorCode
 }
 
 export interface Choice {
-  answer: string
-  isFixedPosition: boolean
+  readonly answer: string
+  readonly isFixedPosition: boolean
 }
 
 interface MultipleChoiceInput {

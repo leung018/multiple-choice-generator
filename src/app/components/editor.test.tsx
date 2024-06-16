@@ -780,15 +780,23 @@ describe('QuestionSetEditor', () => {
       .clickRemoveChoice({ choiceNumber: 3 })
       .clickSave()
 
-    // set the expected values of the questionSet
-    questionSet.name = 'A whole new world'
-    questionSet.questions[0].mc = new MultipleChoiceBuilder()
-      .appendNonFixedChoice('1')
-      .appendNonFixedChoice('2')
-      .setCorrectChoiceIndex(1)
-      .build()
-
-    expect(interactor.getQuestionSetByInputtedName()).toEqual(questionSet)
+    const updatedQuestionSet = new QuestionSet({
+      id: questionSet.id,
+      name: 'A whole new world',
+      questions: [
+        {
+          description: questionSet.questions[0].description,
+          mc: new MultipleChoiceBuilder()
+            .appendNonFixedChoice('1')
+            .appendNonFixedChoice('2')
+            .setCorrectChoiceIndex(1)
+            .build(),
+        },
+      ],
+    })
+    expect(interactor.getQuestionSetByInputtedName()).toEqual(
+      updatedQuestionSet,
+    )
   })
 })
 

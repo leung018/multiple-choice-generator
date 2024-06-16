@@ -1,9 +1,9 @@
 import { MultipleChoiceBuilder, MultipleChoice } from './mc'
 import { v4 as uuidv4 } from 'uuid'
 export class QuestionSet {
-  name: string
+  readonly name: string
 
-  questions: Question[]
+  readonly questions: ReadonlyArray<Question>
 
   readonly id: string
 
@@ -13,7 +13,7 @@ export class QuestionSet {
     id = uuidv4(),
   }: {
     name: string
-    questions: Question[]
+    questions: ReadonlyArray<Question>
     id?: string
   }) {
     this.name = name
@@ -23,8 +23,8 @@ export class QuestionSet {
 }
 
 export interface Question {
-  description: string
-  mc: MultipleChoice
+  readonly description: string
+  readonly mc: MultipleChoice
 }
 
 export class QuestionSetBuilderForTest {
