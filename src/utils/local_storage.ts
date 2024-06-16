@@ -26,30 +26,3 @@ export class LocalStorageWrapperImpl implements LocalStorageWrapper {
     localStorage.setItem(key, value)
   }
 }
-
-export class LocalStorageOperator<T> {
-  static create<T>(storagePath: string): LocalStorageOperator<T> {
-    return new LocalStorageOperator(new LocalStorageWrapperImpl(), storagePath)
-  }
-
-  static createNull<T>(storagePath: string): LocalStorageOperator<T> {
-    return new LocalStorageOperator(new FakeLocalStorageWrapper(), storagePath)
-  }
-
-  private constructor(
-    private readonly localStorageWrapper: LocalStorageWrapper,
-    private readonly storagePath: string,
-  ) {}
-
-  setItem: (value: T) => void = (value) => {
-    this.localStorageWrapper.setItem(this.storagePath, JSON.stringify(value))
-  }
-
-  getItem: () => T | null = () => {
-    const value = this.localStorageWrapper.getItem(this.storagePath)
-    if (!value) {
-      return null
-    }
-    return JSON.parse(value)
-  }
-}
