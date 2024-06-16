@@ -27,6 +27,19 @@ export class QuestionSet {
     })
   }
 
+  /* Serialize or Deserialize methods may be more make sense to be exist in other layers.
+   * However, to achieve this, may need to make below constructor public and have extra validation logic in this model, which will be more complicated in this project size.
+   * Noted that serialize and deserialize method will be covered by unit test in repo layer.
+   */
+  static serialize(questionSet: QuestionSet): string {
+    return JSON.stringify(questionSet)
+  }
+
+  // See the comment of `serialize`.
+  static deserialize(payload: string): QuestionSet {
+    return new QuestionSet(JSON.parse(payload))
+  }
+
   private constructor({
     name,
     questions,
