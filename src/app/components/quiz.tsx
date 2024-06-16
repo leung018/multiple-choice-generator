@@ -97,10 +97,10 @@ export class MultipleChoiceQuizUIService {
         mc: drawer.draw(possibleMcs),
       }
     })
-    return {
+    return QuestionSet.create({
       ...questionSet,
       questions,
-    }
+    })
   }
 }
 
@@ -115,11 +115,13 @@ function MultipleChoiceQuiz({
   const [isLoading, setLoading] = useState(true)
   const [isNotFound, setNotFound] = useState(false)
 
-  const [questionSet, setQuestionSet] = useState<QuestionSet>({
-    id: '',
-    name: '',
-    questions: [],
-  })
+  const [questionSet, setQuestionSet] = useState<QuestionSet>(
+    QuestionSet.create({
+      id: '',
+      name: '',
+      questions: [],
+    }),
+  )
   const [score, setScore] = useState<number | null>(null)
 
   useEffect(() => {

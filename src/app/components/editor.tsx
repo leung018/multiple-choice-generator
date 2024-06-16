@@ -107,7 +107,7 @@ export class QuestionSetEditorUIService {
     return (
       <QuestionSetEditor
         saveQuestionSet={this.saveQuestionSet}
-        fetchQuestionSet={() => new QuestionSet({ name: '', questions: [] })}
+        fetchQuestionSet={() => QuestionSet.create({ name: '', questions: [] })}
       />
     )
   }
@@ -313,7 +313,7 @@ function QuestionSetEditor({
     }
 
     return {
-      result: new QuestionSet({
+      result: QuestionSet.create({
         name: questionSetInput.name,
         questions,
         id: questionSetIdRef.current,

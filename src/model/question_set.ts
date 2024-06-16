@@ -1,30 +1,80 @@
+import { SetRandomDrawer } from '../utils/random_draw'
 import { MultipleChoiceBuilder, MultipleChoice } from './mc'
 import { v4 as uuidv4 } from 'uuid'
+import { MultipleChoiceSwapper } from './swap'
 export class QuestionSet {
-  name: string
+  readonly name: string
 
-  questions: Question[]
+  readonly questions: ReadonlyArray<Question>
+
+  private readonly currentPlayQuestions?: ReadonlyArray<Question>
 
   readonly id: string
 
-  constructor({
+  static create({
     name,
     questions,
     id = uuidv4(),
   }: {
     name: string
-    questions: Question[]
+    questions: ReadonlyArray<Question>
     id?: string
+  }) {
+    return new QuestionSet({
+      name,
+      questions,
+      id,
+    })
+  }
+
+  private constructor({
+    name,
+    questions,
+    id,
+    currentPlayQuestions,
+  }: {
+    name: string
+    questions: ReadonlyArray<Question>
+    id: string
+    currentPlayQuestions?: ReadonlyArray<Question>
   }) {
     this.name = name
     this.questions = questions
     this.id = id
+    this.currentPlayQuestions = currentPlayQuestions
+  }
+
+  newSwappedChoicesQuestionSet(): QuestionSet {
+    const drawer = SetRandomDrawer.create()
+
+    const swappedChoicesQuestions = this.getCurrentPlayQuestions().map(
+      (question) => {
+        const possibleMcs = MultipleChoiceSwapper.getSignificantlySwapped(
+          question.mc,
+        )
+        return {
+          ...question,
+          mc: drawer.draw(possibleMcs),
+        }
+      },
+    )
+
+    return new QuestionSet({
+      id: this.id,
+      name: this.name,
+      questions: this.questions,
+      currentPlayQuestions: swappedChoicesQuestions,
+    })
+  }
+
+  getCurrentPlayQuestions(): ReadonlyArray<Question> {
+    return this.currentPlayQuestions || this.questions
   }
 }
 
 export interface Question {
-  description: string
-  mc: MultipleChoice
+  readonly description: string
+  readonly mc: MultipleChoice
 }
 
 export class QuestionSetBuilderForTest {
@@ -55,7 +105,7 @@ export class QuestionSetBuilderForTest {
   }
 
   build(): QuestionSet {
-    return new QuestionSet({
+    return QuestionSet.create({
       name: this.name,
       questions: this.questions,
     })
