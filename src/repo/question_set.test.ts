@@ -28,7 +28,10 @@ describe('LocalStorageQuestionSetRepo', () => {
 
   it('should add question set and get question set by name', () => {
     repo.upsertQuestionSet(questionSet)
-    expect(repo.getQuestionSetByName(questionSet.name)).toEqual(questionSet)
+    assertQuestionSetEquals(
+      repo.getQuestionSetByName(questionSet.name),
+      questionSet,
+    )
   })
 
   it("should throw error when question set name doesn't exist for getting question set by name", () => {
@@ -55,7 +58,10 @@ describe('LocalStorageQuestionSetRepo', () => {
 
   it('should add question set and get question set by id', () => {
     repo.upsertQuestionSet(questionSet)
-    expect(repo.getQuestionSetById(questionSet.id)).toEqual(questionSet)
+    assertQuestionSetEquals(
+      repo.getQuestionSetById(questionSet.id),
+      questionSet,
+    )
   })
 
   it("should throw error when question set id doesn't exist for getting question set by id", () => {
@@ -103,3 +109,12 @@ describe('LocalStorageQuestionSetRepo', () => {
     expect(repo.getQuestionSets()).toEqual([questionSet])
   })
 })
+
+function assertQuestionSetEquals(
+  questionSetA: QuestionSet,
+  questionSetB: QuestionSet,
+) {
+  expect(questionSetA).toEqual(questionSetB)
+  expect(questionSetA).toBeInstanceOf(QuestionSet)
+  expect(questionSetB).toBeInstanceOf(QuestionSet)
+}
