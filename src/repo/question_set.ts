@@ -62,17 +62,10 @@ export class LocalStorageQuestionSetRepo implements QuestionSetRepo {
     )
   }
 
-  static createOriginalQuestionSetRepo(): LocalStorageQuestionSetRepo {
+  static create(): LocalStorageQuestionSetRepo {
     return new LocalStorageQuestionSetRepo(
       new LocalStorageWrapperImpl(),
-      'ORIGINAL_QUESTION_SET',
-    )
-  }
-
-  static createLastSubmittedQuestionSetRepo(): LocalStorageQuestionSetRepo {
-    return new LocalStorageQuestionSetRepo(
-      new LocalStorageWrapperImpl(),
-      'LAST_SUBMITTED_QUESTION_SET',
+      'QUESTION_SET',
     )
   }
 

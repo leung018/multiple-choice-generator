@@ -14,8 +14,7 @@ import { useRouter } from 'next/navigation'
 export class MultipleChoiceQuizUIService {
   static create({ questionSetId }: { questionSetId: string }) {
     return new MultipleChoiceQuizUIService({
-      originalQuestionSetRepo:
-        LocalStorageQuestionSetRepo.createOriginalQuestionSetRepo(),
+      originalQuestionSetRepo: LocalStorageQuestionSetRepo.create(),
       questionSetId,
     })
   }
