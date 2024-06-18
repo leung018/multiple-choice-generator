@@ -811,7 +811,7 @@ describe('QuestionSetEditor', () => {
 
   it('should able to delete the existing question set', () => {
     const questionSetRepo = LocalStorageQuestionSetRepo.createNull()
-    const questionSet = new QuestionSetBuilderForTest().appendQuestion().build()
+    const questionSet = new QuestionSetBuilderForTest().build()
     questionSetRepo.upsertQuestionSet(questionSet)
 
     const interactor = new UIServiceInteractor({
