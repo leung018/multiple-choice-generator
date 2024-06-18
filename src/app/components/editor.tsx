@@ -493,16 +493,17 @@ function QuestionSetEditor({
               Delete
             </button>
           )}
-          {errorMessage && (
-            <div
-              id="error-message"
-              className="text-red-500 ml-2"
-              aria-label={QuestionSetEditorAriaLabel.ERROR_PROMPT}
-            >
-              {errorMessage}
-            </div>
-          )}
         </div>
+
+        {errorMessage && (
+          <div
+            id="error-message"
+            className="flex items-center justify-center w-full text-red-500 mt-4"
+            aria-label={QuestionSetEditorAriaLabel.ERROR_PROMPT}
+          >
+            {errorMessage}
+          </div>
+        )}
       </form>
     </div>
   )
