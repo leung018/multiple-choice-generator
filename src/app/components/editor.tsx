@@ -387,6 +387,9 @@ function QuestionSetEditor({
           onConfirm: () => {
             deleteQuestionSet!(questionSetIdRef.current)
           },
+          onCancel: () => {
+            setIsConfirmDelete(false)
+          },
         })}
       <form>
         <div className="form-group mb-8">
@@ -505,7 +508,13 @@ function QuestionSetEditor({
   )
 }
 
-function ConfirmDeleteDiaLog({ onConfirm }: { onConfirm: () => void }) {
+function ConfirmDeleteDiaLog({
+  onConfirm,
+  onCancel,
+}: {
+  onConfirm: () => void
+  onCancel: () => void
+}) {
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
       <div className="bg-white p-6 rounded-lg shadow-lg z-50">
@@ -519,7 +528,10 @@ function ConfirmDeleteDiaLog({ onConfirm }: { onConfirm: () => void }) {
           >
             Confirm
           </button>
-          <button className="bg-gray-300 hover:bg-gray-400 text-black font-bold py-2 px-4 rounded">
+          <button
+            className="bg-gray-300 hover:bg-gray-400 text-black font-bold py-2 px-4 rounded"
+            onClick={() => onCancel()}
+          >
             Cancel
           </button>
         </div>
