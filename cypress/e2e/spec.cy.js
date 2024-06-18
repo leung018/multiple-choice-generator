@@ -89,12 +89,22 @@ describe('End to end tests', () => {
 
     assertIsInHomePage(cy)
   })
+
+  it('should after confirming delete question set will navigate to home page', () => {
+    createQuestionSet({ cy })
+
+    cy.contains('Edit').click()
+    cy.contains('Delete').click()
+    cy.contains('Confirm').click()
+
+    assertIsInHomePage(cy)
+  })
 })
 
 // TODO: Perhaps can move to command.ts after typescript configuration of cypress, jest is configured properly
 
 function assertIsInHomePage(cy) {
-  cy.contains('Take Quiz')
+  cy.contains('Add New Question Set')
 }
 
 /**
