@@ -386,6 +386,7 @@ function QuestionSetEditor({
         ConfirmDeleteDiaLog({
           onConfirm: () => {
             deleteQuestionSet!(questionSetIdRef.current)
+            router.push('/')
           },
           onCancel: () => {
             setIsConfirmDelete(false)
