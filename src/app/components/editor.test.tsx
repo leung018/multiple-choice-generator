@@ -165,16 +165,6 @@ class UIServiceInteractor {
     return this
   }
 
-  performDeleteFlow() {
-    fireEvent.click(screen.getByText('Delete'))
-
-    const confirmDeleteButton = screen.getByRole('button', {
-      name: 'Confirm',
-    })
-    fireEvent.click(confirmDeleteButton)
-    return this
-  }
-
   queryRemoveQuestionButton() {
     return screen.queryByLabelText(
       QuestionSetEditorAriaLabel.removeQuestionButton(this.questionNumberFocus),
