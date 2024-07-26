@@ -17,12 +17,10 @@ import {
 class UIServiceInteractor {
   private readonly questionSetRepo: QuestionSetRepo
   private questionSetName: string = ''
-  private questionNumberFocus = 1
+  private screenQueryHelper = new ScreenQueryHelper()
 
   /**
    * Initializes a new instance of UIServiceInteractor, providing methods for rendering the associated UI using `testing-library/react` and interact with it.
-   * Use `setQuestionNumberFocus` to specify the question number before interacting with any UI elements related to a specific question.
-   * Note that querying UI elements unrelated to any specific question is not the responsibility of this class.
    *
    * @param questionSetRepo Repository for storing the submitted question set after it is submitted through this page.
    */
@@ -70,7 +68,7 @@ class UIServiceInteractor {
   }
 
   setQuestionNumberFocus(questionNumber: number) {
-    this.questionNumberFocus = questionNumber
+    this.screenQueryHelper.setQuestionNumberFocus(questionNumber)
     return this
   }
 
@@ -79,14 +77,14 @@ class UIServiceInteractor {
   }
 
   inputQuestionDescription(description: string) {
-    fireEvent.change(this.getQuestionDescriptionInput(), {
+    fireEvent.change(this.screenQueryHelper.getQuestionDescriptionInput(), {
       target: { value: description },
     })
     return this
   }
 
   getQuestionDescriptionInput() {
-    return screen.getByLabelText(`Question ${this.questionNumberFocus}:`)
+    return this.screenQueryHelper.getQuestionDescriptionInput()
   }
 
   inputAnswer({
@@ -103,12 +101,7 @@ class UIServiceInteractor {
   }
 
   getAnswerInput({ choiceNumber }: { choiceNumber: number }) {
-    return screen.getByLabelText(
-      QuestionSetEditorAriaLabel.answerInput({
-        questionNumber: this.questionNumberFocus,
-        choiceNumber,
-      }),
-    )
+    return this.screenQueryHelper.getAnswerInput({ choiceNumber })
   }
 
   clickFixedPosition({ choiceNumber }: { choiceNumber: number }) {
@@ -117,12 +110,9 @@ class UIServiceInteractor {
   }
 
   getIsFixedPositionCheckbox({ choiceNumber }: { choiceNumber: number }) {
-    return screen.getByLabelText(
-      QuestionSetEditorAriaLabel.isFixedPositionCheckbox({
-        questionNumber: this.questionNumberFocus,
-        choiceNumber,
-      }),
-    )
+    return this.screenQueryHelper.getIsFixedPositionCheckbox({
+      choiceNumber,
+    })
   }
 
   clickCorrectAnswer({ choiceNumber }: { choiceNumber: number }) {
@@ -131,12 +121,9 @@ class UIServiceInteractor {
   }
 
   getCorrectAnswerCheckbox({ choiceNumber }: { choiceNumber: number }) {
-    return screen.getByLabelText(
-      QuestionSetEditorAriaLabel.isCorrectAnswerCheckbox({
-        questionNumber: this.questionNumberFocus,
-        choiceNumber,
-      }),
-    )
+    return this.screenQueryHelper.getCorrectAnswerCheckbox({
+      choiceNumber,
+    })
   }
 
   clickRemoveChoice({ choiceNumber }: { choiceNumber: number }) {
@@ -145,8 +132,7 @@ class UIServiceInteractor {
   }
 
   clickAddChoice() {
-    const addChoiceButtons = screen.getAllByText('Add Choice')
-    fireEvent.click(addChoiceButtons[this.questionNumberFocus - 1])
+    fireEvent.click(this.screenQueryHelper.getAddChoiceButton())
     return this
   }
 
@@ -163,6 +149,60 @@ class UIServiceInteractor {
   clickSave() {
     fireEvent.click(screen.getByText('Save'))
     return this
+  }
+
+  queryRemoveQuestionButton() {
+    return this.screenQueryHelper.queryRemoveQuestionButton()
+  }
+
+  queryRemoveChoiceButton({ choiceNumber }: { choiceNumber: number }) {
+    return this.screenQueryHelper.queryRemoveChoiceButton({
+      choiceNumber,
+    })
+  }
+}
+
+class ScreenQueryHelper {
+  private questionNumberFocus = 1
+
+  setQuestionNumberFocus(questionNumber: number) {
+    this.questionNumberFocus = questionNumber
+  }
+
+  getQuestionDescriptionInput() {
+    return screen.getByLabelText(`Question ${this.questionNumberFocus}:`)
+  }
+
+  getAnswerInput({ choiceNumber }: { choiceNumber: number }) {
+    return screen.getByLabelText(
+      QuestionSetEditorAriaLabel.answerInput({
+        questionNumber: this.questionNumberFocus,
+        choiceNumber,
+      }),
+    )
+  }
+
+  getIsFixedPositionCheckbox({ choiceNumber }: { choiceNumber: number }) {
+    return screen.getByLabelText(
+      QuestionSetEditorAriaLabel.isFixedPositionCheckbox({
+        questionNumber: this.questionNumberFocus,
+        choiceNumber,
+      }),
+    )
+  }
+
+  getCorrectAnswerCheckbox({ choiceNumber }: { choiceNumber: number }) {
+    return screen.getByLabelText(
+      QuestionSetEditorAriaLabel.isCorrectAnswerCheckbox({
+        questionNumber: this.questionNumberFocus,
+        choiceNumber,
+      }),
+    )
+  }
+
+  getAddChoiceButton() {
+    const addChoiceButtons = screen.getAllByText('Add Choice')
+    return addChoiceButtons[this.questionNumberFocus - 1]
   }
 
   queryRemoveQuestionButton() {
