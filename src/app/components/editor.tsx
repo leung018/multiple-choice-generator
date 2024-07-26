@@ -250,15 +250,12 @@ function QuestionSetEditor({
     }
   }, [fetchQuestionSet])
 
-  const handleQuestionUpdate = (
-    questionId: number,
-    questionUpdater: (oldQuestion: QuestionInput) => QuestionInput,
-  ) => {
+  const handleQuestionUpdate = (newQuestion: QuestionInput) => {
     setQuestionSetInput({
       ...questionSetInput,
       questions: questionSetInput.questions.map((oldQuestion) => {
-        if (oldQuestion.id === questionId) {
-          return questionUpdater(oldQuestion)
+        if (oldQuestion.id === newQuestion.id) {
+          return newQuestion
         }
         return oldQuestion
       }),
@@ -420,7 +417,7 @@ function QuestionSetEditor({
                 handleQuestionRemove(question.id)
               }}
               onQuestionUpdate={(newQuestion) => {
-                handleQuestionUpdate(question.id, (_) => newQuestion)
+                handleQuestionUpdate(newQuestion)
               }}
               showRemoveButton={questionSetInput.questions.length > 1}
             />
