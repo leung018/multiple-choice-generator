@@ -83,10 +83,6 @@ class UIServiceInteractor {
     return this
   }
 
-  getQuestionDescriptionInput() {
-    return this.screenQueryHelper.getQuestionDescriptionInput()
-  }
-
   inputAnswer({
     choiceNumber,
     answer,
@@ -94,40 +90,30 @@ class UIServiceInteractor {
     choiceNumber: number
     answer: string
   }) {
-    fireEvent.change(this.getAnswerInput({ choiceNumber }), {
+    fireEvent.change(this.screenQueryHelper.getAnswerInput({ choiceNumber }), {
       target: { value: answer },
     })
     return this
   }
 
-  getAnswerInput({ choiceNumber }: { choiceNumber: number }) {
-    return this.screenQueryHelper.getAnswerInput({ choiceNumber })
-  }
-
   clickFixedPosition({ choiceNumber }: { choiceNumber: number }) {
-    fireEvent.click(this.getIsFixedPositionCheckbox({ choiceNumber }))
+    fireEvent.click(
+      this.screenQueryHelper.getIsFixedPositionCheckbox({ choiceNumber }),
+    )
     return this
-  }
-
-  getIsFixedPositionCheckbox({ choiceNumber }: { choiceNumber: number }) {
-    return this.screenQueryHelper.getIsFixedPositionCheckbox({
-      choiceNumber,
-    })
   }
 
   clickCorrectAnswer({ choiceNumber }: { choiceNumber: number }) {
-    fireEvent.click(this.getCorrectAnswerCheckbox({ choiceNumber }))
+    fireEvent.click(
+      this.screenQueryHelper.getCorrectAnswerCheckbox({ choiceNumber }),
+    )
     return this
   }
 
-  getCorrectAnswerCheckbox({ choiceNumber }: { choiceNumber: number }) {
-    return this.screenQueryHelper.getCorrectAnswerCheckbox({
-      choiceNumber,
-    })
-  }
-
   clickRemoveChoice({ choiceNumber }: { choiceNumber: number }) {
-    fireEvent.click(this.queryRemoveChoiceButton({ choiceNumber })!)
+    fireEvent.click(
+      this.screenQueryHelper.queryRemoveChoiceButton({ choiceNumber })!,
+    )
     return this
   }
 
@@ -137,7 +123,7 @@ class UIServiceInteractor {
   }
 
   clickRemoveQuestion() {
-    fireEvent.click(this.queryRemoveQuestionButton()!)
+    fireEvent.click(this.screenQueryHelper.queryRemoveQuestionButton()!)
     return this
   }
 
@@ -149,16 +135,6 @@ class UIServiceInteractor {
   clickSave() {
     fireEvent.click(screen.getByText('Save'))
     return this
-  }
-
-  queryRemoveQuestionButton() {
-    return this.screenQueryHelper.queryRemoveQuestionButton()
-  }
-
-  queryRemoveChoiceButton({ choiceNumber }: { choiceNumber: number }) {
-    return this.screenQueryHelper.queryRemoveChoiceButton({
-      choiceNumber,
-    })
   }
 }
 
@@ -413,14 +389,16 @@ describe('QuestionSetEditor', () => {
     expect(actualQuestionSet.questions[0].mc.correctChoiceIndex).toBe(1)
 
     // also check that the UI is updated correctly
+    const screenQueryHelper = new ScreenQueryHelper()
+    screenQueryHelper.setQuestionNumberFocus(1)
     expect(
-      interactor.getCorrectAnswerCheckbox({ choiceNumber: 2 }),
+      screenQueryHelper.getCorrectAnswerCheckbox({ choiceNumber: 2 }),
     ).toBeChecked()
     expect(
-      interactor.getCorrectAnswerCheckbox({ choiceNumber: 1 }),
+      screenQueryHelper.getCorrectAnswerCheckbox({ choiceNumber: 1 }),
     ).not.toBeChecked()
     expect(
-      interactor.getCorrectAnswerCheckbox({ choiceNumber: 3 }),
+      screenQueryHelper.getCorrectAnswerCheckbox({ choiceNumber: 3 }),
     ).not.toBeChecked()
   })
 
@@ -610,24 +588,26 @@ describe('QuestionSetEditor', () => {
 
     interactor.clickAddQuestion()
 
-    interactor.setQuestionNumberFocus(1)
-    expect(interactor.queryRemoveQuestionButton()).toBeInTheDocument()
+    const screenQueryHelper = new ScreenQueryHelper()
+    screenQueryHelper.setQuestionNumberFocus(1)
+    expect(screenQueryHelper.queryRemoveQuestionButton()).toBeInTheDocument()
 
     interactor.setQuestionNumberFocus(2)
-    expect(interactor.queryRemoveQuestionButton()).toBeInTheDocument()
+    expect(screenQueryHelper.queryRemoveQuestionButton()).toBeInTheDocument()
   })
 
   it('should hide remove question button when there is only one question', () => {
     const interactor = new UIServiceInteractor()
     interactor.renderCreationPage()
 
-    interactor.setQuestionNumberFocus(1)
-    expect(interactor.queryRemoveQuestionButton()).toBeNull()
+    const screenQueryHelper = new ScreenQueryHelper()
+    screenQueryHelper.setQuestionNumberFocus(1)
+    expect(screenQueryHelper.queryRemoveQuestionButton()).toBeNull()
 
     interactor.clickAddQuestion()
     interactor.clickRemoveQuestion()
 
-    expect(interactor.queryRemoveQuestionButton()).toBeNull()
+    expect(screenQueryHelper.queryRemoveQuestionButton()).toBeNull()
   })
 
   it('should remove targeted question by clicking remove question button', () => {
@@ -655,14 +635,16 @@ describe('QuestionSetEditor', () => {
 
     interactor.setQuestionNumberFocus(1).clickAddChoice()
 
+    const screenQueryHelper = new ScreenQueryHelper()
+    screenQueryHelper.setQuestionNumberFocus(1)
     expect(
-      interactor.queryRemoveChoiceButton({ choiceNumber: 1 }),
+      screenQueryHelper.queryRemoveChoiceButton({ choiceNumber: 1 }),
     ).toBeInTheDocument()
     expect(
-      interactor.queryRemoveChoiceButton({ choiceNumber: 2 }),
+      screenQueryHelper.queryRemoveChoiceButton({ choiceNumber: 2 }),
     ).toBeInTheDocument()
     expect(
-      interactor.queryRemoveChoiceButton({ choiceNumber: 3 }),
+      screenQueryHelper.queryRemoveChoiceButton({ choiceNumber: 3 }),
     ).toBeInTheDocument()
   })
 
@@ -670,16 +652,29 @@ describe('QuestionSetEditor', () => {
     const interactor = new UIServiceInteractor()
     interactor.renderCreationPage()
 
-    interactor.setQuestionNumberFocus(1)
-    expect(interactor.queryRemoveChoiceButton({ choiceNumber: 1 })).toBeNull()
-    expect(interactor.queryRemoveChoiceButton({ choiceNumber: 2 })).toBeNull()
+    const screenQueryHelper = new ScreenQueryHelper()
+    screenQueryHelper.setQuestionNumberFocus(1)
 
+    expect(
+      screenQueryHelper.queryRemoveChoiceButton({ choiceNumber: 1 }),
+    ).toBeNull()
+    expect(
+      screenQueryHelper.queryRemoveChoiceButton({ choiceNumber: 2 }),
+    ).toBeNull()
+
+    interactor.setQuestionNumberFocus(1)
     interactor.clickAddChoice()
     interactor.clickRemoveChoice({ choiceNumber: 1 })
 
-    expect(interactor.queryRemoveChoiceButton({ choiceNumber: 1 })).toBeNull()
-    expect(interactor.queryRemoveChoiceButton({ choiceNumber: 2 })).toBeNull()
-    expect(interactor.queryRemoveChoiceButton({ choiceNumber: 3 })).toBeNull()
+    expect(
+      screenQueryHelper.queryRemoveChoiceButton({ choiceNumber: 1 }),
+    ).toBeNull()
+    expect(
+      screenQueryHelper.queryRemoveChoiceButton({ choiceNumber: 2 }),
+    ).toBeNull()
+    expect(
+      screenQueryHelper.queryRemoveChoiceButton({ choiceNumber: 3 }),
+    ).toBeNull()
   })
 
   it('should remove targeted choice by clicking nearby remove choice button', () => {
@@ -734,42 +729,44 @@ describe('QuestionSetEditor', () => {
       'Hello World',
     )
 
-    interactor.setQuestionNumberFocus(1)
-    expect(interactor.getQuestionDescriptionInput()).toHaveDisplayValue(
+    const screenQueryHelper = new ScreenQueryHelper()
+    screenQueryHelper.setQuestionNumberFocus(1)
+
+    expect(screenQueryHelper.getQuestionDescriptionInput()).toHaveDisplayValue(
       'Which one is larger than 1.1?',
     )
 
     // Choice 1
-    expect(interactor.getAnswerInput({ choiceNumber: 1 })).toHaveDisplayValue(
-      '1',
-    )
     expect(
-      interactor.getCorrectAnswerCheckbox({ choiceNumber: 1 }),
+      screenQueryHelper.getAnswerInput({ choiceNumber: 1 }),
+    ).toHaveDisplayValue('1')
+    expect(
+      screenQueryHelper.getCorrectAnswerCheckbox({ choiceNumber: 1 }),
     ).not.toBeChecked()
     expect(
-      interactor.getIsFixedPositionCheckbox({ choiceNumber: 1 }),
+      screenQueryHelper.getIsFixedPositionCheckbox({ choiceNumber: 1 }),
     ).not.toBeChecked()
 
     // Choice 2
-    expect(interactor.getAnswerInput({ choiceNumber: 2 })).toHaveDisplayValue(
-      '2',
-    )
     expect(
-      interactor.getCorrectAnswerCheckbox({ choiceNumber: 2 }),
+      screenQueryHelper.getAnswerInput({ choiceNumber: 2 }),
+    ).toHaveDisplayValue('2')
+    expect(
+      screenQueryHelper.getCorrectAnswerCheckbox({ choiceNumber: 2 }),
     ).toBeChecked()
     expect(
-      interactor.getIsFixedPositionCheckbox({ choiceNumber: 2 }),
+      screenQueryHelper.getIsFixedPositionCheckbox({ choiceNumber: 2 }),
     ).not.toBeChecked()
 
     // Choice 3
-    expect(interactor.getAnswerInput({ choiceNumber: 3 })).toHaveDisplayValue(
-      'All of the above',
-    )
     expect(
-      interactor.getCorrectAnswerCheckbox({ choiceNumber: 3 }),
+      screenQueryHelper.getAnswerInput({ choiceNumber: 3 }),
+    ).toHaveDisplayValue('All of the above')
+    expect(
+      screenQueryHelper.getCorrectAnswerCheckbox({ choiceNumber: 3 }),
     ).not.toBeChecked()
     expect(
-      interactor.getIsFixedPositionCheckbox({ choiceNumber: 3 }),
+      screenQueryHelper.getIsFixedPositionCheckbox({ choiceNumber: 3 }),
     ).toBeChecked()
   })
 
