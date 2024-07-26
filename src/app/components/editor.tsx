@@ -411,12 +411,11 @@ function QuestionSetEditor({
         </div>
 
         {questionSetInput.questions.map((question, questionIndex) => {
-          const questionNumber = questionIndex + 1
           return (
             <QuestionEditor
               key={question.id}
               question={question}
-              questionNumber={questionNumber}
+              questionNumber={questionIndex + 1}
               onQuestionRemove={() => {
                 handleQuestionRemove(question.id)
               }}
