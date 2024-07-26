@@ -798,6 +798,51 @@ describe('QuestionSetEditor', () => {
       updatedQuestionSet,
     )
   })
+
+  it('should able to delete the existing question set', () => {
+    const questionSetRepo = LocalStorageQuestionSetRepo.createNull()
+    const questionSet = new QuestionSetBuilderForTest().build()
+    questionSetRepo.upsertQuestionSet(questionSet)
+
+    const interactor = new UIServiceInteractor({
+      questionSetRepo,
+    })
+    interactor.renderModifyingPage(questionSet.id)
+
+    fireEvent.click(screen.getByText('Delete'))
+    fireEvent.click(
+      screen.getByRole('button', {
+        name: 'Confirm',
+      }),
+    )
+
+    expect(questionSetRepo.getQuestionSets()).toEqual([])
+  })
+
+  it('should able to cancel the waiting for confirm action of delete', () => {
+    const questionSetRepo = LocalStorageQuestionSetRepo.createNull()
+    const questionSet = new QuestionSetBuilderForTest().build()
+    questionSetRepo.upsertQuestionSet(questionSet)
+
+    const interactor = new UIServiceInteractor({ questionSetRepo })
+    interactor.renderModifyingPage(questionSet.id)
+
+    fireEvent.click(screen.getByText('Delete'))
+    fireEvent.click(
+      screen.getByRole('button', {
+        name: 'Cancel',
+      }),
+    )
+
+    expect(screen.queryByRole('button', { name: 'Confirm' })).toBeNull()
+  })
+
+  it('should hide delete button in creation page', () => {
+    const interactor = new UIServiceInteractor()
+    interactor.renderCreationPage()
+
+    expect(screen.queryByRole('button', { name: 'Delete' })).toBeNull()
+  })
 })
 
 function expectCannotCreateQuestionSet({
