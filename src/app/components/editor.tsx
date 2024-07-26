@@ -566,13 +566,15 @@ function QuestionEditor({
   )
 }
 
-function ChoicesEditor(props: {
+function ChoicesEditor({
+  questionNumber,
+  choices,
+  onChoicesUpdate,
+}: {
   questionNumber: number
   choices: ChoiceInput[]
   onChoicesUpdate: (choices: ChoiceInput[]) => void
 }) {
-  const { choices, questionNumber, onChoicesUpdate } = props
-
   const handleInternalChoiceUpdate = (
     choiceId: number,
     choiceUpdate: Partial<ChoiceInput>,
