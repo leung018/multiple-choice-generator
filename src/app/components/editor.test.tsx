@@ -132,6 +132,29 @@ class UIServiceInteractor {
     fireEvent.click(screen.getByText('Save'))
     return this
   }
+
+  clickDelete() {
+    fireEvent.click(screen.getByText('Delete'))
+    return this
+  }
+
+  clickConfirmDelete() {
+    fireEvent.click(
+      screen.getByRole('button', {
+        name: 'Confirm',
+      }),
+    )
+    return this
+  }
+
+  clickCancelDelete() {
+    fireEvent.click(
+      screen.getByRole('button', {
+        name: 'Cancel',
+      }),
+    )
+    return this
+  }
 }
 
 class QuestionComponentQueryHelper {
@@ -832,12 +855,7 @@ describe('QuestionSetEditor', () => {
     })
     interactor.renderModifyingPage(questionSet.id)
 
-    fireEvent.click(screen.getByText('Delete'))
-    fireEvent.click(
-      screen.getByRole('button', {
-        name: 'Confirm',
-      }),
-    )
+    interactor.clickDelete().clickConfirmDelete()
 
     expect(questionSetRepo.getQuestionSets()).toEqual([])
   })
@@ -850,12 +868,7 @@ describe('QuestionSetEditor', () => {
     const interactor = new UIServiceInteractor({ questionSetRepo })
     interactor.renderModifyingPage(questionSet.id)
 
-    fireEvent.click(screen.getByText('Delete'))
-    fireEvent.click(
-      screen.getByRole('button', {
-        name: 'Cancel',
-      }),
-    )
+    interactor.clickDelete().clickCancelDelete()
 
     expect(screen.queryByRole('button', { name: 'Confirm' })).toBeNull()
   })
