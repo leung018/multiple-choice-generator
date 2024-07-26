@@ -17,12 +17,10 @@ import {
 class UIServiceInteractor {
   private readonly questionSetRepo: QuestionSetRepo
   private questionSetName: string = ''
-  private questionNumberFocus = 1
+  private queryHelper = new QuestionComponentQueryHelper()
 
   /**
    * Initializes a new instance of UIServiceInteractor, providing methods for rendering the associated UI using `testing-library/react` and interact with it.
-   * Use `setQuestionNumberFocus` to specify the question number before interacting with any UI elements related to a specific question.
-   * Note that querying UI elements unrelated to any specific question is not the responsibility of this class.
    *
    * @param questionSetRepo Repository for storing the submitted question set after it is submitted through this page.
    */
@@ -70,7 +68,7 @@ class UIServiceInteractor {
   }
 
   setQuestionNumberFocus(questionNumber: number) {
-    this.questionNumberFocus = questionNumber
+    this.queryHelper.setQuestionNumberFocus(questionNumber)
     return this
   }
 
@@ -79,14 +77,10 @@ class UIServiceInteractor {
   }
 
   inputQuestionDescription(description: string) {
-    fireEvent.change(this.getQuestionDescriptionInput(), {
+    fireEvent.change(this.queryHelper.getQuestionDescriptionInput(), {
       target: { value: description },
     })
     return this
-  }
-
-  getQuestionDescriptionInput() {
-    return screen.getByLabelText(`Question ${this.questionNumberFocus}:`)
   }
 
   inputAnswer({
@@ -96,62 +90,36 @@ class UIServiceInteractor {
     choiceNumber: number
     answer: string
   }) {
-    fireEvent.change(this.getAnswerInput({ choiceNumber }), {
+    fireEvent.change(this.queryHelper.getAnswerInput({ choiceNumber }), {
       target: { value: answer },
     })
     return this
   }
 
-  getAnswerInput({ choiceNumber }: { choiceNumber: number }) {
-    return screen.getByLabelText(
-      QuestionSetEditorAriaLabel.answerInput({
-        questionNumber: this.questionNumberFocus,
-        choiceNumber,
-      }),
-    )
-  }
-
   clickFixedPosition({ choiceNumber }: { choiceNumber: number }) {
-    fireEvent.click(this.getIsFixedPositionCheckbox({ choiceNumber }))
-    return this
-  }
-
-  getIsFixedPositionCheckbox({ choiceNumber }: { choiceNumber: number }) {
-    return screen.getByLabelText(
-      QuestionSetEditorAriaLabel.isFixedPositionCheckbox({
-        questionNumber: this.questionNumberFocus,
-        choiceNumber,
-      }),
+    fireEvent.click(
+      this.queryHelper.getIsFixedPositionCheckbox({ choiceNumber }),
     )
+    return this
   }
 
   clickCorrectAnswer({ choiceNumber }: { choiceNumber: number }) {
-    fireEvent.click(this.getCorrectAnswerCheckbox({ choiceNumber }))
+    fireEvent.click(this.queryHelper.getCorrectAnswerCheckbox({ choiceNumber }))
     return this
   }
 
-  getCorrectAnswerCheckbox({ choiceNumber }: { choiceNumber: number }) {
-    return screen.getByLabelText(
-      QuestionSetEditorAriaLabel.isCorrectAnswerCheckbox({
-        questionNumber: this.questionNumberFocus,
-        choiceNumber,
-      }),
-    )
-  }
-
   clickRemoveChoice({ choiceNumber }: { choiceNumber: number }) {
-    fireEvent.click(this.queryRemoveChoiceButton({ choiceNumber })!)
+    fireEvent.click(this.queryHelper.queryRemoveChoiceButton({ choiceNumber })!)
     return this
   }
 
   clickAddChoice() {
-    const addChoiceButtons = screen.getAllByText('Add Choice')
-    fireEvent.click(addChoiceButtons[this.questionNumberFocus - 1])
+    fireEvent.click(this.queryHelper.getAddChoiceButton())
     return this
   }
 
   clickRemoveQuestion() {
-    fireEvent.click(this.queryRemoveQuestionButton()!)
+    fireEvent.click(this.queryHelper.queryRemoveQuestionButton()!)
     return this
   }
 
@@ -163,6 +131,73 @@ class UIServiceInteractor {
   clickSave() {
     fireEvent.click(screen.getByText('Save'))
     return this
+  }
+
+  clickDelete() {
+    fireEvent.click(screen.getByText('Delete'))
+    return this
+  }
+
+  clickConfirmDelete() {
+    fireEvent.click(
+      screen.getByRole('button', {
+        name: 'Confirm',
+      }),
+    )
+    return this
+  }
+
+  clickCancelDelete() {
+    fireEvent.click(
+      screen.getByRole('button', {
+        name: 'Cancel',
+      }),
+    )
+    return this
+  }
+}
+
+class QuestionComponentQueryHelper {
+  private questionNumberFocus = 1
+
+  setQuestionNumberFocus(questionNumber: number) {
+    this.questionNumberFocus = questionNumber
+  }
+
+  getQuestionDescriptionInput() {
+    return screen.getByLabelText(`Question ${this.questionNumberFocus}:`)
+  }
+
+  getAnswerInput({ choiceNumber }: { choiceNumber: number }) {
+    return screen.getByLabelText(
+      QuestionSetEditorAriaLabel.answerInput({
+        questionNumber: this.questionNumberFocus,
+        choiceNumber,
+      }),
+    )
+  }
+
+  getIsFixedPositionCheckbox({ choiceNumber }: { choiceNumber: number }) {
+    return screen.getByLabelText(
+      QuestionSetEditorAriaLabel.isFixedPositionCheckbox({
+        questionNumber: this.questionNumberFocus,
+        choiceNumber,
+      }),
+    )
+  }
+
+  getCorrectAnswerCheckbox({ choiceNumber }: { choiceNumber: number }) {
+    return screen.getByLabelText(
+      QuestionSetEditorAriaLabel.isCorrectAnswerCheckbox({
+        questionNumber: this.questionNumberFocus,
+        choiceNumber,
+      }),
+    )
+  }
+
+  getAddChoiceButton() {
+    const addChoiceButtons = screen.getAllByText('Add Choice')
+    return addChoiceButtons[this.questionNumberFocus - 1]
   }
 
   queryRemoveQuestionButton() {
@@ -373,14 +408,16 @@ describe('QuestionSetEditor', () => {
     expect(actualQuestionSet.questions[0].mc.correctChoiceIndex).toBe(1)
 
     // also check that the UI is updated correctly
+    const queryHelper = new QuestionComponentQueryHelper()
+    queryHelper.setQuestionNumberFocus(1)
     expect(
-      interactor.getCorrectAnswerCheckbox({ choiceNumber: 2 }),
+      queryHelper.getCorrectAnswerCheckbox({ choiceNumber: 2 }),
     ).toBeChecked()
     expect(
-      interactor.getCorrectAnswerCheckbox({ choiceNumber: 1 }),
+      queryHelper.getCorrectAnswerCheckbox({ choiceNumber: 1 }),
     ).not.toBeChecked()
     expect(
-      interactor.getCorrectAnswerCheckbox({ choiceNumber: 3 }),
+      queryHelper.getCorrectAnswerCheckbox({ choiceNumber: 3 }),
     ).not.toBeChecked()
   })
 
@@ -570,24 +607,26 @@ describe('QuestionSetEditor', () => {
 
     interactor.clickAddQuestion()
 
-    interactor.setQuestionNumberFocus(1)
-    expect(interactor.queryRemoveQuestionButton()).toBeInTheDocument()
+    const queryHelper = new QuestionComponentQueryHelper()
+    queryHelper.setQuestionNumberFocus(1)
+    expect(queryHelper.queryRemoveQuestionButton()).toBeInTheDocument()
 
     interactor.setQuestionNumberFocus(2)
-    expect(interactor.queryRemoveQuestionButton()).toBeInTheDocument()
+    expect(queryHelper.queryRemoveQuestionButton()).toBeInTheDocument()
   })
 
   it('should hide remove question button when there is only one question', () => {
     const interactor = new UIServiceInteractor()
     interactor.renderCreationPage()
 
-    interactor.setQuestionNumberFocus(1)
-    expect(interactor.queryRemoveQuestionButton()).toBeNull()
+    const queryHelper = new QuestionComponentQueryHelper()
+    queryHelper.setQuestionNumberFocus(1)
+    expect(queryHelper.queryRemoveQuestionButton()).toBeNull()
 
     interactor.clickAddQuestion()
     interactor.clickRemoveQuestion()
 
-    expect(interactor.queryRemoveQuestionButton()).toBeNull()
+    expect(queryHelper.queryRemoveQuestionButton()).toBeNull()
   })
 
   it('should remove targeted question by clicking remove question button', () => {
@@ -615,14 +654,16 @@ describe('QuestionSetEditor', () => {
 
     interactor.setQuestionNumberFocus(1).clickAddChoice()
 
+    const queryHelper = new QuestionComponentQueryHelper()
+    queryHelper.setQuestionNumberFocus(1)
     expect(
-      interactor.queryRemoveChoiceButton({ choiceNumber: 1 }),
+      queryHelper.queryRemoveChoiceButton({ choiceNumber: 1 }),
     ).toBeInTheDocument()
     expect(
-      interactor.queryRemoveChoiceButton({ choiceNumber: 2 }),
+      queryHelper.queryRemoveChoiceButton({ choiceNumber: 2 }),
     ).toBeInTheDocument()
     expect(
-      interactor.queryRemoveChoiceButton({ choiceNumber: 3 }),
+      queryHelper.queryRemoveChoiceButton({ choiceNumber: 3 }),
     ).toBeInTheDocument()
   })
 
@@ -630,16 +671,19 @@ describe('QuestionSetEditor', () => {
     const interactor = new UIServiceInteractor()
     interactor.renderCreationPage()
 
-    interactor.setQuestionNumberFocus(1)
-    expect(interactor.queryRemoveChoiceButton({ choiceNumber: 1 })).toBeNull()
-    expect(interactor.queryRemoveChoiceButton({ choiceNumber: 2 })).toBeNull()
+    const queryHelper = new QuestionComponentQueryHelper()
+    queryHelper.setQuestionNumberFocus(1)
 
+    expect(queryHelper.queryRemoveChoiceButton({ choiceNumber: 1 })).toBeNull()
+    expect(queryHelper.queryRemoveChoiceButton({ choiceNumber: 2 })).toBeNull()
+
+    interactor.setQuestionNumberFocus(1)
     interactor.clickAddChoice()
     interactor.clickRemoveChoice({ choiceNumber: 1 })
 
-    expect(interactor.queryRemoveChoiceButton({ choiceNumber: 1 })).toBeNull()
-    expect(interactor.queryRemoveChoiceButton({ choiceNumber: 2 })).toBeNull()
-    expect(interactor.queryRemoveChoiceButton({ choiceNumber: 3 })).toBeNull()
+    expect(queryHelper.queryRemoveChoiceButton({ choiceNumber: 1 })).toBeNull()
+    expect(queryHelper.queryRemoveChoiceButton({ choiceNumber: 2 })).toBeNull()
+    expect(queryHelper.queryRemoveChoiceButton({ choiceNumber: 3 })).toBeNull()
   })
 
   it('should remove targeted choice by clicking nearby remove choice button', () => {
@@ -694,42 +738,44 @@ describe('QuestionSetEditor', () => {
       'Hello World',
     )
 
-    interactor.setQuestionNumberFocus(1)
-    expect(interactor.getQuestionDescriptionInput()).toHaveDisplayValue(
+    const queryHelper = new QuestionComponentQueryHelper()
+    queryHelper.setQuestionNumberFocus(1)
+
+    expect(queryHelper.getQuestionDescriptionInput()).toHaveDisplayValue(
       'Which one is larger than 1.1?',
     )
 
     // Choice 1
-    expect(interactor.getAnswerInput({ choiceNumber: 1 })).toHaveDisplayValue(
+    expect(queryHelper.getAnswerInput({ choiceNumber: 1 })).toHaveDisplayValue(
       '1',
     )
     expect(
-      interactor.getCorrectAnswerCheckbox({ choiceNumber: 1 }),
+      queryHelper.getCorrectAnswerCheckbox({ choiceNumber: 1 }),
     ).not.toBeChecked()
     expect(
-      interactor.getIsFixedPositionCheckbox({ choiceNumber: 1 }),
+      queryHelper.getIsFixedPositionCheckbox({ choiceNumber: 1 }),
     ).not.toBeChecked()
 
     // Choice 2
-    expect(interactor.getAnswerInput({ choiceNumber: 2 })).toHaveDisplayValue(
+    expect(queryHelper.getAnswerInput({ choiceNumber: 2 })).toHaveDisplayValue(
       '2',
     )
     expect(
-      interactor.getCorrectAnswerCheckbox({ choiceNumber: 2 }),
+      queryHelper.getCorrectAnswerCheckbox({ choiceNumber: 2 }),
     ).toBeChecked()
     expect(
-      interactor.getIsFixedPositionCheckbox({ choiceNumber: 2 }),
+      queryHelper.getIsFixedPositionCheckbox({ choiceNumber: 2 }),
     ).not.toBeChecked()
 
     // Choice 3
-    expect(interactor.getAnswerInput({ choiceNumber: 3 })).toHaveDisplayValue(
+    expect(queryHelper.getAnswerInput({ choiceNumber: 3 })).toHaveDisplayValue(
       'All of the above',
     )
     expect(
-      interactor.getCorrectAnswerCheckbox({ choiceNumber: 3 }),
+      queryHelper.getCorrectAnswerCheckbox({ choiceNumber: 3 }),
     ).not.toBeChecked()
     expect(
-      interactor.getIsFixedPositionCheckbox({ choiceNumber: 3 }),
+      queryHelper.getIsFixedPositionCheckbox({ choiceNumber: 3 }),
     ).toBeChecked()
   })
 
@@ -809,12 +855,7 @@ describe('QuestionSetEditor', () => {
     })
     interactor.renderModifyingPage(questionSet.id)
 
-    fireEvent.click(screen.getByText('Delete'))
-    fireEvent.click(
-      screen.getByRole('button', {
-        name: 'Confirm',
-      }),
-    )
+    interactor.clickDelete().clickConfirmDelete()
 
     expect(questionSetRepo.getQuestionSets()).toEqual([])
   })
@@ -827,12 +868,7 @@ describe('QuestionSetEditor', () => {
     const interactor = new UIServiceInteractor({ questionSetRepo })
     interactor.renderModifyingPage(questionSet.id)
 
-    fireEvent.click(screen.getByText('Delete'))
-    fireEvent.click(
-      screen.getByRole('button', {
-        name: 'Cancel',
-      }),
-    )
+    interactor.clickDelete().clickCancelDelete()
 
     expect(screen.queryByRole('button', { name: 'Confirm' })).toBeNull()
   })
