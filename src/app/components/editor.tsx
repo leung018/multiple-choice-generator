@@ -413,51 +413,18 @@ function QuestionSetEditor({
         {questionSetInput.questions.map((question, questionIndex) => {
           const questionNumber = questionIndex + 1
           return (
-            <div
+            <QuestionEditor
               key={question.id}
-              className="mb-8 border border-2 border-gray-300 p-4 relative"
-            >
-              {questionSetInput.questions.length > 1 && (
-                <button
-                  type="button"
-                  className="absolute top-2 right-2 bg-transparent text-2xl text-red-500 hover:text-red-700"
-                  aria-label={QuestionSetEditorAriaLabel.removeQuestionButton(
-                    questionNumber,
-                  )}
-                  onClick={() => {
-                    handleQuestionRemove(question.id)
-                  }}
-                >
-                  ×
-                </button>
-              )}
-              <label>
-                <h2 className="text-lg font-bold mb-2">
-                  Question {questionNumber}:
-                </h2>
-                <input
-                  type="text"
-                  className="border border-gray-300 px-2 py-1 w-full"
-                  value={question.description}
-                  onChange={(e) => {
-                    handleQuestionUpdate(question.id, (oldQuestion) => ({
-                      ...oldQuestion,
-                      description: e.target.value,
-                    }))
-                  }}
-                />
-              </label>
-              <ChoicesEditor
-                questionNumber={questionNumber}
-                choices={question.choices}
-                onChoicesUpdate={(choices) => {
-                  handleQuestionUpdate(question.id, (oldQuestion) => ({
-                    ...oldQuestion,
-                    choices,
-                  }))
-                }}
-              />
-            </div>
+              question={question}
+              questionNumber={questionNumber}
+              onQuestionRemove={() => {
+                handleQuestionRemove(question.id)
+              }}
+              onQuestionUpdate={(newQuestion) => {
+                handleQuestionUpdate(question.id, (_) => newQuestion)
+              }}
+              showRemoveButton={questionSetInput.questions.length > 1}
+            />
           )
         })}
         <button
@@ -538,6 +505,63 @@ function ConfirmDeleteDiaLog({
           </button>
         </div>
       </div>
+    </div>
+  )
+}
+
+function QuestionEditor({
+  questionNumber,
+  question,
+  showRemoveButton: displayRemoveButton,
+  onQuestionRemove,
+  onQuestionUpdate,
+}: {
+  questionNumber: number
+  question: QuestionInput
+  showRemoveButton: boolean
+  onQuestionRemove: () => void
+  onQuestionUpdate: (newQuestion: QuestionInput) => void
+}) {
+  return (
+    <div className="mb-8 border border-2 border-gray-300 p-4 relative">
+      {displayRemoveButton && (
+        <button
+          type="button"
+          className="absolute top-2 right-2 bg-transparent text-2xl text-red-500 hover:text-red-700"
+          aria-label={QuestionSetEditorAriaLabel.removeQuestionButton(
+            questionNumber,
+          )}
+          onClick={() => {
+            onQuestionRemove()
+          }}
+        >
+          ×
+        </button>
+      )}
+      <label>
+        <h2 className="text-lg font-bold mb-2">Question {questionNumber}:</h2>
+        <input
+          type="text"
+          className="border border-gray-300 px-2 py-1 w-full"
+          value={question.description}
+          onChange={(e) => {
+            onQuestionUpdate({
+              ...question,
+              description: e.target.value,
+            })
+          }}
+        />
+      </label>
+      <ChoicesEditor
+        questionNumber={questionNumber}
+        choices={question.choices}
+        onChoicesUpdate={(choices) => {
+          onQuestionUpdate({
+            ...question,
+            choices,
+          })
+        }}
+      />
     </div>
   )
 }
