@@ -217,6 +217,87 @@ const mapMultipleChoiceToChoiceInputs = (mc: MultipleChoice): ChoiceInput[] => {
   )
 }
 
+const buildQuestionSet = (
+  questionSetInput: QuestionSetInput,
+  questionSetId: string,
+): OperationResult<QuestionSet> => {
+  if (questionSetInput.name === '') {
+    return { error: "Question set name can't be empty" }
+  }
+
+  // build Questions
+  const questions: Question[] = []
+  for (let i = 0; i < questionSetInput.questions.length; i++) {
+    const questionInput = questionSetInput.questions[i]
+    const questionNumber = i + 1
+
+    const response = buildQuestion(questionInput, questionNumber)
+    if ('error' in response) {
+      return {
+        error: response.error,
+      }
+    }
+
+    questions.push(response.result)
+  }
+
+  return {
+    result: QuestionSet.create({
+      name: questionSetInput.name,
+      questions,
+      id: questionSetId,
+    }),
+  }
+}
+
+const buildQuestion = (
+  input: QuestionInput,
+  questionNumber: number,
+): OperationResult<Question> => {
+  if (input.description === '') {
+    return {
+      error: `Question ${questionNumber}: description can't be empty`,
+    }
+  }
+
+  if (input.choices.filter((choice) => choice.answer === '').length > 0) {
+    return { error: `Question ${questionNumber}: answer can't be empty` }
+  }
+
+  const mcBuilder = new MultipleChoiceBuilder()
+  input.choices.forEach((choice, choiceIndex) => {
+    mcBuilder.appendChoice({
+      answer: choice.answer,
+      isFixedPosition: choice.isFixedPosition,
+    })
+    if (choice.isCorrect) {
+      mcBuilder.setCorrectChoiceIndex(choiceIndex)
+    }
+  })
+
+  try {
+    const mc = mcBuilder.build()
+    return {
+      result: {
+        description: input.description,
+        mc,
+      },
+    }
+  } catch (e) {
+    if (e instanceof MultipleChoiceError) {
+      if (e.cause.code === 'DUPLICATE_CHOICES') {
+        return { error: `Question ${questionNumber}: duplicate answer` }
+      }
+      if (e.cause.code === 'INVALID_CORRECT_CHOICE_INDEX') {
+        return {
+          error: `Question ${questionNumber}: please select one correct choice`,
+        }
+      }
+    }
+    throw e
+  }
+}
+
 function QuestionSetEditor({
   saveQuestionSet,
   fetchQuestionSet,
@@ -283,91 +364,14 @@ function QuestionSetEditor({
   }
 
   const saveChanges = (): OperationResult => {
-    const response = buildQuestionSet(questionSetInput)
+    const response = buildQuestionSet(
+      questionSetInput,
+      questionSetIdRef.current,
+    )
     if ('error' in response) {
       return response
     }
     return saveQuestionSet(response.result)
-  }
-
-  const buildQuestionSet = (
-    questionSetInput: QuestionSetInput,
-  ): OperationResult<QuestionSet> => {
-    if (questionSetInput.name === '') {
-      return { error: "Question set name can't be empty" }
-    }
-
-    // build Questions
-    const questions: Question[] = []
-    for (let i = 0; i < questionSetInput.questions.length; i++) {
-      const questionInput = questionSetInput.questions[i]
-      const questionNumber = i + 1
-
-      const response = buildQuestion(questionInput, questionNumber)
-      if ('error' in response) {
-        return {
-          error: response.error,
-        }
-      }
-
-      questions.push(response.result)
-    }
-
-    return {
-      result: QuestionSet.create({
-        name: questionSetInput.name,
-        questions,
-        id: questionSetIdRef.current,
-      }),
-    }
-  }
-
-  const buildQuestion = (
-    input: QuestionInput,
-    questionNumber: number,
-  ): OperationResult<Question> => {
-    if (input.description === '') {
-      return {
-        error: `Question ${questionNumber}: description can't be empty`,
-      }
-    }
-
-    if (input.choices.filter((choice) => choice.answer === '').length > 0) {
-      return { error: `Question ${questionNumber}: answer can't be empty` }
-    }
-
-    const mcBuilder = new MultipleChoiceBuilder()
-    input.choices.forEach((choice, choiceIndex) => {
-      mcBuilder.appendChoice({
-        answer: choice.answer,
-        isFixedPosition: choice.isFixedPosition,
-      })
-      if (choice.isCorrect) {
-        mcBuilder.setCorrectChoiceIndex(choiceIndex)
-      }
-    })
-
-    try {
-      const mc = mcBuilder.build()
-      return {
-        result: {
-          description: input.description,
-          mc,
-        },
-      }
-    } catch (e) {
-      if (e instanceof MultipleChoiceError) {
-        if (e.cause.code === 'DUPLICATE_CHOICES') {
-          return { error: `Question ${questionNumber}: duplicate answer` }
-        }
-        if (e.cause.code === 'INVALID_CORRECT_CHOICE_INDEX') {
-          return {
-            error: `Question ${questionNumber}: please select one correct choice`,
-          }
-        }
-      }
-      throw e
-    }
   }
 
   if (isNotFound) {
