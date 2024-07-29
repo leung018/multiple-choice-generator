@@ -48,9 +48,16 @@ export class MultipleChoiceQuizUIService {
   getElement() {
     return (
       <MultipleChoiceQuiz
-        fetchQuestionSet={() =>
-          this.questionSetRepo.getQuestionSetById(this.questionSetId)
-        }
+        fetchQuestionSet={() => {
+          try {
+            return this.questionSetRepo.getQuestionSetById(this.questionSetId)
+          } catch (e) {
+            if (e instanceof GetQuestionSetError) {
+              return null
+            }
+            throw e
+          }
+        }}
         onSubmit={(questionSet) => {
           this.questionSetRepo.upsertQuestionSet(
             questionSet.newSwappedChoicesQuestionSet(),
@@ -65,7 +72,7 @@ function MultipleChoiceQuiz({
   fetchQuestionSet,
   onSubmit,
 }: {
-  fetchQuestionSet: () => QuestionSet
+  fetchQuestionSet: () => QuestionSet | null
   onSubmit: (questionSet: QuestionSet) => void
 }) {
   const [isLoading, setLoading] = useState(true)
@@ -81,20 +88,14 @@ function MultipleChoiceQuiz({
   const [score, setScore] = useState<number | null>(null)
 
   useEffect(() => {
-    try {
-      const questionSet = fetchQuestionSet()
-      setQuestionSet(questionSet)
-      setLoading(false)
-    } catch (e) {
-      if (
-        e instanceof GetQuestionSetError &&
-        e.cause.code === 'QUESTION_SET_NOT_FOUND'
-      ) {
-        setNotFound(true)
-        return
-      }
-      throw e
+    const questionSet = fetchQuestionSet()
+    if (questionSet === null) {
+      setNotFound(true)
+      return
     }
+
+    setQuestionSet(questionSet)
+    setLoading(false)
   }, [fetchQuestionSet])
 
   const [questionToCheckedChoiceMap, setCheckedChoice] = useState<
