@@ -115,9 +115,16 @@ export class QuestionSetEditorUIService {
     return (
       <QuestionSetEditor
         saveQuestionSet={this.saveQuestionSet}
-        fetchQuestionSet={() =>
-          this.questionSetRepo.getQuestionSetById(questionSetId)
-        }
+        fetchQuestionSet={() => {
+          try {
+            return this.questionSetRepo.getQuestionSetById(questionSetId)
+          } catch (e) {
+            if (e instanceof GetQuestionSetError) {
+              return null
+            }
+            throw e
+          }
+        }}
         deleteQuestionSet={(id) => this.questionSetRepo.deleteQuestionSet(id)}
       />
     )
@@ -210,12 +217,93 @@ const mapMultipleChoiceToChoiceInputs = (mc: MultipleChoice): ChoiceInput[] => {
   )
 }
 
+const buildQuestionSet = (
+  questionSetInput: QuestionSetInput,
+  questionSetId: string,
+): OperationResult<QuestionSet> => {
+  if (questionSetInput.name === '') {
+    return { error: "Question set name can't be empty" }
+  }
+
+  // build Questions
+  const questions: Question[] = []
+  for (let i = 0; i < questionSetInput.questions.length; i++) {
+    const questionInput = questionSetInput.questions[i]
+    const questionNumber = i + 1
+
+    const response = buildQuestion(questionInput, questionNumber)
+    if ('error' in response) {
+      return {
+        error: response.error,
+      }
+    }
+
+    questions.push(response.result)
+  }
+
+  return {
+    result: QuestionSet.create({
+      name: questionSetInput.name,
+      questions,
+      id: questionSetId,
+    }),
+  }
+}
+
+const buildQuestion = (
+  input: QuestionInput,
+  questionNumber: number,
+): OperationResult<Question> => {
+  if (input.description === '') {
+    return {
+      error: `Question ${questionNumber}: description can't be empty`,
+    }
+  }
+
+  if (input.choices.filter((choice) => choice.answer === '').length > 0) {
+    return { error: `Question ${questionNumber}: answer can't be empty` }
+  }
+
+  const mcBuilder = new MultipleChoiceBuilder()
+  input.choices.forEach((choice, choiceIndex) => {
+    mcBuilder.appendChoice({
+      answer: choice.answer,
+      isFixedPosition: choice.isFixedPosition,
+    })
+    if (choice.isCorrect) {
+      mcBuilder.setCorrectChoiceIndex(choiceIndex)
+    }
+  })
+
+  try {
+    const mc = mcBuilder.build()
+    return {
+      result: {
+        description: input.description,
+        mc,
+      },
+    }
+  } catch (e) {
+    if (e instanceof MultipleChoiceError) {
+      if (e.cause.code === 'DUPLICATE_CHOICES') {
+        return { error: `Question ${questionNumber}: duplicate answer` }
+      }
+      if (e.cause.code === 'INVALID_CORRECT_CHOICE_INDEX') {
+        return {
+          error: `Question ${questionNumber}: please select one correct choice`,
+        }
+      }
+    }
+    throw e
+  }
+}
+
 function QuestionSetEditor({
   saveQuestionSet,
   fetchQuestionSet,
   deleteQuestionSet,
 }: {
-  fetchQuestionSet: () => QuestionSet
+  fetchQuestionSet: () => QuestionSet | null
   saveQuestionSet: (questionSet: QuestionSet) => OperationResult
   deleteQuestionSet?: (questionSetId: string) => void
 }) {
@@ -233,32 +321,23 @@ function QuestionSetEditor({
   const [isConfirmDelete, setIsConfirmDelete] = useState<boolean>(false)
 
   useEffect(() => {
-    try {
-      const questionSet = fetchQuestionSet()
-      questionSetIdRef.current = questionSet.id
-      setQuestionSetInput(mapQuestionSetToQuestionSetInput(questionSet))
-      setLoading(false)
-    } catch (e) {
-      if (
-        e instanceof GetQuestionSetError &&
-        e.cause.code === 'QUESTION_SET_NOT_FOUND'
-      ) {
-        setNotFound(true)
-        return
-      }
-      throw e
+    const questionSet = fetchQuestionSet()
+    if (questionSet == null) {
+      setNotFound(true)
+      return
     }
+
+    questionSetIdRef.current = questionSet.id
+    setQuestionSetInput(mapQuestionSetToQuestionSetInput(questionSet))
+    setLoading(false)
   }, [fetchQuestionSet])
 
-  const handleQuestionUpdate = (
-    questionId: number,
-    questionUpdater: (oldQuestion: QuestionInput) => QuestionInput,
-  ) => {
+  const handleQuestionUpdate = (newQuestion: QuestionInput) => {
     setQuestionSetInput({
       ...questionSetInput,
       questions: questionSetInput.questions.map((oldQuestion) => {
-        if (oldQuestion.id === questionId) {
-          return questionUpdater(oldQuestion)
+        if (oldQuestion.id === newQuestion.id) {
+          return newQuestion
         }
         return oldQuestion
       }),
@@ -285,91 +364,14 @@ function QuestionSetEditor({
   }
 
   const saveChanges = (): OperationResult => {
-    const response = buildQuestionSet(questionSetInput)
+    const response = buildQuestionSet(
+      questionSetInput,
+      questionSetIdRef.current,
+    )
     if ('error' in response) {
       return response
     }
     return saveQuestionSet(response.result)
-  }
-
-  const buildQuestionSet = (
-    questionSetInput: QuestionSetInput,
-  ): OperationResult<QuestionSet> => {
-    if (questionSetInput.name === '') {
-      return { error: "Question set name can't be empty" }
-    }
-
-    // build Questions
-    const questions: Question[] = []
-    for (let i = 0; i < questionSetInput.questions.length; i++) {
-      const questionInput = questionSetInput.questions[i]
-      const questionNumber = i + 1
-
-      const response = buildQuestion(questionInput, questionNumber)
-      if ('error' in response) {
-        return {
-          error: response.error,
-        }
-      }
-
-      questions.push(response.result)
-    }
-
-    return {
-      result: QuestionSet.create({
-        name: questionSetInput.name,
-        questions,
-        id: questionSetIdRef.current,
-      }),
-    }
-  }
-
-  const buildQuestion = (
-    input: QuestionInput,
-    questionNumber: number,
-  ): OperationResult<Question> => {
-    if (input.description === '') {
-      return {
-        error: `Question ${questionNumber}: description can't be empty`,
-      }
-    }
-
-    if (input.choices.filter((choice) => choice.answer === '').length > 0) {
-      return { error: `Question ${questionNumber}: answer can't be empty` }
-    }
-
-    const mcBuilder = new MultipleChoiceBuilder()
-    input.choices.forEach((choice, choiceIndex) => {
-      mcBuilder.appendChoice({
-        answer: choice.answer,
-        isFixedPosition: choice.isFixedPosition,
-      })
-      if (choice.isCorrect) {
-        mcBuilder.setCorrectChoiceIndex(choiceIndex)
-      }
-    })
-
-    try {
-      const mc = mcBuilder.build()
-      return {
-        result: {
-          description: input.description,
-          mc,
-        },
-      }
-    } catch (e) {
-      if (e instanceof MultipleChoiceError) {
-        if (e.cause.code === 'DUPLICATE_CHOICES') {
-          return { error: `Question ${questionNumber}: duplicate answer` }
-        }
-        if (e.cause.code === 'INVALID_CORRECT_CHOICE_INDEX') {
-          return {
-            error: `Question ${questionNumber}: please select one correct choice`,
-          }
-        }
-      }
-      throw e
-    }
   }
 
   if (isNotFound) {
@@ -411,53 +413,19 @@ function QuestionSetEditor({
         </div>
 
         {questionSetInput.questions.map((question, questionIndex) => {
-          const questionNumber = questionIndex + 1
           return (
-            <div
+            <QuestionEditor
               key={question.id}
-              className="mb-8 border border-2 border-gray-300 p-4 relative"
-            >
-              {questionSetInput.questions.length > 1 && (
-                <button
-                  type="button"
-                  className="absolute top-2 right-2 bg-transparent text-2xl text-red-500 hover:text-red-700"
-                  aria-label={QuestionSetEditorAriaLabel.removeQuestionButton(
-                    questionNumber,
-                  )}
-                  onClick={() => {
-                    handleQuestionRemove(question.id)
-                  }}
-                >
-                  ×
-                </button>
-              )}
-              <label>
-                <h2 className="text-lg font-bold mb-2">
-                  Question {questionNumber}:
-                </h2>
-                <input
-                  type="text"
-                  className="border border-gray-300 px-2 py-1 w-full"
-                  value={question.description}
-                  onChange={(e) => {
-                    handleQuestionUpdate(question.id, (oldQuestion) => ({
-                      ...oldQuestion,
-                      description: e.target.value,
-                    }))
-                  }}
-                />
-              </label>
-              <ChoicesEditor
-                questionNumber={questionNumber}
-                choices={question.choices}
-                onChoicesUpdate={(choices) => {
-                  handleQuestionUpdate(question.id, (oldQuestion) => ({
-                    ...oldQuestion,
-                    choices,
-                  }))
-                }}
-              />
-            </div>
+              question={question}
+              questionNumber={questionIndex + 1}
+              onQuestionRemove={() => {
+                handleQuestionRemove(question.id)
+              }}
+              onQuestionUpdate={(newQuestion) => {
+                handleQuestionUpdate(newQuestion)
+              }}
+              showRemoveButton={questionSetInput.questions.length > 1}
+            />
           )
         })}
         <button
@@ -542,13 +510,72 @@ function ConfirmDeleteDiaLog({
   )
 }
 
-function ChoicesEditor(props: {
+function QuestionEditor({
+  questionNumber,
+  question,
+  showRemoveButton: displayRemoveButton,
+  onQuestionRemove,
+  onQuestionUpdate,
+}: {
+  questionNumber: number
+  question: QuestionInput
+  showRemoveButton: boolean
+  onQuestionRemove: () => void
+  onQuestionUpdate: (newQuestion: QuestionInput) => void
+}) {
+  return (
+    <div className="mb-8 border border-2 border-gray-300 p-4 relative">
+      {displayRemoveButton && (
+        <button
+          type="button"
+          className="absolute top-2 right-2 bg-transparent text-2xl text-red-500 hover:text-red-700"
+          aria-label={QuestionSetEditorAriaLabel.removeQuestionButton(
+            questionNumber,
+          )}
+          onClick={() => {
+            onQuestionRemove()
+          }}
+        >
+          ×
+        </button>
+      )}
+      <label>
+        <h2 className="text-lg font-bold mb-2">Question {questionNumber}:</h2>
+        <input
+          type="text"
+          className="border border-gray-300 px-2 py-1 w-full"
+          value={question.description}
+          onChange={(e) => {
+            onQuestionUpdate({
+              ...question,
+              description: e.target.value,
+            })
+          }}
+        />
+      </label>
+      <ChoicesEditor
+        questionNumber={questionNumber}
+        choices={question.choices}
+        onChoicesUpdate={(choices) => {
+          onQuestionUpdate({
+            ...question,
+            choices,
+          })
+        }}
+      />
+    </div>
+  )
+}
+
+function ChoicesEditor({
+  questionNumber,
+  choices,
+  onChoicesUpdate,
+}: {
   questionNumber: number
   choices: ChoiceInput[]
   onChoicesUpdate: (choices: ChoiceInput[]) => void
 }) {
-  const { choices, questionNumber, onChoicesUpdate } = props
-
   const handleInternalChoiceUpdate = (
     choiceId: number,
     choiceUpdate: Partial<ChoiceInput>,
