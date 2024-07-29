@@ -9,7 +9,6 @@ import {
 } from '../../repo/question_set'
 import LoadingSpinner from './loading'
 import Error from 'next/error'
-import { useRouter } from 'next/navigation'
 
 export class MultipleChoiceQuizUIService {
   static create({ questionSetId }: { questionSetId: string }) {
@@ -69,7 +68,6 @@ function MultipleChoiceQuiz({
   fetchQuestionSet: () => QuestionSet
   onSubmit: (questionSet: QuestionSet) => void
 }) {
-  const router = useRouter()
   const [isLoading, setLoading] = useState(true)
   const [isNotFound, setNotFound] = useState(false)
 
