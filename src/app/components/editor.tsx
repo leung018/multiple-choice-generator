@@ -115,9 +115,16 @@ export class QuestionSetEditorUIService {
     return (
       <QuestionSetEditor
         saveQuestionSet={this.saveQuestionSet}
-        fetchQuestionSet={() =>
-          this.questionSetRepo.getQuestionSetById(questionSetId)
-        }
+        fetchQuestionSet={() => {
+          try {
+            return this.questionSetRepo.getQuestionSetById(questionSetId)
+          } catch (e) {
+            if (e instanceof GetQuestionSetError) {
+              return null
+            }
+            throw e
+          }
+        }}
         deleteQuestionSet={(id) => this.questionSetRepo.deleteQuestionSet(id)}
       />
     )
@@ -215,7 +222,7 @@ function QuestionSetEditor({
   fetchQuestionSet,
   deleteQuestionSet,
 }: {
-  fetchQuestionSet: () => QuestionSet
+  fetchQuestionSet: () => QuestionSet | null
   saveQuestionSet: (questionSet: QuestionSet) => OperationResult
   deleteQuestionSet?: (questionSetId: string) => void
 }) {
@@ -233,21 +240,15 @@ function QuestionSetEditor({
   const [isConfirmDelete, setIsConfirmDelete] = useState<boolean>(false)
 
   useEffect(() => {
-    try {
-      const questionSet = fetchQuestionSet()
-      questionSetIdRef.current = questionSet.id
-      setQuestionSetInput(mapQuestionSetToQuestionSetInput(questionSet))
-      setLoading(false)
-    } catch (e) {
-      if (
-        e instanceof GetQuestionSetError &&
-        e.cause.code === 'QUESTION_SET_NOT_FOUND'
-      ) {
-        setNotFound(true)
-        return
-      }
-      throw e
+    const questionSet = fetchQuestionSet()
+    if (questionSet == null) {
+      setNotFound(true)
+      return
     }
+
+    questionSetIdRef.current = questionSet.id
+    setQuestionSetInput(mapQuestionSetToQuestionSetInput(questionSet))
+    setLoading(false)
   }, [fetchQuestionSet])
 
   const handleQuestionUpdate = (newQuestion: QuestionInput) => {
