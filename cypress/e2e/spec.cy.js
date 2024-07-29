@@ -77,15 +77,11 @@ describe('End to end tests', () => {
     cy.contains('Edited name')
   })
 
-  it('should allow navigate to home page after submitted quiz', () => {
-    createQuestionSet({ cy })
-
+  it('should navigate back to home page after clicking home button', () => {
     cy.visit('/')
-    cy.contains('Take Quiz').click()
+    cy.contains('Add New Question Set').click()
 
-    // Do the quiz
-    cy.contains('Submit').click()
-    cy.contains('Back').click()
+    cy.contains('Home').click()
 
     assertIsInHomePage(cy)
   })
