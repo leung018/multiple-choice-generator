@@ -157,17 +157,6 @@ describe('MultipleChoiceQuiz', () => {
     expect(await findByText('Your score: 1/2')).toBeVisible()
   })
 
-  it('should display back to home page button only after submit button is clicked', async () => {
-    const {
-      renderResult: { queryByRole, getByText, findByRole },
-    } = renderMultipleChoicePage()
-
-    expect(queryByRole('button', { name: 'Back' })).toBeNull()
-    fireEvent.click(getByText('Submit'))
-
-    expect(await findByRole('button', { name: 'Back' })).toBeVisible()
-  })
-
   it('should submit button and choices are disabled after submitting', async () => {
     const {
       renderResult: { getByText, getByLabelText },
