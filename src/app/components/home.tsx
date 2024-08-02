@@ -6,8 +6,7 @@ import {
   QuestionSetRepo,
   LocalStorageQuestionSetRepo,
 } from '../../repo/question_set'
-import { useEffect, useState } from 'react'
-import LoadingSpinner from './loading'
+import { DataLoader } from './container'
 
 export class HomePageUIService {
   static create() {
@@ -41,29 +40,23 @@ export class HomePageUIService {
   }
 
   getElement() {
-    return <HomePage fetchQuestionSets={this.getSortedQuestionSets}></HomePage>
+    return (
+      <DataLoader
+        fetchAction={this.getSortedQuestionSets}
+        render={(questionSets) => {
+          return <HomePage questionSets={questionSets}></HomePage>
+        }}
+      />
+    )
   }
 }
 
 function HomePage({
-  fetchQuestionSets,
+  questionSets,
 }: {
-  fetchQuestionSets: () => ReadonlyArray<QuestionSet>
+  questionSets: ReadonlyArray<QuestionSet>
 }) {
   const router = useRouter()
-  const [isLoading, setLoading] = useState(true)
-
-  const [questionSets, setQuestionSets] = useState<ReadonlyArray<QuestionSet>>(
-    [],
-  )
-  useEffect(() => {
-    setQuestionSets(fetchQuestionSets())
-    setLoading(false)
-  }, [fetchQuestionSets])
-
-  if (isLoading) {
-    return <LoadingSpinner />
-  }
 
   return (
     <div className="p-4">
