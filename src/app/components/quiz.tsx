@@ -65,7 +65,7 @@ export class MultipleChoiceQuizUIService {
           return (
             <MultipleChoiceQuiz
               questionSet={questionSet}
-              onSubmit={(questionSet) => {
+              onSubmit={() => {
                 this.questionSetRepo.upsertQuestionSet(
                   questionSet.newSwappedChoicesQuestionSet(),
                 )
@@ -83,7 +83,7 @@ function MultipleChoiceQuiz({
   onSubmit,
 }: {
   questionSet: QuestionSet
-  onSubmit: (questionSet: QuestionSet) => void
+  onSubmit: () => void
 }) {
   const [score, setScore] = useState<number | null>(null)
 
@@ -99,7 +99,7 @@ function MultipleChoiceQuiz({
 
   const handleSubmit = () => {
     setScore(calculateScore())
-    onSubmit(questionSet)
+    onSubmit()
   }
 
   const isSubmitted = () => score !== null
