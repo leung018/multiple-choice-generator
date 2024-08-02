@@ -396,6 +396,12 @@ function QuestionSetEditor({
             />
           </label>
         </div>
+        <p className="mb-3">
+          Each time you play the quiz, the system may swap the order of the
+          choices for each question. For each choice in the question, if you
+          check <b>Fixed Position</b>, it won&apos;t be swapped. This is helpful
+          if you want to create a choice like &apos;None of the above&apos;.
+        </p>
 
         {questionSetInput.questions.map((question, questionIndex) => {
           return (
