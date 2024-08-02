@@ -1,14 +1,14 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { Question, QuestionSet } from '../../model/question_set'
 import {
   GetQuestionSetError,
   QuestionSetRepo,
   LocalStorageQuestionSetRepo,
 } from '../../repo/question_set'
-import LoadingSpinner from './loading'
 import Error from 'next/error'
+import { DataLoader } from './container'
 
 export class MultipleChoiceQuizUIService {
   static create({ questionSetId }: { questionSetId: string }) {
@@ -47,8 +47,8 @@ export class MultipleChoiceQuizUIService {
 
   getElement() {
     return (
-      <MultipleChoiceQuiz
-        fetchQuestionSet={() => {
+      <DataLoader
+        fetchAction={() => {
           try {
             return this.questionSetRepo.getQuestionSetById(this.questionSetId)
           } catch (e) {
@@ -58,45 +58,34 @@ export class MultipleChoiceQuizUIService {
             throw e
           }
         }}
-        onSubmit={(questionSet) => {
-          this.questionSetRepo.upsertQuestionSet(
-            questionSet.newSwappedChoicesQuestionSet(),
+        render={(questionSet: QuestionSet | null) => {
+          if (questionSet === null) {
+            return <Error statusCode={404} />
+          }
+          return (
+            <MultipleChoiceQuiz
+              questionSet={questionSet}
+              onSubmit={(questionSet) => {
+                this.questionSetRepo.upsertQuestionSet(
+                  questionSet.newSwappedChoicesQuestionSet(),
+                )
+              }}
+            />
           )
         }}
-      ></MultipleChoiceQuiz>
+      />
     )
   }
 }
 
 function MultipleChoiceQuiz({
-  fetchQuestionSet,
+  questionSet,
   onSubmit,
 }: {
-  fetchQuestionSet: () => QuestionSet | null
+  questionSet: QuestionSet
   onSubmit: (questionSet: QuestionSet) => void
 }) {
-  const [isLoading, setLoading] = useState(true)
-  const [isNotFound, setNotFound] = useState(false)
-
-  const [questionSet, setQuestionSet] = useState<QuestionSet>(
-    QuestionSet.create({
-      id: '',
-      name: '',
-      questions: [],
-    }),
-  )
   const [score, setScore] = useState<number | null>(null)
-
-  useEffect(() => {
-    const questionSet = fetchQuestionSet()
-    if (questionSet === null) {
-      setNotFound(true)
-      return
-    }
-
-    setQuestionSet(questionSet)
-    setLoading(false)
-  }, [fetchQuestionSet])
 
   const [questionToCheckedChoiceMap, setCheckedChoice] = useState<
     Map<number, number>
@@ -126,14 +115,6 @@ function MultipleChoiceQuiz({
       }
     })
     return score
-  }
-
-  if (isNotFound) {
-    return <Error statusCode={404} />
-  }
-
-  if (isLoading) {
-    return <LoadingSpinner />
   }
 
   return (
