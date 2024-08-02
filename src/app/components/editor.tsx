@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
+import { useState } from 'react'
 import {
   QuestionSetRepo,
   LocalStorageQuestionSetRepo,
@@ -15,7 +15,7 @@ import {
 } from '../../model/mc'
 import { useRouter } from 'next/navigation'
 import Error from 'next/error'
-import LoadingSpinner from './loading'
+import { DataLoader } from './container'
 
 export class QuestionSetEditorAriaLabel {
   // If update of labels in this class, may need also to update e2e test
@@ -106,16 +106,15 @@ export class QuestionSetEditorUIService {
     return (
       <QuestionSetEditor
         saveQuestionSet={this.saveQuestionSet}
-        fetchQuestionSet={() => QuestionSet.create({ name: '', questions: [] })}
+        originalQuestionSet={QuestionSet.create({ name: '', questions: [] })}
       />
     )
   }
 
   getModifyingPageElement(questionSetId: string) {
     return (
-      <QuestionSetEditor
-        saveQuestionSet={this.saveQuestionSet}
-        fetchQuestionSet={() => {
+      <DataLoader
+        fetchAction={() => {
           try {
             return this.questionSetRepo.getQuestionSetById(questionSetId)
           } catch (e) {
@@ -125,7 +124,21 @@ export class QuestionSetEditorUIService {
             throw e
           }
         }}
-        deleteQuestionSet={(id) => this.questionSetRepo.deleteQuestionSet(id)}
+        render={(questionSet) => {
+          if (!questionSet) {
+            return <Error statusCode={404} />
+          }
+
+          return (
+            <QuestionSetEditor
+              saveQuestionSet={this.saveQuestionSet}
+              originalQuestionSet={questionSet}
+              deleteQuestionSet={(id) =>
+                this.questionSetRepo.deleteQuestionSet(id)
+              }
+            />
+          )
+        }}
       />
     )
   }
@@ -299,38 +312,21 @@ const buildQuestion = (
 }
 
 function QuestionSetEditor({
+  originalQuestionSet,
   saveQuestionSet,
-  fetchQuestionSet,
   deleteQuestionSet,
 }: {
-  fetchQuestionSet: () => QuestionSet | null
+  originalQuestionSet: QuestionSet
   saveQuestionSet: (questionSet: QuestionSet) => OperationResult
   deleteQuestionSet?: (questionSetId: string) => void
 }) {
   const router = useRouter()
-  const [isLoading, setLoading] = useState(true)
-  const [isNotFound, setNotFound] = useState(false)
 
-  const questionSetIdRef = useRef<string>('')
-
-  const [questionSetInput, setQuestionSetInput] = useState<QuestionSetInput>({
-    name: '',
-    questions: [],
-  })
+  const [questionSetInput, setQuestionSetInput] = useState<QuestionSetInput>(
+    mapQuestionSetToQuestionSetInput(originalQuestionSet),
+  )
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
   const [isConfirmDelete, setIsConfirmDelete] = useState<boolean>(false)
-
-  useEffect(() => {
-    const questionSet = fetchQuestionSet()
-    if (questionSet == null) {
-      setNotFound(true)
-      return
-    }
-
-    questionSetIdRef.current = questionSet.id
-    setQuestionSetInput(mapQuestionSetToQuestionSetInput(questionSet))
-    setLoading(false)
-  }, [fetchQuestionSet])
 
   const handleQuestionUpdate = (newQuestion: QuestionInput) => {
     setQuestionSetInput({
@@ -364,22 +360,11 @@ function QuestionSetEditor({
   }
 
   const saveChanges = (): OperationResult => {
-    const response = buildQuestionSet(
-      questionSetInput,
-      questionSetIdRef.current,
-    )
+    const response = buildQuestionSet(questionSetInput, originalQuestionSet.id)
     if ('error' in response) {
       return response
     }
     return saveQuestionSet(response.result)
-  }
-
-  if (isNotFound) {
-    return <Error statusCode={404} />
-  }
-
-  if (isLoading) {
-    return <LoadingSpinner />
   }
 
   return (
@@ -387,7 +372,7 @@ function QuestionSetEditor({
       {isConfirmDelete &&
         ConfirmDeleteDiaLog({
           onConfirm: () => {
-            deleteQuestionSet!(questionSetIdRef.current)
+            deleteQuestionSet!(originalQuestionSet.id)
             router.push('/')
           },
           onCancel: () => {
