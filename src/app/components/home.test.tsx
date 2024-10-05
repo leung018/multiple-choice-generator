@@ -6,6 +6,7 @@ import { render } from '@testing-library/react'
 import '@testing-library/jest-dom'
 import { HomePageUIService } from './home'
 import { LocalStorageQuestionSetRepo } from '../../repo/question_set'
+import { assertIsBefore } from '../../test_utils/assert/is_before'
 
 describe('HomePage', () => {
   // Detail of testing of the navigation of this page should be in larger scope tests like e2e tests
@@ -34,15 +35,9 @@ describe('HomePage', () => {
     const durian = getByText('durian')
     const orange = getByText('Orange')
 
-    expect(apple.compareDocumentPosition(banana)).toBe(
-      Node.DOCUMENT_POSITION_FOLLOWING,
-    )
-    expect(banana.compareDocumentPosition(durian)).toBe(
-      Node.DOCUMENT_POSITION_FOLLOWING,
-    )
-    expect(durian.compareDocumentPosition(orange)).toBe(
-      Node.DOCUMENT_POSITION_FOLLOWING,
-    )
+    assertIsBefore(apple, banana)
+    assertIsBefore(banana, durian)
+    assertIsBefore(durian, orange)
   })
 })
 
