@@ -238,7 +238,7 @@ describe('MultipleChoiceQuiz', () => {
     )
   })
 
-  it('should display getCurrentPlayQuestions of questionSet if they are different from its original questions', async () => {
+  it('should display swapped questionSet', async () => {
     const questionSet = new QuestionSetBuilderForTest()
       .appendQuestion({
         mc: new MultipleChoiceBuilder()
@@ -252,7 +252,7 @@ describe('MultipleChoiceQuiz', () => {
     const {
       renderResult: { getByLabelText },
     } = renderMultipleChoicePage({
-      questionSet: questionSet.newSwappedChoicesQuestionSet(),
+      questionSet: questionSet.newSwappedChoicesQuestionSet(), // The swapped choices question set has different getCurrentPlayQuestions from the original one
     })
 
     // Choices are swapped in the page
