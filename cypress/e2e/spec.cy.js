@@ -48,9 +48,7 @@ describe('End to end tests', () => {
 
     cy.findByText('Answer 1').then(($el1) => {
       cy.findByText('Answer 2').then(($el2) => {
-        expect($el2[0].compareDocumentPosition($el1[0])).to.eq(
-          Node.DOCUMENT_POSITION_FOLLOWING,
-        )
+        assertIsBefore($el2[0], $el1[0])
       })
     })
   })
@@ -101,6 +99,13 @@ describe('End to end tests', () => {
 
 function assertIsInHomePage(cy) {
   cy.contains('Add New Question Set')
+}
+
+// TODO: Copy from the main codebase, can't figure out how to import it here yet
+function assertIsBefore(aHtmlElement, bHtmlElement) {
+  expect(aHtmlElement.compareDocumentPosition(bHtmlElement)).to.eq(
+    Node.DOCUMENT_POSITION_FOLLOWING,
+  )
 }
 
 /**

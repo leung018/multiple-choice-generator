@@ -7,6 +7,7 @@ import {
   QuestionSet,
 } from '../../model/question_set'
 import { LocalStorageQuestionSetRepo } from '../../repo/question_set'
+import { assertIsBefore } from '../../test_utils/assert/is_before'
 
 describe('MultipleChoiceQuiz', () => {
   const presetCorrectChoiceMcBuilder = () => {
@@ -237,7 +238,7 @@ describe('MultipleChoiceQuiz', () => {
     )
   })
 
-  it('should display getCurrentPlayQuestions of questionSet if they are different from its original questions', async () => {
+  it('should display swapped questionSet', async () => {
     const questionSet = new QuestionSetBuilderForTest()
       .appendQuestion({
         mc: new MultipleChoiceBuilder()
@@ -251,15 +252,13 @@ describe('MultipleChoiceQuiz', () => {
     const {
       renderResult: { getByLabelText },
     } = renderMultipleChoicePage({
-      questionSet: questionSet.newSwappedChoicesQuestionSet(),
+      questionSet: questionSet.newSwappedChoicesQuestionSet(), // The swapped choices question set has different getCurrentPlayQuestions from the original one
     })
 
     // Choices are swapped in the page
     const choice1 = getByLabelText('Question 1 Choice 1 (Correct)')
     const choice2 = getByLabelText('Question 1 Choice 2')
-    expect(choice2.compareDocumentPosition(choice1)).toBe(
-      Node.DOCUMENT_POSITION_FOLLOWING,
-    )
+    assertIsBefore(choice2, choice1)
   })
 })
 
