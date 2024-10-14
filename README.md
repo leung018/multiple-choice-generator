@@ -4,6 +4,18 @@
 
 This project aims to develop a web application prototype that allows users to play previously saved multiple-choice questions, with the choices generated in a different order each time they play. The project also focuses on incorporating standard engineering practices such as **automated testing**, **continuous integration**, **continuous deployment**, and maintaining descriptive changes through **small pull requests** and **focused commits**.
 
+## How to Run
+
+### Prerequisites
+
+- Node.js: I use v18 and if you use nvm, you can run `nvm use` to switch to that version.
+- Yarn: Follow the instructions [here](https://yarnpkg.com/getting-started/install) for how to enabling Yarn if you haven't.
+
+### Steps
+
+1. `yarn install` to install dependencies
+2. `yarn dev` to start the development server
+
 ## Feature Summaries
 
 1. **Question Bank Stored in Browser Local Storage**
