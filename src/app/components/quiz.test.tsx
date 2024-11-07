@@ -260,6 +260,29 @@ describe('MultipleChoiceQuiz', () => {
     const choice2 = getByLabelText('Question 1 Choice 2')
     assertIsBefore(choice2, choice1)
   })
+
+  it('should score of playing swapped question set be calculated correctly', async () => {
+    const questionSet = new QuestionSetBuilderForTest()
+      .appendQuestion({
+        mc: new MultipleChoiceBuilder()
+          .setCorrectChoiceIndex(1)
+          .appendNonFixedChoice('Question 1 Choice 1')
+          .appendNonFixedChoice('Question 1 Choice 2 (Correct)')
+          .build(),
+      })
+      .build()
+
+    const {
+      renderResult: { getByText, getByLabelText, findByText },
+    } = renderMultipleChoicePage({
+      questionSet: questionSet.newSwappedChoicesQuestionSet(),
+    })
+
+    fireEvent.click(getByLabelText('Question 1 Choice 1'))
+    fireEvent.click(getByText('Submit'))
+
+    expect(await findByText('Your score: 0/1')).toBeVisible()
+  })
 })
 
 function renderMultipleChoicePage({
