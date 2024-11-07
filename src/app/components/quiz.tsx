@@ -106,7 +106,7 @@ function MultipleChoiceQuiz({
 
   const calculateScore = () => {
     let score = 0
-    questionSet.questions.forEach((question, questionIndex) => {
+    questionSet.getCurrentPlayQuestions().forEach((question, questionIndex) => {
       if (
         question.mc.correctChoiceIndex ===
         questionToCheckedChoiceMap.get(questionIndex)
