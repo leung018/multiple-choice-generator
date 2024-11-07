@@ -64,7 +64,8 @@ export class MultipleChoiceQuizUIService {
           }
           return (
             <MultipleChoiceQuiz
-              questionSet={questionSet}
+              questionSetName={questionSet.name}
+              questions={questionSet.getCurrentPlayQuestions()}
               onSubmit={() => {
                 this.questionSetRepo.upsertQuestionSet(
                   questionSet.newSwappedChoicesQuestionSet(),
@@ -79,10 +80,12 @@ export class MultipleChoiceQuizUIService {
 }
 
 function MultipleChoiceQuiz({
-  questionSet,
+  questionSetName,
+  questions,
   onSubmit,
 }: {
-  questionSet: QuestionSet
+  questionSetName: string
+  questions: ReadonlyArray<Question>
   onSubmit: () => void
 }) {
   const [score, setScore] = useState<number | null>(null)
@@ -106,7 +109,7 @@ function MultipleChoiceQuiz({
 
   const calculateScore = () => {
     let score = 0
-    questionSet.questions.forEach((question, questionIndex) => {
+    questions.forEach((question, questionIndex) => {
       if (
         question.mc.correctChoiceIndex ===
         questionToCheckedChoiceMap.get(questionIndex)
@@ -119,8 +122,8 @@ function MultipleChoiceQuiz({
 
   return (
     <div className="p-4">
-      <h1 className="text-xl font-semibold mb-6">{questionSet.name}</h1>
-      {questionSet.getCurrentPlayQuestions().map((question, questionIndex) => (
+      <h1 className="text-xl font-semibold mb-6">{questionSetName}</h1>
+      {questions.map((question, questionIndex) => (
         <QuestionForm
           key={questionIndex}
           question={question}
@@ -143,7 +146,7 @@ function MultipleChoiceQuiz({
       {isSubmitted() && (
         <div className="mt-4">
           <p className="font-bold">
-            Your score: {score}/{questionSet.questions.length}
+            Your score: {score}/{questions.length}
           </p>
         </div>
       )}
